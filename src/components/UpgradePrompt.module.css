@@ -57,6 +57,13 @@
 }
 .close:active { transform: scale(0.9); }
 
+/* Visual size stays 34px; pads the tap area to 44px (WCAG/Material minimum). */
+.close::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
+
 .icon {
   font-size: 52px;
   margin-bottom: 12px;

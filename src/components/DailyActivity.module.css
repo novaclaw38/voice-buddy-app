@@ -43,7 +43,10 @@
   line-height: 1.4;
 }
 
+/* Visual size stays 22px; the invisible ::before pads the tap area to 44px
+   (WCAG/Material minimum) without disturbing the layout around it. */
 .dismiss {
+  position: relative;
   font-size: 0.75rem;
   color: var(--ink-dim);
   background: rgba(0,0,0,0.06);
@@ -56,4 +59,10 @@
   justify-content: center;
   flex-shrink: 0;
   margin-top: -2px;
+}
+
+.dismiss::before {
+  content: '';
+  position: absolute;
+  inset: -11px;
 }
