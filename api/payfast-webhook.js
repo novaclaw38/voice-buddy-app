@@ -55,8 +55,23 @@ export default async function handler(req, res) {
   const status        = body.payment_status
   const token         = body.token || null
   const amount        = parseFloat(body.amount_gross || '0')
+  const pfPaymentId   = body.pf_payment_id
 
   if (!userId) return res.status(400).end()
+  if (!pfPaymentId) return res.status(400).end()
+
+  // Reject replays of a notification we've already processed.
+  const { error: dedupeErr } = await db
+    .from('payfast_webhook_events')
+    .insert({ pf_payment_id: pfPaymentId })
+  if (dedupeErr) {
+    if (dedupeErr.code === '23505') {
+      // Already processed this pf_payment_id — ack without re-applying it.
+      return res.status(200).end()
+    }
+    console.error('PayFast ITN: dedupe insert failed', dedupeErr)
+    return res.status(500).end()
+  }
 
   // Only amounts we actually request: R0 trial setup, or the R149 recurring charge.
   const ALLOWED_AMOUNTS = [0, 149]

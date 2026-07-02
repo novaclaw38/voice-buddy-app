@@ -1,5 +1,9 @@
 import { getUser, isProMode, isEntitled } from './_auth.js'
 
+const MAX_HISTORY = 17 // 1 system prompt + up to 16 turns, matches client's MAX_HISTORY
+const MAX_MESSAGE_CHARS = 4000
+const MAX_TOKENS_CAP = 800
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
@@ -12,6 +16,19 @@ export default async function handler(req, res) {
   }
 
   const { messages, maxTokens = 300, temperature = 0.85, mode } = req.body
+
+  if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_HISTORY) {
+    return res.status(400).json({ error: { message: 'Invalid messages payload.' } })
+  }
+  for (const m of messages) {
+    if (!m || typeof m.content !== 'string' || m.content.length > MAX_MESSAGE_CHARS ||
+        !['system', 'user', 'assistant'].includes(m.role)) {
+      return res.status(400).json({ error: { message: 'Invalid message payload.' } })
+    }
+  }
+
+  const clampedMaxTokens = Math.min(Math.max(1, Number(maxTokens) || 300), MAX_TOKENS_CAP)
+  const clampedTemperature = Math.min(Math.max(0, Number(temperature) || 0.85), 2)
 
   // Enforce Pro gating server-side — the client cannot be trusted.
   if (isProMode(mode) && !(await isEntitled(user.id))) {
@@ -42,8 +59,8 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: MODELS[i],
           messages,
-          max_tokens: maxTokens,
-          temperature,
+          max_tokens: clampedMaxTokens,
+          temperature: clampedTemperature,
         }),
         signal: ctrl.signal,
       })

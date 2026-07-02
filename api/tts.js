@@ -16,7 +16,8 @@ export default async function handler(req, res) {
   if (!key) return res.status(503).json({ error: 'GOOGLE_TTS_KEY not configured' })
 
   const { text, rate = 0.9, pitch = 0, gender = 'female' } = req.body
-  if (!text) return res.status(400).json({ error: 'text is required' })
+  if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text is required' })
+  if (text.length > 2000) return res.status(400).json({ error: 'text is too long' })
 
   const response = await fetch(
     `https://texttospeech.googleapis.com/v1/text:synthesize?key=${key}`,

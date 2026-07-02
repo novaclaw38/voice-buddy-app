@@ -29,7 +29,9 @@ export async function chatCompletion(messages, options = {}) {
   }
 
   const data = await response.json()
-  return data.choices[0].message.content.trim()
+  const content = data?.choices?.[0]?.message?.content
+  if (typeof content !== 'string') throw new Error('Malformed response from Buddy.')
+  return content.trim()
 }
 
 // Uses a public ping endpoint — no Supabase auth required, just checks the Groq key works.

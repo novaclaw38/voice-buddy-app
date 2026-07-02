@@ -11,10 +11,11 @@ export default function UpgradePrompt({ onClose, session }) {
     try {
       const res = await fetch('/api/payfast-create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
-          userId:    session.user.id,
-          email:     session.user.email,
           firstName: session.user.user_metadata?.full_name?.split(' ')[0] || 'Parent',
         }),
       })
