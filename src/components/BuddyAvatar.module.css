@@ -106,10 +106,39 @@
   50%      { opacity: 1;    transform: scale(1.35); }
 }
 
+/* ── Costume listening accents ── */
+.earPulse { animation: earBlink 0.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes earBlink { from { opacity: 0.2; transform: scale(0.7); } to { opacity: 0.6; transform: scale(1.3); } }
+
+.earTwitch  { animation: twitch 0.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
+.earTwitchR { animation: twitchR 0.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
+@keyframes twitch  { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+@keyframes twitchR { from { transform: rotate(5deg); }  to { transform: rotate(-5deg); } }
+
+.dogEarL { animation: wagL 0.5s ease-in-out infinite alternate; }
+.dogEarR { animation: wagR 0.5s ease-in-out infinite alternate; }
+@keyframes wagL { from { transform: rotate(0deg); } to { transform: rotate(10deg); } }
+@keyframes wagR { from { transform: rotate(0deg); } to { transform: rotate(-10deg); } }
+
+.bunnyEarL { animation: wigL 0.5s ease-in-out infinite alternate; }
+.bunnyEarR { animation: wigR 0.5s ease-in-out infinite alternate; }
+@keyframes wigL { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+@keyframes wigR { from { transform: rotate(5deg); }  to { transform: rotate(-5deg); } }
+
+.antenna { animation: antennaBlink 0.5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes antennaBlink { from { fill: #86efac; transform: scale(1); } to { fill: #fff; transform: scale(1.3); } }
+
+.spike { animation: spikeFlash 0.6s ease-in-out infinite alternate; }
+@keyframes spikeFlash { from { opacity: 0.6; } to { opacity: 1; } }
+
 /* Static thumbnails: no ambient animation. */
 .static .glow,
 .static .bodyGroup,
-.static .face { animation: none; }
+.static .face,
+.static .earPulse, .static .earTwitch, .static .earTwitchR,
+.static .dogEarL, .static .dogEarR,
+.static .bunnyEarL, .static .bunnyEarR,
+.static .antenna, .static .spike { animation: none; }
 
 /* Reduced motion: calm everything. */
 @media (prefers-reduced-motion: reduce) {
@@ -117,5 +146,9 @@
   .bodyGroup,
   .face,
   .spark1, .spark2, .spark3, .spark4,
-  .thinkDot1, .thinkDot2, .thinkDot3 { animation: none; }
+  .thinkDot1, .thinkDot2, .thinkDot3,
+  .earPulse, .earTwitch, .earTwitchR,
+  .dogEarL, .dogEarR,
+  .bunnyEarL, .bunnyEarR,
+  .antenna, .spike { animation: none; }
 }

@@ -1,6 +1,7 @@
 import styles from './BuddyAvatar.module.css'
 import { useMouthLevel } from '../hooks/useMouthLevel.js'
 import { useBuddyLife } from '../hooks/useBuddyLife.js'
+import { Costume } from './BuddyCostumes.jsx'
 
 const STATE_COLORS = {
   idle:      { face: '#7c3aed', glow: '#a855f7' },
@@ -51,7 +52,7 @@ export default function BuddyAvatar({
             character deforms like jelly. */}
         <g className={styles.bodyGroup}>
           {/* Costume behind the body (ears, spikes) — filled in Task 4 */}
-          {/* <Costume type={type} isListening={isListening} /> */}
+          <Costume type={type} isListening={isListening} s={styles} />
 
           {/* Blob body */}
           <path d={BLOB_PATH} className={styles.body} />
