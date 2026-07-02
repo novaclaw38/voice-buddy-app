@@ -1,4 +1,6 @@
 import styles from './BuddyAvatar.module.css'
+import { useMouthLevel } from '../hooks/useMouthLevel.js'
+import { useBuddyLife } from '../hooks/useBuddyLife.js'
 
 const STATE_COLORS = {
   idle:      { face: '#7c3aed', glow: '#a855f7' },
@@ -7,190 +9,119 @@ const STATE_COLORS = {
   thinking:  { face: '#2563eb', glow: '#60a5fa' },
 }
 
-/* ── Per-type head/ear renderers ─────────────────────────────────────── */
+// Pear-ish blob: wider at the bottom so it reads as having weight.
+const BLOB_PATH =
+  'M50 18 C76 18 90 37 90 60 C90 85 73 97 50 97 C27 97 10 85 10 60 C10 37 24 18 50 18 Z'
 
-function BearHead({ c, isListening }) {
-  return (
-    <>
-      <circle cx="22" cy="24" r="18" fill={c} />
-      <circle cx="78" cy="24" r="18" fill={c} />
-      <circle cx="22" cy="24" r="11" fill="rgba(255,190,190,0.45)" />
-      <circle cx="78" cy="24" r="11" fill="rgba(255,190,190,0.45)" />
-      {isListening && (
-        <>
-          <circle cx="22" cy="24" r="5" fill="rgba(255,255,255,0.35)" className={styles.earPulse} />
-          <circle cx="78" cy="24" r="5" fill="rgba(255,255,255,0.35)" className={styles.earPulse} />
-        </>
-      )}
-      <circle cx="50" cy="58" r="39" fill={c} />
-    </>
-  )
-}
-
-function CatHead({ c, isListening }) {
-  return (
-    <>
-      <polygon points="12,42 26,6 38,40"   fill={c} />
-      <polygon points="16,40 26,12 35,39"  fill="rgba(255,190,190,0.5)" />
-      <polygon points="62,40 74,6 88,42"   fill={c} />
-      <polygon points="65,39 74,12 84,40"  fill="rgba(255,190,190,0.5)" />
-      {isListening && (
-        <>
-          <polygon className={styles.earTwitch} points="12,42 26,6 38,40"  fill="rgba(255,255,255,0.15)" />
-          <polygon className={styles.earTwitch} points="62,40 74,6 88,42"  fill="rgba(255,255,255,0.15)" />
-        </>
-      )}
-      <circle cx="50" cy="58" r="39" fill={c} />
-      {/* Whiskers */}
-      <line x1="18" y1="64" x2="42" y2="67" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="18" y1="69" x2="42" y2="69" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="18" y1="74" x2="42" y2="71" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="58" y1="67" x2="82" y2="64" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="58" y1="69" x2="82" y2="69" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="58" y1="71" x2="82" y2="74" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-    </>
-  )
-}
-
-function DogHead({ c, isListening }) {
-  return (
-    <>
-      <ellipse cx="12" cy="62" rx="13" ry="24" fill={c} transform="rotate(-12 12 62)" className={isListening ? styles.dogEarWag : ''} />
-      <ellipse cx="88" cy="62" rx="13" ry="24" fill={c} transform="rotate(12 88 62)"  className={isListening ? styles.dogEarWagR : ''} />
-      <circle cx="50" cy="57" r="38" fill={c} />
-    </>
-  )
-}
-
-function BunnyHead({ c, isListening }) {
-  return (
-    <>
-      <ellipse cx="32" cy="15" rx="11" ry="26" fill={c} className={isListening ? styles.bunnyEarL : ''} />
-      <ellipse cx="32" cy="15" rx="6.5" ry="20" fill="rgba(255,190,190,0.5)" className={isListening ? styles.bunnyEarL : ''} />
-      <ellipse cx="68" cy="15" rx="11" ry="26" fill={c} className={isListening ? styles.bunnyEarR : ''} />
-      <ellipse cx="68" cy="15" rx="6.5" ry="20" fill="rgba(255,190,190,0.5)" className={isListening ? styles.bunnyEarR : ''} />
-      <circle cx="50" cy="60" r="37" fill={c} />
-    </>
-  )
-}
-
-function AlienHead({ c, isListening }) {
-  return (
-    <>
-      <line x1="50" y1="20" x2="50" y2="7" stroke={c} strokeWidth="3" strokeLinecap="round" />
-      <circle cx="50" cy="5" r="5" fill="#86efac" className={isListening ? styles.antennaPulse : ''} />
-      <ellipse cx="50" cy="57" rx="40" ry="44" fill={c} />
-    </>
-  )
-}
-
-function DinoHead({ c, isListening }) {
-  return (
-    <>
-      <polygon points="34,28 39,9 44,28"  fill={c} />
-      <polygon points="45,22 50,4 55,22"  fill={c} className={isListening ? styles.spikeGlow : ''} />
-      <polygon points="56,28 61,9 66,28"  fill={c} />
-      <circle cx="50" cy="58" r="39" fill={c} />
-    </>
-  )
-}
-
-const HEADS = { bear: BearHead, cat: CatHead, dog: DogHead, bunny: BunnyHead, alien: AlienHead, dino: DinoHead }
-
-/* ── Main component ──────────────────────────────────────────────────── */
-
-export default function BuddyAvatar({ status = 'idle', avatarColor, type = 'bear', size = 170 }) {
+export default function BuddyAvatar({
+  status = 'idle',
+  avatarColor,
+  type = 'bear',
+  size = 170,
+  audioRef,
+  live = true,
+}) {
   const colors    = STATE_COLORS[status] || STATE_COLORS.idle
-  const faceColor = avatarColor && status === 'idle' ? avatarColor : colors.face
+  const bodyColor = avatarColor && status === 'idle' ? avatarColor : colors.face
   const isListening = status === 'listening'
   const isSpeaking  = status === 'speaking'
   const isThinking  = status === 'thinking'
-  const isAlien     = type === 'alien'
 
-  const Head = HEADS[type] || HEADS.bear
+  const getMouthLevel = useMouthLevel(audioRef, isSpeaking && live)
+  const { containerRef, poke } = useBuddyLife({ status, live, getMouthLevel })
 
-  // Alien eyes are larger and spaced for the wide oval head
-  const eyeCy = isAlien ? 47 : 50
-  const eyeR  = isAlien ? 12 : (isListening ? 10 : 9)
-  const pupilR = isAlien ? 7  : 5
+  const eyeR = isListening ? 10 : 9
 
   return (
     <div
-      className={`${styles.container} ${styles[status]}`}
+      ref={containerRef}
+      className={`${styles.container} ${styles[status]} ${live ? '' : styles.static}`}
       style={{ width: size + 20, height: size + 20 }}
+      onPointerDown={live ? poke : undefined}
     >
       <div className={styles.glow} style={{ background: colors.glow, width: size, height: size }} />
 
       <svg
         viewBox="0 0 100 100"
         className={styles.face}
-        style={{ width: size, height: size }}
+        style={{ width: size, height: size, ['--body']: bodyColor }}
         aria-label={`Buddy is ${status}`}
       >
-        <Head c={faceColor} isListening={isListening} />
+        {/* Body group — squash/stretch + bounce applied here so the whole
+            character deforms like jelly. */}
+        <g className={styles.bodyGroup}>
+          {/* Costume behind the body (ears, spikes) — filled in Task 4 */}
+          {/* <Costume type={type} isListening={isListening} /> */}
 
-        {/* Head sheen */}
-        <ellipse cx="50" cy="46" rx="28" ry="18" fill="rgba(255,255,255,0.06)" />
+          {/* Blob body */}
+          <path d={BLOB_PATH} className={styles.body} />
+          {/* Bottom depth shadow */}
+          <ellipse cx="50" cy="86" rx="30" ry="10" fill="rgba(0,0,0,0.10)" />
+          {/* Glossy top highlight */}
+          <ellipse cx="42" cy="40" rx="22" ry="14" fill="rgba(255,255,255,0.18)" />
+          {/* Belly highlight */}
+          <ellipse cx="50" cy="66" rx="20" ry="14" fill="rgba(255,255,255,0.10)" />
 
-        {/* Muzzle — hidden for cat (whiskers serve same purpose) */}
-        {type !== 'cat' && (
-          <ellipse cx="50" cy="71" rx="17" ry="12" fill="rgba(255,255,255,0.18)" />
-        )}
+          {/* Cheek blush */}
+          <circle cx="26" cy="64" r="8" fill="rgba(255,120,120,0.28)" />
+          <circle cx="74" cy="64" r="8" fill="rgba(255,120,120,0.28)" />
 
-        {/* Raised eyebrows when listening */}
-        {isListening && (
-          <>
-            <path d="M 27 40 Q 35 35 42 40" stroke="rgba(255,255,255,0.7)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M 58 40 Q 65 35 73 40" stroke="rgba(255,255,255,0.7)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          </>
-        )}
-
-        {/* Eyes */}
-        <circle cx="35" cy={eyeCy} r={eyeR}  fill="white" />
-        <circle cx="37" cy={eyeCy} r={pupilR} fill="#1e1b4b" />
-        <circle cx="38" cy={eyeCy - 2} r="2" fill="white" />
-
-        <circle cx="65" cy={eyeCy} r={eyeR}  fill="white" />
-        <circle cx="63" cy={eyeCy} r={pupilR} fill="#1e1b4b" />
-        <circle cx="64" cy={eyeCy - 2} r="2" fill="white" />
-
-        {/* Nose */}
-        <ellipse cx="50" cy="63" rx="5.5" ry="4" fill="rgba(0,0,0,0.35)" />
-
-        {/* Mouth */}
-        {isSpeaking ? (
-          <ellipse cx="50" cy="73" rx="9" ry="6" fill="rgba(0,0,0,0.38)" className={styles.mouthTalk} />
-        ) : isThinking ? (
-          <path d="M 40 73 Q 50 73 60 73" stroke="rgba(255,255,255,0.55)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        ) : (
-          <path d="M 38 72 Q 50 81 62 72" stroke="rgba(255,255,255,0.7)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-        )}
-
-        {/* Cheek blush */}
-        <circle cx="24" cy="65" r="9" fill="rgba(255,140,140,0.22)" />
-        <circle cx="76" cy="65" r="9" fill="rgba(255,140,140,0.22)" />
-
-        {/* Speaking sparkles */}
-        {isSpeaking && (
-          <g>
-            <polygon className={styles.spark1} points="8,18 9.5,22 13,22 10.5,24.5 11.5,28 8,26 4.5,28 5.5,24.5 3,22 6.5,22" fill="#fcd34d" />
-            <polygon className={styles.spark2} points="92,15 93,18 96,18 94,20 94.5,23 92,21.5 89.5,23 90,20 88,18 91,18" fill="#fcd34d" />
-            <polygon className={styles.spark3} points="5,75 6.5,79 10,79 7.5,81 8.5,85 5,82.5 1.5,85 2.5,81 0,79 3.5,79" fill="#60a5fa" />
-            <polygon className={styles.spark4} points="95,72 96.5,76 100,76 97.5,78 98.5,82 95,79.5 91.5,82 92.5,78 90,76 93.5,76" fill="#60a5fa" />
-            <circle className={styles.spark5} cx="20" cy="10" r="3" fill="#f9a8d4" />
-            <circle className={styles.spark6} cx="80" cy="8"  r="2" fill="#86efac" />
-            <circle className={styles.spark7} cx="50" cy="3"  r="2.5" fill="#fcd34d" />
+          {/* Eyes (blink squashes each eye group vertically) */}
+          <g className={styles.eye} style={{ ['--ex']: '35px' }}>
+            <circle cx="35" cy="52" r={eyeR} fill="white" />
+            <g className={styles.pupil}>
+              <circle cx="35" cy="52" r="5" fill="#1e1b4b" />
+              <circle cx="36.6" cy="50" r="1.8" fill="white" />
+              <circle cx="33.6" cy="53.5" r="1" fill="rgba(255,255,255,0.7)" />
+            </g>
           </g>
-        )}
-
-        {/* Thinking dots */}
-        {isThinking && (
-          <g>
-            <circle className={styles.thinkDot1} cx="38" cy="82" r="3.5" fill="rgba(255,255,255,0.7)" />
-            <circle className={styles.thinkDot2} cx="50" cy="82" r="3.5" fill="rgba(255,255,255,0.7)" />
-            <circle className={styles.thinkDot3} cx="62" cy="82" r="3.5" fill="rgba(255,255,255,0.7)" />
+          <g className={styles.eye} style={{ ['--ex']: '65px' }}>
+            <circle cx="65" cy="52" r={eyeR} fill="white" />
+            <g className={styles.pupil}>
+              <circle cx="65" cy="52" r="5" fill="#1e1b4b" />
+              <circle cx="66.6" cy="50" r="1.8" fill="white" />
+              <circle cx="63.6" cy="53.5" r="1" fill="rgba(255,255,255,0.7)" />
+            </g>
           </g>
-        )}
+
+          {/* Raised brows when listening */}
+          {isListening && (
+            <>
+              <path d="M 27 41 Q 35 36 43 41" className={styles.brow} />
+              <path d="M 57 41 Q 65 36 73 41" className={styles.brow} />
+            </>
+          )}
+
+          {/* Mouth: resting smile, or audio-driven open ellipse when speaking */}
+          {isSpeaking ? (
+            <g className={styles.mouthGroup}>
+              <ellipse cx="50" cy="74" rx="8" ry="6" fill="rgba(60,20,20,0.55)" />
+            </g>
+          ) : isThinking ? (
+            <path d="M 42 75 Q 50 75 58 75" className={styles.mouthLine} />
+          ) : (
+            <path d="M 40 73 Q 50 82 60 73" className={styles.smile} />
+          )}
+
+          {/* Speaking sparkles */}
+          {isSpeaking && (
+            <g>
+              <polygon className={styles.spark1} points="8,20 9.5,24 13,24 10.5,26.5 11.5,30 8,28 4.5,30 5.5,26.5 3,24 6.5,24" fill="#fcd34d" />
+              <polygon className={styles.spark2} points="92,17 93,20 96,20 94,22 94.5,25 92,23.5 89.5,25 90,22 88,20 91,20" fill="#fcd34d" />
+              <circle className={styles.spark3} cx="18" cy="12" r="2.5" fill="#f9a8d4" />
+              <circle className={styles.spark4} cx="82" cy="10" r="2" fill="#86efac" />
+            </g>
+          )}
+
+          {/* Thinking dots */}
+          {isThinking && (
+            <g>
+              <circle className={styles.thinkDot1} cx="38" cy="90" r="3.2" fill="rgba(255,255,255,0.75)" />
+              <circle className={styles.thinkDot2} cx="50" cy="90" r="3.2" fill="rgba(255,255,255,0.75)" />
+              <circle className={styles.thinkDot3} cx="62" cy="90" r="3.2" fill="rgba(255,255,255,0.75)" />
+            </g>
+          )}
+        </g>
       </svg>
     </div>
   )

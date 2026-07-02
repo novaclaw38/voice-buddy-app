@@ -1,17 +1,16 @@
 .container {
   position: relative;
-  width: 180px;
-  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
 }
 
 .glow {
   position: absolute;
-  width: 160px;
-  height: 160px;
   border-radius: 50%;
   filter: blur(32px);
   opacity: 0.5;
@@ -21,141 +20,102 @@
 
 @keyframes glowPulse {
   0%, 100% { transform: scale(1);    opacity: 0.45; }
-  50%       { transform: scale(1.15); opacity: 0.65; }
+  50%      { transform: scale(1.15); opacity: 0.65; }
 }
 
 .face {
   position: relative;
   z-index: 1;
-  width: 170px;
-  height: 170px;
-  transition: all 0.3s ease;
+  transition: filter 0.3s ease;
   filter: drop-shadow(0 6px 22px rgba(0,0,0,0.35));
+  overflow: visible;
 }
 
-/* ── State body animations ── */
+.body { fill: var(--body); transition: fill 0.4s ease; }
 
-.idle .face {
-  animation: bearBob 3s ease-in-out infinite;
+/* Body group: bounce (translateY) + squash/stretch from useBuddyLife vars,
+   composed with a gentle idle breathing loop. */
+.bodyGroup {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;   /* pivot near the feet for weighty squash */
+  transform:
+    translateY(var(--by, 0px))
+    scaleX(var(--sx, 1))
+    scaleY(var(--sy, 1));
 }
 
-.listening .face {
-  animation: bearListen 0.5s ease-in-out infinite;
+/* Breathing multiplies onto the var-driven transform via a wrapper animation.
+   We animate a separate scale on the SVG element to avoid clobbering the
+   group's var transform. */
+.idle .face      { animation: breathe 3.4s ease-in-out infinite; }
+.listening .face { animation: leanIn 0.6s ease-in-out infinite; }
+.speaking .face  { animation: none; }
+.thinking .face  { animation: sway 2.4s ease-in-out infinite; }
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-3px) scale(1.02); }
+}
+@keyframes leanIn {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-2px) rotate(1.5deg); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2deg); }
 }
 
-.speaking .face {
-  animation: bearTalk 0.3s ease-in-out infinite;
+/* Eyes blink by squashing the eye group vertically around its center. */
+.eye {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scaleY(calc(1 - 0.9 * var(--blink, 0)));
+}
+/* Pupils track gaze. */
+.pupil {
+  transform: translate(var(--pupil-x, 0px), var(--pupil-y, 0px));
 }
 
-.thinking .face {
-  animation: bearThink 1.5s ease-in-out infinite;
+.brow  { stroke: rgba(255,255,255,0.75); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+.smile { stroke: rgba(255,255,255,0.8); stroke-width: 3; fill: none; stroke-linecap: round; }
+.mouthLine { stroke: rgba(255,255,255,0.6); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+
+/* Mouth openness from --mouth (0..1): scale a mouth group vertically. */
+.mouthGroup {
+  transform-box: fill-box;
+  transform-origin: 50% 40%;
+  transform: scaleY(calc(0.22 + 0.9 * var(--mouth, 0)));
 }
 
-@keyframes bearBob {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  35%       { transform: translateY(-5px) rotate(-1.5deg); }
-  65%       { transform: translateY(-5px) rotate(1.5deg); }
-}
-
-@keyframes bearListen {
-  0%, 100% { transform: rotate(-3deg) scale(1.04); }
-  50%       { transform: rotate(3deg)  scale(1.04); }
-}
-
-@keyframes bearTalk {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.03); }
-}
-
-@keyframes bearThink {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%       { transform: translateY(-8px) rotate(-4deg); }
-}
-
-/* ── Mouth open/close when speaking ── */
-.mouthTalk {
-  animation: mouthPop 0.25s ease-in-out infinite alternate;
-}
-
-@keyframes mouthPop {
-  from { ry: 3; }
-  to   { ry: 8; }
-}
-
-/* ── Ear pulse when listening ── */
-.earPulse {
-  animation: earBlink 0.6s ease-in-out infinite alternate;
-}
-
-@keyframes earBlink {
-  from { opacity: 0.2; r: 4; }
-  to   { opacity: 0.6; r: 7; }
-}
-
-/* ── Per-type ear/feature animations ── */
-.earTwitch {
-  animation: earTwitch 0.4s ease-in-out infinite alternate;
-  transform-box: fill-box; transform-origin: bottom center;
-}
-@keyframes earTwitch {
-  from { transform: rotate(-5deg); }
-  to   { transform: rotate(5deg); }
-}
-
-.dogEarWag  { animation: dogWagL 0.5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: top center; }
-.dogEarWagR { animation: dogWagR 0.5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: top center; }
-@keyframes dogWagL { from { transform: rotate(0deg); } to { transform: rotate(10deg); } }
-@keyframes dogWagR { from { transform: rotate(0deg); } to { transform: rotate(-10deg); } }
-
-.bunnyEarL { animation: bunnyWigL 0.5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
-.bunnyEarR { animation: bunnyWigR 0.5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
-@keyframes bunnyWigL { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
-@keyframes bunnyWigR { from { transform: rotate(5deg); } to { transform: rotate(-5deg); } }
-
-.antennaPulse {
-  animation: antennaBlink 0.5s ease-in-out infinite alternate;
-}
-@keyframes antennaBlink {
-  from { fill: #86efac; r: 5; }
-  to   { fill: #ffffff; r: 7; }
-}
-
-.spikeGlow {
-  animation: spikeFlash 0.6s ease-in-out infinite alternate;
-}
-@keyframes spikeFlash {
-  from { fill: rgba(255,255,255,0.1); }
-  to   { fill: rgba(255,255,255,0.35); }
-}
-
-/* ── Speaking sparkles ── */
+/* Sparkles */
 .spark1 { animation: sparkle 0.7s ease-in-out 0s    infinite; transform-box: fill-box; transform-origin: center; }
-.spark2 { animation: sparkle 0.7s ease-in-out 0.15s infinite; transform-box: fill-box; transform-origin: center; }
-.spark3 { animation: sparkle 0.7s ease-in-out 0.3s  infinite; transform-box: fill-box; transform-origin: center; }
-.spark4 { animation: sparkle 0.7s ease-in-out 0.45s infinite; transform-box: fill-box; transform-origin: center; }
-.spark5 { animation: sparkle 0.8s ease-in-out 0.1s  infinite; transform-box: fill-box; transform-origin: center; }
-.spark6 { animation: sparkle 0.8s ease-in-out 0.35s infinite; transform-box: fill-box; transform-origin: center; }
-.spark7 { animation: sparkle 0.9s ease-in-out 0.55s infinite; transform-box: fill-box; transform-origin: center; }
-
+.spark2 { animation: sparkle 0.7s ease-in-out 0.2s  infinite; transform-box: fill-box; transform-origin: center; }
+.spark3 { animation: sparkle 0.8s ease-in-out 0.1s  infinite; transform-box: fill-box; transform-origin: center; }
+.spark4 { animation: sparkle 0.8s ease-in-out 0.35s infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes sparkle {
-  0%, 100% { opacity: 0;   transform: scale(0.4) rotate(0deg); }
-  50%       { opacity: 1;  transform: scale(1.3) rotate(30deg); }
+  0%, 100% { opacity: 0;  transform: scale(0.4) rotate(0deg); }
+  50%      { opacity: 1;  transform: scale(1.3) rotate(30deg); }
 }
 
-/* ── Thinking dots ── */
-.thinkDot1 { animation: dotPop 1.2s ease-in-out 0s      infinite; }
-.thinkDot2 { animation: dotPop 1.2s ease-in-out 0.2s    infinite; }
-.thinkDot3 { animation: dotPop 1.2s ease-in-out 0.4s    infinite; }
-
+/* Thinking dots */
+.thinkDot1 { animation: dotPop 1.2s ease-in-out 0s   infinite; transform-box: fill-box; transform-origin: center; }
+.thinkDot2 { animation: dotPop 1.2s ease-in-out 0.2s infinite; transform-box: fill-box; transform-origin: center; }
+.thinkDot3 { animation: dotPop 1.2s ease-in-out 0.4s infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes dotPop {
-  0%, 100% {
-    opacity: 0.25;
-    transform: scale(0.7);
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.35);
-  }
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50%      { opacity: 1;    transform: scale(1.35); }
+}
+
+/* Static thumbnails: no ambient animation. */
+.static .glow,
+.static .bodyGroup,
+.static .face { animation: none; }
+
+/* Reduced motion: calm everything. */
+@media (prefers-reduced-motion: reduce) {
+  .glow,
+  .bodyGroup,
+  .face,
+  .spark1, .spark2, .spark3, .spark4,
+  .thinkDot1, .thinkDot2, .thinkDot3 { animation: none; }
 }
