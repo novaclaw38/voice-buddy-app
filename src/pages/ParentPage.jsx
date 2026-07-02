@@ -266,13 +266,20 @@ export default function ParentPage() {
             <div className={styles.field}>
               <label className={styles.label}>Avatar Color</label>
               <div className={styles.colorRow}>
-                {['#7c3aed','#db2777','#ea580c','#16a34a','#2563eb','#0891b2'].map((c) => (
+                {[
+                  { hex: '#7c3aed', name: 'Purple' },
+                  { hex: '#db2777', name: 'Pink' },
+                  { hex: '#ea580c', name: 'Orange' },
+                  { hex: '#16a34a', name: 'Green' },
+                  { hex: '#2563eb', name: 'Blue' },
+                  { hex: '#0891b2', name: 'Teal' },
+                ].map(({ hex, name }) => (
                   <button
-                    key={c}
-                    className={`${styles.colorSwatch} ${settings.avatarColor === c ? styles.selectedColor : ''}`}
-                    style={{ background: c }}
-                    onClick={() => updateSetting('avatarColor', c)}
-                    aria-label={c}
+                    key={hex}
+                    className={`${styles.colorSwatch} ${settings.avatarColor === hex ? styles.selectedColor : ''}`}
+                    style={{ background: hex }}
+                    onClick={() => updateSetting('avatarColor', hex)}
+                    aria-label={name}
                   />
                 ))}
               </div>
@@ -450,6 +457,7 @@ export default function ParentPage() {
                 onPointerUp={stopRecording}
                 onPointerLeave={stopRecording}
                 disabled={recStatus === 'sending'}
+                aria-label={recStatus === 'recording' ? 'Recording, release to send' : 'Hold to record a voice message'}
               >
                 {recStatus === 'sent' ? '✓' : recStatus === 'error' ? '✗' : '🎤'}
               </button>
@@ -676,9 +684,9 @@ function RoutineEditor({ label, emoji, steps, onChange }) {
             <span className={styles.routineNum}>{i + 1}</span>
             <span className={styles.routineText}>{step}</span>
             <div className={styles.routineActions}>
-              <button onClick={() => move(i, -1)} disabled={i === 0} className={styles.moveBtn}>▲</button>
-              <button onClick={() => move(i, 1)} disabled={i === steps.length - 1} className={styles.moveBtn}>▼</button>
-              <button onClick={() => remove(i)} className={styles.removeBtn}>✕</button>
+              <button onClick={() => move(i, -1)} disabled={i === 0} className={styles.moveBtn} aria-label={`Move "${step}" up`}>▲</button>
+              <button onClick={() => move(i, 1)} disabled={i === steps.length - 1} className={styles.moveBtn} aria-label={`Move "${step}" down`}>▼</button>
+              <button onClick={() => remove(i)} className={styles.removeBtn} aria-label={`Remove "${step}"`}>✕</button>
             </div>
           </div>
         ))}
