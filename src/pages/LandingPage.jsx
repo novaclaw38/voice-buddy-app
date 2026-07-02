@@ -176,12 +176,18 @@ export default function LandingPage() {
   const [navHidden, setNavHidden] = useState(false)
   const lastY = useRef(0)
 
-  // Hide nav on scroll down, show on scroll up
+  // Hide nav on scroll down, show on scroll up (rAF-throttled, one measurement per frame)
   useEffect(() => {
+    let ticking = false
     const onScroll = () => {
-      const y = window.scrollY
-      setNavHidden(y > 80 && y > lastY.current)
-      lastY.current = y
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const y = window.scrollY
+        setNavHidden(y > 80 && y > lastY.current)
+        lastY.current = y
+        ticking = false
+      })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -219,7 +225,7 @@ export default function LandingPage() {
           </div>
           <div className={styles.navActions}>
             <button className={styles.navLogin} onClick={() => navigate('/login')}>Log In</button>
-            <button className={styles.navCta} onClick={() => navigate('/login')}>Start Free</button>
+            <button className={styles.navCta} onClick={() => navigate('/login')}>Start Free Trial</button>
           </div>
         </div>
       </nav>
@@ -228,14 +234,14 @@ export default function LandingPage() {
       <section className={styles.hero}>
         <Particles />
         <div className={styles.heroContent}>
-          <div className={styles.heroBadge}>✨ 10 days free — no card needed</div>
+          <div className={styles.heroBadge}>✨ 10 days free, no card needed</div>
           <h1 className={styles.heroTitle}>
             Meet <span className={styles.gradientText}>Buddy</span>
             <br />your child's AI best friend
           </h1>
           <p className={styles.heroSub}>
             An always-on companion that tells stories, teaches courses, sings songs,
-            and gives parents peace of mind — all in one magical app.
+            and gives parents peace of mind, all in one magical app.
           </p>
           <div className={styles.heroCtas}>
             <button
@@ -245,7 +251,7 @@ export default function LandingPage() {
               onClick={() => navigate('/login')}
             >
               <span className={styles.ctaRipple} />
-              Try Free for 10 Days
+              Start Free Trial
             </button>
             <button className={styles.ctaGhost} onClick={() => navigate('/login')}>
               Log In →
@@ -276,7 +282,7 @@ export default function LandingPage() {
             </p>
             <div className={styles.featureChips}>
               <span>📹 Live camera</span>
-              <span>🔒 Private & secure</span>
+              <span>🔒 Signed-in parents only</span>
               <span>⚡ Real-time</span>
             </div>
           </div>
@@ -288,7 +294,7 @@ export default function LandingPage() {
             <div className={styles.featureTag}>Stay Connected</div>
             <h2 className={styles.featureTitle}>Leave voice messages for your child</h2>
             <p className={styles.featureDesc}>
-              Record a voice note from the parent dashboard. Buddy delivers it instantly —
+              Record a voice note from the parent dashboard. Buddy delivers it instantly,
               even if you're not home. Your child hears your voice whenever they need it most.
             </p>
             <div className={styles.featureChips}>
@@ -309,24 +315,22 @@ export default function LandingPage() {
           </div>
         </RevealSection>
 
-        {/* Feature 3: AI Chat */}
-        <RevealSection className={styles.featureRow}>
-          <div className={styles.featureVisual}>
+        {/* Feature 3: AI Chat - full-width showcase, breaks the left/right split rhythm */}
+        <RevealSection className={styles.featureShowcase}>
+          <div className={styles.featureTag}>AI Companion</div>
+          <h2 className={styles.featureTitle}>Buddy talks, plays and imagines with your child</h2>
+          <p className={styles.featureDesc}>
+            From bedtime stories to quiz games, jokes to feelings check-ins, Buddy adapts
+            to whatever your child needs. Fully child-safe, always kind.
+          </p>
+          <div className={styles.showcaseChat}>
             <ChatDemo />
           </div>
-          <div className={styles.featureText}>
-            <div className={styles.featureTag}>AI Companion</div>
-            <h2 className={styles.featureTitle}>Buddy talks, plays and imagines with your child</h2>
-            <p className={styles.featureDesc}>
-              From bedtime stories to quiz games, jokes to feelings check-ins —
-              Buddy adapts to whatever your child needs. Fully child-safe, always kind.
-            </p>
-            <div className={styles.featureChips}>
-              <span>📖 Stories</span>
-              <span>🎮 Games</span>
-              <span>🎵 Sing-along</span>
-              <span>🧠 Quiz</span>
-            </div>
+          <div className={styles.featureChips}>
+            <span>📖 Stories</span>
+            <span>🎮 Games</span>
+            <span>🎵 Sing-along</span>
+            <span>🧠 Quiz</span>
           </div>
         </RevealSection>
 
@@ -336,8 +340,9 @@ export default function LandingPage() {
             <div className={styles.featureTag}>Learn Something New</div>
             <h2 className={styles.featureTitle}>Interactive courses your child will love</h2>
             <p className={styles.featureDesc}>
-              Buddy guides kids through real lessons — gardening, robotics, science experiments —
-              all delivered conversationally, at their pace, with no screens or worksheets required.
+              Buddy guides kids through real lessons in gardening, robotics, and science
+              experiments, all delivered conversationally, at their pace, with no screens
+              or worksheets required.
             </p>
             <div className={styles.featureChips}>
               <span>🌱 Gardening</span>
@@ -396,7 +401,7 @@ export default function LandingPage() {
               <li className={styles.no}>✗ Courses</li>
             </ul>
             <button className={styles.planBtn} onClick={() => navigate('/login')}>
-              Get Started Free
+              Continue Free
             </button>
           </div>
 
@@ -410,7 +415,8 @@ export default function LandingPage() {
               <span className={styles.planPer}>/month</span>
             </div>
             <p className={styles.planDesc}>
-              <strong className={styles.trialHighlight}>First 10 days free</strong> — cancel anytime
+              <strong className={styles.trialHighlight}>First 10 days free</strong>, then
+              R149/month. Cancel anytime before day 10 and you won't be charged.
             </p>
             <ul className={styles.planFeatures}>
               <li className={styles.yes}>✓ Unlimited daily messages</li>
@@ -445,7 +451,7 @@ export default function LandingPage() {
         </div>
         <p className={styles.footerTagline}>Made with ❤️ in South Africa</p>
         <p className={styles.footerLinks}>
-          <button onClick={() => navigate('/login')}>Sign Up</button>
+          <button onClick={() => navigate('/login')}>Start Free Trial</button>
           <span>·</span>
           <button onClick={() => navigate('/login')}>Log In</button>
         </p>

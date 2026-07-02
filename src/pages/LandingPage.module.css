@@ -346,6 +346,32 @@
   justify-content: center;
 }
 
+/* Full-width showcase - deliberately breaks the left/right split rhythm
+   used by the other three feature rows. */
+.featureShowcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.featureShowcase .featureDesc {
+  max-width: 520px;
+}
+.showcaseChat {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 32px 0 28px;
+}
+.showcaseChat .chatDemo {
+  max-width: 420px;
+}
+.featureShowcase .featureChips {
+  justify-content: center;
+}
+
 .featureTag {
   display: inline-block;
   color: var(--c-pink-d);
@@ -388,7 +414,7 @@
   box-shadow: 0 3px 0 rgba(91,33,182,0.08);
 }
 
-/* Phone mockup — stays dark, it's a device screen */
+/* Phone mockup - stays dark, it's a device screen */
 .phone {
   position: relative;
   width: 200px;
