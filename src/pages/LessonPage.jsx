@@ -128,6 +128,7 @@ export default function LessonPage() {
           status={uiStatus}
           avatarColor={settings.avatarColor}
           type={settings.avatarType || 'bear'}
+          audioRef={speech.audioRef}
         />
       </div>
 

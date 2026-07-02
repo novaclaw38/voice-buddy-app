@@ -51,7 +51,7 @@ export default function AvatarPicker({ currentType, currentName, currentColor, o
               style={{ '--sel-color': a.color }}
               onClick={() => setSelType(a.type)}
             >
-              <BuddyAvatar type={a.type} status="idle" avatarColor={a.color} size={56} />
+              <BuddyAvatar type={a.type} status="idle" avatarColor={a.color} size={56} live={false} />
               <span className={styles.avatarLabel}>{a.label}</span>
             </button>
           ))}

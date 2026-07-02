@@ -468,7 +468,7 @@ export default function ChildPage({ session }) {
 
       {/* Avatar */}
       <div className={styles.avatarArea}>
-        <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} />
+        <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} audioRef={speech.audioRef} />
         <p className={styles.buddyNameTag}>{buddyName}</p>
       </div>
 
