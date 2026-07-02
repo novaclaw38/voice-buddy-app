@@ -76,6 +76,7 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     el.style.setProperty('--sy', '1')
     el.style.setProperty('--by', '0px')
     el.style.setProperty('--mouth', '0')
+    el.style.setProperty('--shadow-scale', '1')
   }, [])
 
   useEffect(() => {
@@ -170,6 +171,10 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
       el.style.setProperty('--sy', sy.toFixed(3))
       el.style.setProperty('--by', st.by.toFixed(2) + 'px')
       el.style.setProperty('--mouth', st.mouth.toFixed(3))
+      // Ground shadow shrinks as Buddy rises during a bounce (st.by goes
+      // negative while airborne), clamped so it never vanishes entirely.
+      const shadowScale = Math.max(0.6, 1 + st.by / 60)
+      el.style.setProperty('--shadow-scale', shadowScale.toFixed(3))
     }
 
     rafRef.current = requestAnimationFrame(loop)

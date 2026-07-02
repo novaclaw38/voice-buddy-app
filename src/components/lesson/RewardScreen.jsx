@@ -32,7 +32,7 @@ export default function RewardScreen({ lesson, course, childName, avatarType, av
         {/* Result card */}
         <div className={styles.content}>
           <div className={styles.buddyWrap}>
-            <BuddyAvatar type={avatarType || 'bear'} status="speaking" avatarColor={avatarColor} size={130} />
+            <BuddyAvatar type={avatarType || 'bear'} status="happy" avatarColor={avatarColor} size={130} />
           </div>
           <h1 className={styles.heading}>You did it! 🌟</h1>
           <p className={styles.sub}>

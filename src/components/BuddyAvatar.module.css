@@ -31,7 +31,36 @@
   overflow: visible;
 }
 
-.body { fill: var(--body); transition: fill 0.4s ease; }
+/* Fill comes from the radial gradient (see .gradLight/.gradDark); no flat
+   fill here so the gradient's fill="url(#...)" attribute isn't overridden. */
+.body {}
+
+/* Gradient stops derived from --body: a lighter tint top-left (the "lit"
+   side) fading to a darker tint bottom-right — this is most of the "3D read"
+   for a flat-shaded character. Transition is on the stops, not the fill
+   reference, since url() paint servers don't interpolate. */
+.gradLight {
+  stop-color: color-mix(in srgb, var(--body, #7c3aed) 100%, white 32%);
+  transition: stop-color 0.4s ease;
+}
+.gradDark {
+  stop-color: color-mix(in srgb, var(--body, #7c3aed) 100%, black 22%);
+  transition: stop-color 0.4s ease;
+}
+
+/* Ground contact shadow: fixed to the ground, shrinks as Buddy bounces up
+   (--shadow-scale is written by useBuddyLife alongside the bounce physics). */
+.groundShadow {
+  fill: rgba(20, 10, 40, 0.22);
+  filter: blur(2.5px);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scale(var(--shadow-scale, 1));
+}
+
+/* Happy squint-arc eyes and open-grin mouth */
+.happyEye { stroke: #1e1b4b; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.grin { fill: rgba(60,20,20,0.55); }
 
 /* Body group: bounce (translateY) + squash/stretch from useBuddyLife vars,
    composed with a gentle idle breathing loop. */
@@ -51,6 +80,8 @@
 .listening .face { animation: leanIn 0.6s ease-in-out infinite; }
 .speaking .face  { animation: none; }
 .thinking .face  { animation: sway 2.4s ease-in-out infinite; }
+.happy .face     { animation: happyBounce 0.5s ease-in-out infinite; }
+.confused .face  { animation: confusedTilt 3s ease-in-out infinite; }
 
 @keyframes breathe {
   0%, 100% { transform: translateY(0) scale(1); }
@@ -63,6 +94,14 @@
 @keyframes sway {
   0%, 100% { transform: rotate(-2deg); }
   50%      { transform: rotate(2deg); }
+}
+@keyframes happyBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-6px) scale(1.04, 0.97); }
+}
+@keyframes confusedTilt {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(1deg); }
 }
 
 /* Eyes blink by squashing the eye group vertically around its center. */
