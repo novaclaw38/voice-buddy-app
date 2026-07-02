@@ -51,13 +51,19 @@ export function useSpeech(settings) {
     )
   }, [voices, settings?.voiceName, settings?.robotVoice])
 
-  const fallbackSpeak = useCallback((text, onDone) => {
+  // voiceOpts lets a caller give a mode/category its own "voice color" on top
+  // of the user's own accessibility settings: pitchOffset (~-20..20, same
+  // semitone-ish scale as the Google TTS pitch below) and rateMul (a speed
+  // multiplier applied to the base rate).
+  const fallbackSpeak = useCallback((text, onDone, voiceOpts = {}) => {
     if (!synthRef.current || !text) { onDone?.(); return }
     synthRef.current.cancel()
     const utter = new SpeechSynthesisUtterance(text)
+    const baseRate  = settings?.robotVoice ? 0.85 : (settings?.speechRate  ?? 0.9)
+    const basePitch = settings?.robotVoice ? 0.3  : (settings?.speechPitch ?? 1.1)
     utter.voice  = getFallbackVoice()
-    utter.rate   = settings?.robotVoice ? 0.85 : (settings?.speechRate  ?? 0.9)
-    utter.pitch  = settings?.robotVoice ? 0.3  : (settings?.speechPitch ?? 1.1)
+    utter.rate   = Math.max(0.1, Math.min(10, baseRate * (voiceOpts.rateMul ?? 1)))
+    utter.pitch  = Math.max(0, Math.min(2, basePitch + (voiceOpts.pitchOffset ?? 0) / 20))
     utter.volume = 1
     utter.onboundary = (e) => {
       if (e.name !== 'word') return
@@ -86,15 +92,18 @@ export function useSpeech(settings) {
   }, [])
 
   // ── Google TTS speak ──────────────────────────────────────────────────────
-  const speak = useCallback((text, onDone) => {
+  // voiceOpts: optional { pitchOffset, rateMul } — see fallbackSpeak above.
+  const speak = useCallback((text, onDone, voiceOpts = {}) => {
     if (!text) { onDone?.(); return }
     stopListening()
     stopSpeaking()
     setStatus('speaking')
 
-    const rate   = settings?.robotVoice ? 0.8  : (settings?.speechRate  ?? 0.9)
-    const pitch  = settings?.robotVoice ? -8   : 0    // semitones for Google TTS
-    const gender = settings?.robotVoice ? 'male' : 'female'
+    const baseRate  = settings?.robotVoice ? 0.8  : (settings?.speechRate  ?? 0.9)
+    const basePitch = settings?.robotVoice ? -8   : 0    // semitones for Google TTS
+    const gender    = settings?.robotVoice ? 'male' : 'female'
+    const rate  = Math.max(0.25, Math.min(4, baseRate * (voiceOpts.rateMul ?? 1)))
+    const pitch = Math.max(-20, Math.min(20, basePitch + (voiceOpts.pitchOffset ?? 0)))
 
     supabase.auth.getSession()
       .then(({ data }) => {
@@ -128,12 +137,12 @@ export function useSpeech(settings) {
         audio.play().catch(() => {
           // Autoplay blocked — fall back
           audioRef.current = null
-          fallbackSpeak(text, onDone)
+          fallbackSpeak(text, onDone, voiceOpts)
         })
       })
       .catch(() => {
         // Key not set or network error — fall back to browser TTS silently
-        fallbackSpeak(text, onDone)
+        fallbackSpeak(text, onDone, voiceOpts)
       })
   }, [stopListening, stopSpeaking, fallbackSpeak,
       settings?.robotVoice, settings?.speechRate])

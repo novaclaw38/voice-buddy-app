@@ -16,6 +16,7 @@ import { fetchMessageById, markPlayed } from '../services/messageService.js'
 import SingAlong from '../components/SingAlong.jsx'
 import DailyActivity from '../components/DailyActivity.jsx'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
+import { getModeVoice } from '../utils/modeVoice.js'
 import styles from './ChildPage.module.css'
 
 export default function ChildPage({ session }) {
@@ -31,7 +32,7 @@ export default function ChildPage({ session }) {
 
   const speech = useSpeech(settings)
   const chat = useChat(settings)
-  const { isPro, tier, daysLeft } = useSubscription()
+  const { tier, daysLeft } = useSubscription()
   const [wordIndex, setWordIndex] = useState(-1)
   const [showUpgrade, setShowUpgrade] = useState(false)
   const rafRef = useRef(null)
@@ -313,6 +314,13 @@ export default function ChildPage({ session }) {
   }, [wakeWordEnabled, uiStatus, wakePhrase])
 
   const handleModeSelect = useCallback((modeId) => {
+    // The Learn tile opens the structured Courses experience instead of a
+    // chat mode — keeps course access in one place instead of a separate
+    // bottom-row button.
+    if (modeId === 'learn') {
+      navigate('/courses')
+      return
+    }
     cancelBubbleClear()
     const intro = chat.switchMode(modeId)
     setBuddyText(intro)
@@ -321,8 +329,8 @@ export default function ChildPage({ session }) {
     speech.speak(intro, () => {
       setUiStatus('idle')
       scheduleBubbleClear()
-    })
-  }, [chat, speech, scheduleBubbleClear, cancelBubbleClear])
+    }, getModeVoice(modeId))
+  }, [chat, speech, scheduleBubbleClear, cancelBubbleClear, navigate])
 
   const handleUserSpeech = useCallback((transcript) => {
     cancelBubbleClear()
@@ -339,7 +347,7 @@ export default function ChildPage({ session }) {
         if (settings.autoListen) {
           setTimeout(() => handleVoicePress(), 500)
         }
-      })
+      }, getModeVoice(chat.mode))
     })
   }, [chat, speech, settings.autoListen, scheduleBubbleClear, cancelBubbleClear])
 
@@ -488,20 +496,22 @@ export default function ChildPage({ session }) {
               </button>
             )}
             {cameraOn && <span className={styles.cameraIndicator} title="Camera on">📹</span>}
-            <button
-              className={styles.customizeBtn}
-              onClick={() => setShowPicker(true)}
-              aria-label="Customise buddy"
-            >
-              🎨
-            </button>
-            <button
-              className={styles.settingsBtn}
-              onClick={() => setShowPin(true)}
-              aria-label="Parent settings"
-            >
-              ⚙️
-            </button>
+            <div className={styles.topBarActions}>
+              <button
+                className={styles.customizeBtn}
+                onClick={() => setShowPicker(true)}
+                aria-label="Customise buddy"
+              >
+                🎨
+              </button>
+              <button
+                className={styles.settingsBtn}
+                onClick={() => setShowPin(true)}
+                aria-label="Parent settings"
+              >
+                ⚙️
+              </button>
+            </div>
           </div>
 
           {/* Avatar */}
@@ -553,14 +563,13 @@ export default function ChildPage({ session }) {
               onSelect={handleModeSelect}
               onUpgrade={() => setShowUpgrade(true)}
             />
-            <div className={styles.coursesRow}>
-              <button className={styles.coursesBtn} onClick={() => navigate('/courses')}>
-                📚 Courses {!isPro && <span className={styles.coursesPro}>Pro</span>}
-              </button>
-              {tier === 'trial' && daysLeft !== null && (
+            {/* Courses now live behind the Learn tile above; this just keeps
+                the trial-days-left indicator visible. */}
+            {tier === 'trial' && daysLeft !== null && (
+              <div className={styles.coursesRow}>
                 <span className={styles.trialBadge}>Trial: {daysLeft}d left</span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
       </div>

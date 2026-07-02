@@ -2,8 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import { COURSES } from '../utils/courses.js'
 import { useSubscription } from '../hooks/useSubscription.jsx'
 import { useCompletions } from '../hooks/useCompletions.js'
+import { useSpeech } from '../hooks/useSpeech.js'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getSettings } from '../utils/storage.js'
 import styles from './CoursesPage.module.css'
 
@@ -65,9 +66,31 @@ export default function CoursesPage({ session }) {
   const [settings] = useState(() => getSettings())
   const durationLabel = (settings.childAge || 7) <= 6 ? '~15 min' : '~30 min'
   const { completions } = useCompletions()
+  const speech = useSpeech(settings)
+
+  // Read the course list aloud on arrival — a non-reader can't tell what's
+  // here from text alone. Speaks once per visit.
+  useEffect(() => {
+    const names = COURSES.map((c) => c.title).join(', ')
+    speech.speak(`Here are your courses! ${names}. Tap one to hear what's inside!`)
+    return () => speech.stopSpeaking()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleExpand = (course) => {
+    const opening = expanded !== course.id
+    setExpanded(opening ? course.id : null)
+    if (opening) {
+      const lessonNames = course.lessons.map((l) => l.title).join(', ')
+      speech.speak(`${course.title}. ${course.description}. It has ${course.lessons.length} lessons: ${lessonNames}.`)
+    } else {
+      speech.stopSpeaking()
+    }
+  }
 
   const handleLesson = (courseId, lessonId) => {
     if (!isPro) { setShowUpgrade(true); return }
+    speech.stopSpeaking()
     navigate(`/lesson?course=${courseId}&lesson=${lessonId}`)
   }
 
@@ -76,7 +99,7 @@ export default function CoursesPage({ session }) {
       <div className={styles.bg} />
 
       <header className={styles.header}>
-        <button className={styles.back} onClick={() => navigate('/app')}>← Back to Buddy</button>
+        <button className={styles.back} onClick={() => { speech.stopSpeaking(); navigate('/app') }}>← Back to Buddy</button>
         <h1 className={styles.title}>Courses</h1>
         <p className={styles.sub}>Interactive lessons taught by Buddy, just for you</p>
       </header>
@@ -96,7 +119,7 @@ export default function CoursesPage({ session }) {
               <p className={styles.courseDesc}>{course.description}</p>
               <button
                 className={styles.expandBtn}
-                onClick={() => setExpanded(expanded === course.id ? null : course.id)}
+                onClick={() => handleExpand(course)}
               >
                 {expanded === course.id ? 'Hide lessons ▲' : `${course.lessons.length} lessons ▼`}
               </button>

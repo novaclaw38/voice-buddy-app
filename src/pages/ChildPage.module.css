@@ -128,6 +128,15 @@
   text-shadow: 0 1px 0 rgba(255,255,255,0.55);
 }
 
+/* Groups the avatar-chooser and settings-gear buttons tightly together —
+   .topBar's justify-content:space-between would otherwise spread every
+   child evenly, pushing them apart instead of reading as a pair. */
+.topBarActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .customizeBtn,
 .settingsBtn {
   font-size: 1.35rem;
@@ -454,30 +463,6 @@
   justify-content: center;
   gap: 10px;
   padding: 10px 16px 2px;
-}
-
-.coursesBtn {
-  background: #fff;
-  color: var(--c-grape);
-  padding: 9px 18px;
-  border-radius: var(--r-pill);
-  font-family: var(--font-head);
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 4px 0 rgba(91,33,182,0.14);
-}
-.coursesBtn:active { transform: translateY(2px) scale(0.97); box-shadow: 0 2px 0 rgba(91,33,182,0.14); }
-
-.coursesPro {
-  background: linear-gradient(135deg, var(--c-tangerine), var(--c-sunny));
-  color: #7a3e00;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
 }
 
 .trialBadge {
