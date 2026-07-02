@@ -82,21 +82,31 @@
 
 .printBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(91,33,182,0.12); }
 
+/* Progress stars — fill in and pop as the child passes each step */
 .dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.45);
-  transition: background 0.3s, transform 0.3s;
+  font-size: 1.05rem;
+  line-height: 1;
+  color: rgba(255,255,255,0.85);
+  -webkit-text-stroke: 1px rgba(124,58,237,0.35);
+  transition: color 0.3s, transform 0.3s;
 }
 
 .dotActive {
-  background: var(--c-grape);
-  transform: scale(1.25);
+  color: var(--c-sunny);
+  -webkit-text-stroke: 1px rgba(180,120,0,0.5);
+  transform: scale(1.35);
+  animation: starPop 0.45s var(--spring);
 }
 
 .dotDone {
-  background: rgba(124,58,237,0.45);
+  color: var(--c-sunny);
+  -webkit-text-stroke: 1px rgba(180,120,0,0.4);
+}
+
+@keyframes starPop {
+  0%   { transform: scale(0.6) rotate(-20deg); }
+  60%  { transform: scale(1.6) rotate(8deg); }
+  100% { transform: scale(1.35) rotate(0); }
 }
 
 /* ── Avatar ── */

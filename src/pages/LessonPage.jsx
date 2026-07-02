@@ -95,6 +95,8 @@ export default function LessonPage() {
         lesson={lesson}
         course={course}
         childName={settings.childName}
+        avatarType={settings.avatarType}
+        avatarColor={settings.avatarColor}
         onBack={() => navigate('/courses')}
       />
     )
@@ -114,8 +116,9 @@ export default function LessonPage() {
             {steps.map((_, i) => (
               <span
                 key={i}
+                aria-hidden="true"
                 className={`${styles.dot} ${i === stepIndex ? styles.dotActive : ''} ${i < stepIndex ? styles.dotDone : ''}`}
-              />
+              >★</span>
             ))}
           </div>
           <button className={styles.printBtn} onClick={handlePrintSheet} title="Print worksheet">🖨️</button>

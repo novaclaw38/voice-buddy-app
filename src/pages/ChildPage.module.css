@@ -28,6 +28,18 @@
   100% { opacity: 1; }
 }
 
+/* ── Ground plane ─────────────────────────────────────── */
+.hills {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(90px, 18vh, 160px);
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* ── Floating decorations ──────────────────────────────── */
 .deco {
   position: absolute;
@@ -76,7 +88,7 @@
 
 .modeLabel {
   font-family: var(--font-head);
-  font-size: 1.05rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--ink);
   text-transform: capitalize;
@@ -110,7 +122,7 @@
 
 .buddyNameTag {
   font-family: var(--font-head);
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--ink);
   background: rgba(255,255,255,0.7);

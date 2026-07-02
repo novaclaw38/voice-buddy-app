@@ -57,6 +57,10 @@ function BuddyHero() {
         <circle cx="24" cy="65" r="9" fill="rgba(255,140,140,0.22)" />
         <circle cx="76" cy="65" r="9" fill="rgba(255,140,140,0.22)" />
       </svg>
+      {/* Speech bubble — hints at the real product experience, not just the mascot */}
+      <div className={styles.heroBubble}>
+        Hi! Want to hear a story about a cloud kingdom? ✨
+      </div>
     </div>
   )
 }

@@ -68,10 +68,8 @@
   to   { transform: scale(1);   opacity: 1; }
 }
 
-.trophy {
-  font-size: 4rem;
-  display: block;
-  margin-bottom: 10px;
+.buddyWrap {
+  margin-bottom: 6px;
   animation: trophyBounce 0.8s ease-in-out infinite alternate;
 }
 

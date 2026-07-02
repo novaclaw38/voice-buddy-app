@@ -1,4 +1,5 @@
 import { useSubscription } from '../hooks/useSubscription.jsx'
+import ModeIcon from './ModeIcons.jsx'
 import styles from './ModeSelector.module.css'
 
 const MODES = [
@@ -37,7 +38,7 @@ export default function ModeSelector({ currentMode, onSelect, onUpgrade }) {
             onClick={() => handleClick(m)}
             aria-label={locked ? `${m.label} — Pro feature` : m.label}
           >
-            <span className={styles.emoji}>{m.emoji}</span>
+            <span className={styles.emoji}><ModeIcon id={m.id} /></span>
             <span className={styles.label}>{m.label}</span>
             {locked && <span className={styles.lockIcon}>Pro</span>}
           </button>

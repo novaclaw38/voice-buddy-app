@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import BuddyAvatar from '../BuddyAvatar.jsx'
 import styles from './RewardScreen.module.css'
 
 const STAR_COUNT = 12
 
-export default function RewardScreen({ lesson, course, childName, onBack }) {
+export default function RewardScreen({ lesson, course, childName, avatarType, avatarColor, onBack }) {
   const [printTarget, setPrintTarget] = useState(null)
 
   const handlePrint = (target) => {
@@ -30,7 +31,9 @@ export default function RewardScreen({ lesson, course, childName, onBack }) {
 
         {/* Result card */}
         <div className={styles.content}>
-          <span className={styles.trophy}>🏆</span>
+          <div className={styles.buddyWrap}>
+            <BuddyAvatar type={avatarType || 'bear'} status="speaking" avatarColor={avatarColor} size={130} />
+          </div>
           <h1 className={styles.heading}>You did it! 🌟</h1>
           <p className={styles.sub}>
             You finished <strong>{lesson.title}</strong>!

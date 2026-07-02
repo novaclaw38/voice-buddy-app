@@ -421,6 +421,13 @@ export default function ChildPage({ session }) {
       className={styles.page}
       style={{ background: `linear-gradient(160deg, ${from} 0%, ${to} 100%)` }}
     >
+      {/* Rolling hills — gives Buddy a ground to stand on; the translucent
+          white fills auto-tint to whichever mode gradient is behind them. */}
+      <svg className={styles.hills} viewBox="0 0 375 120" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 70 Q60 32 140 62 T375 52 V120 H0 Z" fill="rgba(255,255,255,0.22)" />
+        <path d="M0 96 Q100 60 210 90 T375 82 V120 H0 Z" fill="rgba(255,255,255,0.38)" />
+      </svg>
+
       {/* Floating background decorations */}
       <div className={styles.deco} aria-hidden="true">
         <span className={styles.d1}>✦</span>

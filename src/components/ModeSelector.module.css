@@ -46,7 +46,8 @@
 }
 
 .emoji {
-  font-size: 2rem;
+  display: grid;
+  place-items: center;
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
   animation: emojiWiggle 3s ease-in-out infinite;
