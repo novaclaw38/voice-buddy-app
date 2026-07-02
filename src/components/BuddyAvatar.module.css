@@ -179,7 +179,11 @@
 .static .bunnyEarL, .static .bunnyEarR,
 .static .antenna, .static .spike { animation: none; }
 
-/* Reduced motion: calm everything. */
+/* Reduced motion: calm everything.
+   !important is deliberate here — the per-state rules above (.idle .face,
+   .happy .face, etc.) are two-class selectors with higher specificity than
+   a plain .face selector, so without !important this block silently loses
+   the cascade and reduced-motion users still get the full animation set. */
 @media (prefers-reduced-motion: reduce) {
   .glow,
   .bodyGroup,
@@ -189,5 +193,5 @@
   .earPulse, .earTwitch, .earTwitchR,
   .dogEarL, .dogEarR,
   .bunnyEarL, .bunnyEarR,
-  .antenna, .spike { animation: none; }
+  .antenna, .spike { animation: none !important; }
 }

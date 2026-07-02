@@ -38,6 +38,9 @@ export default function ChildPage({ session }) {
   const [showActivity, setShowActivity] = useState(() => !isDailyActivityDismissed())
   const dailyActivity = getDailyActivity()
   const [parentMessage, setParentMessage] = useState(null)
+  // null = nothing pending; 'ask' = Buddy is asking whether to hear it;
+  // 'playing' = child said yes and the recording is playing/played.
+  const [msgPhase, setMsgPhase] = useState(null)
   const parentAudioRef = useRef(null)
   // Timer ref for clearing bubble text after speech ends
   const bubbleClearRef = useRef(null)
@@ -157,15 +160,37 @@ export default function ChildPage({ session }) {
         }, async (payload) => {
           // Fetch full row (audio_data too large for realtime payload)
           const msg = await fetchMessageById(payload.new.id).catch(() => null)
-          if (msg) setParentMessage(msg)
+          if (msg) { setParentMessage(msg); setMsgPhase('ask') }
         })
         .subscribe()
     })
     return () => { channel?.unsubscribe() }
   }, [])
 
-  // Auto-play parent message when it arrives — overlay stays until "Got it!"
+  // Buddy announces the message and asks whether to hear it, then listens
+  // for a yes/no — the recording never auto-plays without asking first.
   useEffect(() => {
+    if (msgPhase !== 'ask' || !parentMessage) return
+    speech.stopListening()
+    const prompt = "You have a message from your parent! Do you want to hear it?"
+    setBuddyText(prompt)
+    setUiStatus('speaking')
+    speech.speak(prompt, () => {
+      if (!speech.supported.stt) { setUiStatus('idle'); return } // wait for the tap-buttons instead
+      setUiStatus('listening')
+      speech.startListening((transcript) => {
+        setUiStatus('idle')
+        if (/\b(yes|yeah|yep|sure|please|ok|okay)\b/i.test(transcript)) {
+          playParentMessageNow()
+        } else {
+          setMsgPhase(null)
+          setBuddyText('')
+        }
+      })
+    })
+  }, [msgPhase]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const playParentMessageNow = () => {
     if (!parentMessage) return
     speech.stopSpeaking()
     speech.stopListening()
@@ -174,13 +199,21 @@ export default function ChildPage({ session }) {
     audio.onended = () => { parentAudioRef.current = null }
     audio.onerror = () => { parentAudioRef.current = null }
     audio.play().catch(() => {})
-  }, [parentMessage]) // eslint-disable-line react-hooks/exhaustive-deps
+    setMsgPhase('playing')
+  }
+
+  const declineParentMessage = () => {
+    speech.stopListening()
+    setMsgPhase(null)
+    setBuddyText('')
+  }
 
   const dismissParentMessage = () => {
     parentAudioRef.current?.pause()
     parentAudioRef.current = null
     if (parentMessage) markPlayed(parentMessage.id).catch(() => {})
     setParentMessage(null)
+    setMsgPhase(null)
   }
 
   const replayParentMessage = () => {
@@ -372,19 +405,15 @@ export default function ChildPage({ session }) {
           </>
         )}
 
-        {parentMessage && (
-          <>
-            <button className={styles.envelopeBtn} aria-label="Parent message waiting">📩</button>
-            <div className={styles.msgOverlay}>
-              <div className={styles.msgBubble}>
-                <div className={styles.msgIcon}>📩</div>
-                <p className={styles.msgTitle}>Message from your parent!</p>
-                <button className={styles.msgPlayBtn} onClick={replayParentMessage}>▶ Play again</button>
-                <button className={styles.msgDismissBtn} onClick={dismissParentMessage}>Got it!</button>
-              </div>
-            </div>
-          </>
-        )}
+        <ParentMessageOverlay
+          msgPhase={msgPhase}
+          envelopeClass={styles.envelopeBtn}
+          onEnvelopeClick={() => setMsgPhase('ask')}
+          onYes={playParentMessageNow}
+          onNo={declineParentMessage}
+          onReplay={replayParentMessage}
+          onDismiss={dismissParentMessage}
+        />
       </div>
     )
   }
@@ -406,25 +435,15 @@ export default function ChildPage({ session }) {
             })
           }}
         />
-        {parentMessage && (
-          <>
-            <button
-              className={styles.envelopeFloat}
-              onClick={() => {}}
-              aria-label="Parent message waiting"
-            >
-              📩
-            </button>
-            <div className={styles.msgOverlay}>
-              <div className={styles.msgBubble}>
-                <div className={styles.msgIcon}>📩</div>
-                <p className={styles.msgTitle}>Message from your parent!</p>
-                <button className={styles.msgPlayBtn} onClick={replayParentMessage}>▶ Play again</button>
-                <button className={styles.msgDismissBtn} onClick={dismissParentMessage}>Got it!</button>
-              </div>
-            </div>
-          </>
-        )}
+        <ParentMessageOverlay
+          msgPhase={msgPhase}
+          envelopeClass={styles.envelopeFloat}
+          onEnvelopeClick={() => setMsgPhase('ask')}
+          onYes={playParentMessageNow}
+          onNo={declineParentMessage}
+          onReplay={replayParentMessage}
+          onDismiss={dismissParentMessage}
+        />
       </>
     )
   }
@@ -461,7 +480,8 @@ export default function ChildPage({ session }) {
             {parentMessage && (
               <button
                 className={styles.envelopeBtn}
-                aria-label="Parent message waiting"
+                onClick={() => setMsgPhase('ask')}
+                aria-label="Message from your parent, tap to hear it"
                 title="Message from your parent!"
               >
                 📩
@@ -578,27 +598,55 @@ export default function ChildPage({ session }) {
         <UpgradePrompt session={session} onClose={() => setShowUpgrade(false)} />
       )}
 
-      {/* Parent voice message overlay */}
-      {parentMessage && (
-        <div className={styles.msgOverlay}>
-          <div className={styles.msgBubble}>
-            <div className={styles.msgIcon}>📩</div>
-            <p className={styles.msgTitle}>Message from your parent!</p>
-            <button
-              className={styles.msgPlayBtn}
-              onClick={replayParentMessage}
-            >
-              ▶ Play again
-            </button>
-            <button
-              className={styles.msgDismissBtn}
-              onClick={dismissParentMessage}
-            >
-              Got it!
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Parent voice message: envelope already lives in the top bar above,
+          so this only renders the ask/playing bubble. */}
+      <ParentMessageOverlay
+        msgPhase={msgPhase}
+        showEnvelope={false}
+        onYes={playParentMessageNow}
+        onNo={declineParentMessage}
+        onReplay={replayParentMessage}
+        onDismiss={dismissParentMessage}
+      />
     </div>
+  )
+}
+
+/* Parent voice message: envelope indicator + ask-first / playing bubble.
+   Shared across the default, voice-only, and sing-mode screens so the
+   ask-then-play flow stays identical everywhere a message can appear. */
+function ParentMessageOverlay({ msgPhase, showEnvelope = true, envelopeClass, onEnvelopeClick, onYes, onNo, onReplay, onDismiss }) {
+  if (!msgPhase) return null
+  return (
+    <>
+      {showEnvelope && (
+        <button
+          className={envelopeClass}
+          onClick={onEnvelopeClick}
+          aria-label="Message from your parent, tap to hear it"
+          title="Message from your parent!"
+        >
+          📩
+        </button>
+      )}
+      <div className={styles.msgOverlay}>
+        <div className={styles.msgBubble}>
+          <div className={styles.msgIcon}>📩</div>
+          {msgPhase === 'ask' ? (
+            <>
+              <p className={styles.msgTitle}>Message from your parent! Want to hear it?</p>
+              <button className={styles.msgPlayBtn} onClick={onYes}>▶ Yes, play it!</button>
+              <button className={styles.msgDismissBtn} onClick={onNo}>Not now</button>
+            </>
+          ) : (
+            <>
+              <p className={styles.msgTitle}>Message from your parent!</p>
+              <button className={styles.msgPlayBtn} onClick={onReplay}>▶ Play again</button>
+              <button className={styles.msgDismissBtn} onClick={onDismiss}>Got it!</button>
+            </>
+          )}
+        </div>
+      </div>
+    </>
   )
 }
