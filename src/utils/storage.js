@@ -3,6 +3,7 @@ const KEYS = {
 }
 
 const DEFAULTS = {
+  onboarded: false,
   childName: '',
   buddyName: 'Buddy',
   avatarType: 'bear',

@@ -24,7 +24,9 @@ export default function ChildPage({ session }) {
   const [buddyText, setBuddyText] = useState('')
   const [userText, setUserText] = useState('')
   const [showPin, setShowPin] = useState(false)
-  const [showPicker, setShowPicker] = useState(false)
+  // First-run: force the avatar picker open before anything else so a brand-new
+  // signup sees who their Buddy is, instead of only discovering the 🎨 button.
+  const [showPicker, setShowPicker] = useState(() => !getSettings().onboarded)
   const [uiStatus, setUiStatus] = useState('idle') // idle | listening | thinking | speaking
 
   const speech = useSpeech(settings)
@@ -47,9 +49,20 @@ export default function ChildPage({ session }) {
   const wakePhrase      = `hey ${buddyName}`.toLowerCase()
 
   const handlePickerSave = ({ type, name, color }) => {
-    const next = { ...settings, avatarType: type, buddyName: name, avatarColor: color }
+    const next = { ...settings, avatarType: type, buddyName: name, avatarColor: color, onboarded: true }
     saveSettings(next)
     setSettings(next)
+    setShowPicker(false)
+  }
+
+  // "Maybe later" on first run still marks onboarding done so the picker
+  // only ever force-opens once, not on every visit.
+  const handlePickerClose = () => {
+    if (!settings.onboarded) {
+      const next = { ...settings, onboarded: true }
+      saveSettings(next)
+      setSettings(next)
+    }
     setShowPicker(false)
   }
 
@@ -421,13 +434,6 @@ export default function ChildPage({ session }) {
       className={styles.page}
       style={{ background: `linear-gradient(160deg, ${from} 0%, ${to} 100%)` }}
     >
-      {/* Rolling hills — gives Buddy a ground to stand on; the translucent
-          white fills auto-tint to whichever mode gradient is behind them. */}
-      <svg className={styles.hills} viewBox="0 0 375 120" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 70 Q60 32 140 62 T375 52 V120 H0 Z" fill="rgba(255,255,255,0.22)" />
-        <path d="M0 96 Q100 60 210 90 T375 82 V120 H0 Z" fill="rgba(255,255,255,0.38)" />
-      </svg>
-
       {/* Floating background decorations */}
       <div className={styles.deco} aria-hidden="true">
         <span className={styles.d1}>✦</span>
@@ -442,88 +448,102 @@ export default function ChildPage({ session }) {
         <span className={styles.d10}>★</span>
       </div>
 
-      {/* Top bar */}
-      <div className={styles.topBar}>
-        <span className={styles.modeLabel}>
-          {chat.mode !== 'chat' ? `${chat.mode} mode` : `Hi, ${childName}!`}
-        </span>
-        {parentMessage && (
-          <button
-            className={styles.envelopeBtn}
-            aria-label="Parent message waiting"
-            title="Message from your parent!"
-          >
-            📩
-          </button>
-        )}
-        {cameraOn && <span className={styles.cameraIndicator} title="Camera on">📹</span>}
-        <button
-          className={styles.customizeBtn}
-          onClick={() => setShowPicker(true)}
-          aria-label="Customise buddy"
-        >
-          🎨
-        </button>
-        <button
-          className={styles.settingsBtn}
-          onClick={() => setShowPin(true)}
-          aria-label="Parent settings"
-        >
-          ⚙️
-        </button>
-      </div>
-
-      {/* Avatar */}
-      <div className={styles.avatarArea}>
-        <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} audioRef={speech.audioRef} />
-        <p className={styles.buddyNameTag}>{buddyName}</p>
-      </div>
-
-      {/* Speech bubble */}
-      <div className={styles.bubbleArea}>
-        <SpeechBubble
-          buddyText={buddyText}
-          userText={userText}
-          status={uiStatus}
-          storyMode={isTrackedMode}
-          wordIndex={wordIndex}
-        />
-      </div>
-
-      {/* Voice button — main CTA, above the mode strip */}
-      <div className={styles.voiceArea}>
-        {!speech.supported.stt && (
-          <p className={styles.noMic}>
-            Voice not supported in this browser. Try Chrome!
-          </p>
-        )}
-        <VoiceButton status={uiStatus} onPress={handleVoicePress} buddyName={buddyName} />
-        {wakeWordEnabled && uiStatus === 'idle' && (
-          <p className={styles.wakeHint}>Say &ldquo;Hey {buddyName}&rdquo;</p>
-        )}
-      </div>
-
-      {/* Mode selector — bottom strip, shown when idle or listening */}
-      {(uiStatus === 'idle' || uiStatus === 'listening') && (
-        <div className={styles.modesArea}>
-          {showActivity && chat.mode === 'chat' && (
-            <DailyActivity activity={dailyActivity} onDismiss={handleDismissActivity} />
-          )}
-          <ModeSelector
-            currentMode={chat.mode}
-            onSelect={handleModeSelect}
-            onUpgrade={() => setShowUpgrade(true)}
-          />
-          <div className={styles.coursesRow}>
-            <button className={styles.coursesBtn} onClick={() => navigate('/courses')}>
-              📚 Courses {!isPro && <span className={styles.coursesPro}>Pro</span>}
+      {/* Layout: stacks vertically on phones (mode tiles at bottom), becomes
+          a main-content + left-sidebar pair on tablet/desktop (>=768px) so
+          the mode tiles don't look stranded at the bottom of a wide screen. */}
+      <div className={styles.layout}>
+        <div className={styles.mainColumn}>
+          {/* Top bar */}
+          <div className={styles.topBar}>
+            <span className={styles.modeLabel}>
+              {chat.mode !== 'chat' ? `${chat.mode} mode` : `Hi, ${childName}!`}
+            </span>
+            {parentMessage && (
+              <button
+                className={styles.envelopeBtn}
+                aria-label="Parent message waiting"
+                title="Message from your parent!"
+              >
+                📩
+              </button>
+            )}
+            {cameraOn && <span className={styles.cameraIndicator} title="Camera on">📹</span>}
+            <button
+              className={styles.customizeBtn}
+              onClick={() => setShowPicker(true)}
+              aria-label="Customise buddy"
+            >
+              🎨
             </button>
-            {tier === 'trial' && daysLeft !== null && (
-              <span className={styles.trialBadge}>Trial: {daysLeft}d left</span>
+            <button
+              className={styles.settingsBtn}
+              onClick={() => setShowPin(true)}
+              aria-label="Parent settings"
+            >
+              ⚙️
+            </button>
+          </div>
+
+          {/* Avatar */}
+          <div className={styles.avatarArea}>
+            {/* Rolling hills — gives Buddy a ground to stand on, right behind
+                his feet. The translucent white fills auto-tint to whichever
+                mode gradient is behind them. */}
+            <svg className={styles.hills} viewBox="0 0 375 60" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 35 Q60 16 140 31 T375 26 V60 H0 Z" fill="rgba(255,255,255,0.28)" />
+              <path d="M0 48 Q100 30 210 45 T375 41 V60 H0 Z" fill="rgba(255,255,255,0.45)" />
+            </svg>
+            <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} audioRef={speech.audioRef} />
+            <p className={styles.buddyNameTag}>{buddyName}</p>
+          </div>
+
+          {/* Speech bubble */}
+          <div className={styles.bubbleArea}>
+            <SpeechBubble
+              buddyText={buddyText}
+              userText={userText}
+              status={uiStatus}
+              storyMode={isTrackedMode}
+              wordIndex={wordIndex}
+            />
+          </div>
+
+          {/* Voice button — main CTA, above the mode strip */}
+          <div className={styles.voiceArea}>
+            {!speech.supported.stt && (
+              <p className={styles.noMic}>
+                Voice not supported in this browser. Try Chrome!
+              </p>
+            )}
+            <VoiceButton status={uiStatus} onPress={handleVoicePress} buddyName={buddyName} />
+            {wakeWordEnabled && uiStatus === 'idle' && (
+              <p className={styles.wakeHint}>Say &ldquo;Hey {buddyName}&rdquo;</p>
             )}
           </div>
         </div>
-      )}
+
+        {/* Mode selector — bottom strip on phone, left sidebar on tablet/desktop */}
+        {(uiStatus === 'idle' || uiStatus === 'listening') && (
+          <div className={styles.modesArea}>
+            {showActivity && chat.mode === 'chat' && (
+              <DailyActivity activity={dailyActivity} onDismiss={handleDismissActivity} />
+            )}
+            <ModeSelector
+              currentMode={chat.mode}
+              onSelect={handleModeSelect}
+              onUpgrade={() => setShowUpgrade(true)}
+            />
+            <div className={styles.coursesRow}>
+              <button className={styles.coursesBtn} onClick={() => navigate('/courses')}>
+                📚 Courses {!isPro && <span className={styles.coursesPro}>Pro</span>}
+              </button>
+              {tier === 'trial' && daysLeft !== null && (
+                <span className={styles.trialBadge}>Trial: {daysLeft}d left</span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* PIN gate */}
       {showPin && (
@@ -549,7 +569,7 @@ export default function ChildPage({ session }) {
           currentName={buddyName}
           currentColor={settings.avatarColor}
           onSave={handlePickerSave}
-          onClose={() => setShowPicker(false)}
+          onClose={handlePickerClose}
         />
       )}
 

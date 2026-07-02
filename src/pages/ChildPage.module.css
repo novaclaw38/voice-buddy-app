@@ -29,15 +29,17 @@
 }
 
 /* ── Ground plane ─────────────────────────────────────── */
+/* Sits behind Buddy's feet, inside .avatarArea, so it's never hidden
+   under the mode strip / courses row that occupy the bottom of the page. */
 .hills {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: clamp(90px, 18vh, 160px);
+  left: -20px;
+  right: -20px;
+  bottom: 6px;
+  width: calc(100% + 40px);
+  height: 60px;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
 }
 
 /* ── Floating decorations ──────────────────────────────── */
@@ -75,6 +77,37 @@
 .d9  { left: 93%; top: 30%; font-size: 1rem;   animation-duration: 11s; animation-delay: 0.8s; }
 .d10 { left: 60%; top: 60%; font-size: 1.2rem; animation-duration: 8s;  animation-delay: 3.5s; }
 
+/* ── Responsive layout ─────────────────────────────────────
+   Phone (default): single column, mode tiles as a bottom strip.
+   Tablet/desktop (>=768px): mode tiles become a left sidebar instead
+   of being stranded at the bottom of a wide screen. */
+.layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .layout {
+    flex-direction: row-reverse;
+    align-items: stretch;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+}
+
 .topBar {
   display: flex;
   align-items: center;
@@ -111,6 +144,7 @@
 .customizeBtn:active { transform: rotate(15deg) scale(0.92); }
 
 .avatarArea {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -158,6 +192,24 @@
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+  .modesArea {
+    width: 230px;
+    flex-shrink: 0;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-y: auto;
+    padding: 20px 14px;
+    animation: fadeInSide 0.3s ease both;
+  }
+
+  @keyframes fadeInSide {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
 }
 
 .voiceArea {

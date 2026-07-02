@@ -11,6 +11,26 @@
 
 .row::-webkit-scrollbar { display: none; }
 
+/* Sidebar mode (ChildPage's .modesArea >=768px): tiles stack vertically
+   and fill the sidebar width instead of scrolling horizontally. */
+@media (min-width: 768px) {
+  .row {
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: visible;
+    width: 100%;
+    padding: 4px 0;
+  }
+  .tile {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+  }
+}
+
 .tile {
   display: flex;
   flex-direction: column;
