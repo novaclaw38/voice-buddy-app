@@ -14,6 +14,9 @@ export default function QuizCard({ step, onComplete }) {
     if (i === step.correct) {
       setShowConfetti(true)
       timerRef.current = setTimeout(onComplete, 650)
+    } else {
+      // Wrong pick: show the mistake + reveal the right answer, then let them try again.
+      timerRef.current = setTimeout(() => setSelected(null), 900)
     }
   }
 

@@ -72,10 +72,17 @@
 }
 .locked:hover { opacity: 0.8; }
 
+/* Matches the "Pro" chip on ChildPage's courses button (.coursesPro)
+   and CoursesPage's lockBadge, so gated content reads the same everywhere. */
 .lockIcon {
   position: absolute;
   top: 4px;
   right: 4px;
-  font-size: 10px;
+  background: linear-gradient(135deg, var(--c-tangerine), var(--c-sunny));
+  color: #7a3e00;
+  font-size: 9px;
+  font-weight: 800;
   line-height: 1;
+  padding: 3px 6px;
+  border-radius: var(--r-pill);
 }

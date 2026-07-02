@@ -39,7 +39,7 @@ export default function ModeSelector({ currentMode, onSelect, onUpgrade }) {
           >
             <span className={styles.emoji}>{m.emoji}</span>
             <span className={styles.label}>{m.label}</span>
-            {locked && <span className={styles.lockIcon}>🔒</span>}
+            {locked && <span className={styles.lockIcon}>Pro</span>}
           </button>
         )
       })}

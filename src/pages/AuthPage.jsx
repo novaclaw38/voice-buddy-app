@@ -38,10 +38,7 @@ export default function AuthPage() {
 
   return (
     <div className={styles.page}>
-      <button
-        onClick={() => navigate('/')}
-        style={{ position: 'absolute', top: 20, left: 20, background: '#fff', borderRadius: 999, padding: '8px 16px', border: 'none', color: '#7c3aed', fontWeight: 700, cursor: 'pointer', fontSize: '14px', boxShadow: '0 4px 0 rgba(91,33,182,0.14)' }}
-      >
+      <button className={styles.home} onClick={() => navigate('/')}>
         ← Home
       </button>
       <div className={styles.card}>
@@ -82,25 +79,33 @@ export default function AuthPage() {
         </div>
 
         <form className={styles.form} onSubmit={handle}>
-          <input
-            className={styles.input}
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-          <input
-            className={styles.input}
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-          />
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="auth-email">Email address</label>
+            <input
+              id="auth-email"
+              className={styles.input}
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="auth-password">Password</label>
+            <input
+              id="auth-password"
+              className={styles.input}
+              type="password"
+              placeholder="At least 6 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+            />
+          </div>
 
           {error && <p className={styles.error}>{error}</p>}
           {success && <p className={styles.successMsg}>{success}</p>}

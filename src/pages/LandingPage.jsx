@@ -352,6 +352,8 @@ export default function LandingPage() {
             </div>
           </div>
           <div className={styles.featureVisual}>
+            {/* Mirrors the real CoursesPage card shape (colored header + white
+                body) so this preview matches what the product actually looks like. */}
             <div className={styles.courseCards}>
               {[
                 { emoji: '🌱', title: 'Gardening for Kids', color: ['#3ddc97', '#16a34a'] },
@@ -361,13 +363,17 @@ export default function LandingPage() {
                 <div
                   key={i}
                   className={styles.courseCard}
-                  style={{
-                    background: `linear-gradient(135deg, ${c.color[0]}, ${c.color[1]})`,
-                    animationDelay: `${i * 0.15}s`,
-                  }}
+                  style={{ animationDelay: `${i * 0.15}s` }}
                 >
-                  <span className={styles.courseEmoji}>{c.emoji}</span>
-                  <span className={styles.courseTitle}>{c.title}</span>
+                  <div
+                    className={styles.courseCardHeader}
+                    style={{ background: `linear-gradient(135deg, ${c.color[0]}, ${c.color[1]})` }}
+                  >
+                    <span className={styles.courseEmoji}>{c.emoji}</span>
+                  </div>
+                  <div className={styles.courseCardBody}>
+                    <span className={styles.courseTitle}>{c.title}</span>
+                  </div>
                 </div>
               ))}
             </div>
