@@ -1,0 +1,104 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0 20px;
+}
+
+.button {
+  position: relative;
+  z-index: 2;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s var(--spring), box-shadow 0.2s ease, background 0.35s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.button svg {
+  width: 48px;
+  height: 48px;
+  stroke: white;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* ── States — chunky candy buttons with a 3D bottom lip ── */
+.idle {
+  background: linear-gradient(135deg, #b07bff, var(--c-grape));
+  box-shadow: 0 9px 0 var(--c-grape-d), 0 18px 30px rgba(124, 58, 237, 0.45);
+  animation: idlePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes idlePulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.05); }
+}
+
+.idle:active {
+  transform: translateY(6px) scale(0.95) !important;
+  box-shadow: 0 3px 0 var(--c-grape-d), 0 8px 16px rgba(124, 58, 237, 0.4);
+  animation: none;
+}
+
+.listening {
+  background: linear-gradient(135deg, #5ef0b0, var(--c-mint));
+  box-shadow: 0 9px 0 #14935f, 0 18px 30px rgba(61, 220, 151, 0.5);
+  transform: scale(1.08);
+  animation: listenBob 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes listenBob {
+  from { transform: scale(1.07); }
+  to   { transform: scale(1.1); }
+}
+
+.speaking {
+  background: linear-gradient(135deg, var(--c-sunny), var(--c-tangerine));
+  box-shadow: 0 9px 0 #c2680c, 0 18px 30px rgba(255, 154, 60, 0.5);
+  cursor: not-allowed;
+  animation: speakBob 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes speakBob {
+  from { transform: scale(1); }
+  to   { transform: scale(1.04); }
+}
+
+.thinking {
+  background: linear-gradient(135deg, #7cc4fb, var(--c-sky));
+  box-shadow: 0 9px 0 #1e74c4, 0 18px 30px rgba(77, 173, 247, 0.5);
+  cursor: not-allowed;
+}
+
+/* ── Pulse rings (listening) ── */
+.ring {
+  position: absolute;
+  z-index: 1;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  background: rgba(61, 220, 151, 0.4);
+  animation: pulseRing 1.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+}
+
+@keyframes pulseRing {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  100% { transform: scale(2.5);  opacity: 0; }
+}
+
+/* ── Label ── */
+.label {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+  letter-spacing: 0.01em;
+}

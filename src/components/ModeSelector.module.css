@@ -1,0 +1,109 @@
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 16px 8px;
+  width: 100%;
+}
+
+.row::-webkit-scrollbar { display: none; }
+
+/* Sidebar mode (ChildPage's .modesArea >=768px): tiles stack vertically
+   and fill the sidebar width instead of scrolling horizontally. */
+@media (min-width: 768px) {
+  .row {
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: visible;
+    width: 100%;
+    padding: 4px 0;
+  }
+  .tile {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+  }
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 26px;
+  padding: 14px 10px 12px;
+  min-width: 82px;
+  flex-shrink: 0;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.18), 0 12px 20px rgba(40,20,60,0.18), inset 0 2px 0 rgba(255,255,255,0.4);
+  -webkit-user-select: none;
+  user-select: none;
+  animation: tilePop 0.45s var(--spring) both;
+  will-change: transform;
+  transition: box-shadow 0.15s ease, transform 0.15s var(--spring);
+}
+
+@keyframes tilePop {
+  from { transform: scale(0.6) translateY(18px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+.tile:active {
+  transform: translateY(4px) scale(0.94) !important;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.18), 0 6px 12px rgba(40,20,60,0.18), inset 0 2px 0 rgba(255,255,255,0.4);
+}
+
+.active {
+  box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--glow, #fff), 0 8px 18px rgba(40,20,60,0.25);
+  transform: scale(1.08) translateY(-2px);
+  animation: none !important;
+}
+
+.emoji {
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  animation: emojiWiggle 3s ease-in-out infinite;
+}
+
+@keyframes emojiWiggle {
+  0%, 90%, 100% { transform: rotate(0deg) scale(1); }
+  93%            { transform: rotate(-8deg) scale(1.1); }
+  97%            { transform: rotate(8deg) scale(1.1); }
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.locked {
+  opacity: 0.6;
+  position: relative;
+}
+.locked:hover { opacity: 0.8; }
+
+/* Matches the "Pro" chip on ChildPage's courses button (.coursesPro)
+   and CoursesPage's lockBadge, so gated content reads the same everywhere. */
+.lockIcon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: linear-gradient(135deg, var(--c-tangerine), var(--c-sunny));
+  color: #7a3e00;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: var(--r-pill);
+}

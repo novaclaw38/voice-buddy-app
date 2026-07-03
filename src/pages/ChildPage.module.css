@@ -1,0 +1,512 @@
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  padding-bottom: env(safe-area-inset-bottom);
+  transition: background 0.8s ease;
+}
+
+/* Soft light blobs drifting on the candy background */
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(120px 120px at 12% 18%, rgba(255,255,255,0.45) 0%, transparent 70%),
+    radial-gradient(90px 90px at 82% 12%, rgba(255,255,255,0.35) 0%, transparent 70%),
+    radial-gradient(140px 140px at 88% 70%, rgba(255,255,255,0.4) 0%, transparent 70%),
+    radial-gradient(100px 100px at 20% 82%, rgba(255,255,255,0.3) 0%, transparent 70%);
+  pointer-events: none;
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0%   { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* ── Ground plane ─────────────────────────────────────── */
+/* Sits behind Buddy's feet, inside .avatarArea, so it's never hidden
+   under the mode strip / courses row that occupy the bottom of the page. */
+.hills {
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  bottom: 6px;
+  width: calc(100% + 40px);
+  height: 60px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── Floating decorations ──────────────────────────────── */
+.deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.deco span {
+  position: absolute;
+  color: rgba(255,255,255,0.55);
+  font-size: 1.1rem;
+  text-shadow: 0 2px 8px rgba(124,58,237,0.18);
+  animation: floatDrift 10s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes floatDrift {
+  0%   { transform: translateY(0) rotate(0deg);   opacity: 0.35; }
+  50%  { opacity: 0.7; }
+  100% { transform: translateY(-30px) rotate(20deg); opacity: 0.4; }
+}
+
+.d1  { left:  6%; top: 18%; font-size: 1.6rem; animation-duration: 9s;  animation-delay: 0s;   }
+.d2  { left: 88%; top: 10%; font-size: 1.1rem; animation-duration: 11s; animation-delay: 1s;   }
+.d3  { left: 20%; top: 75%; font-size: 1.4rem; animation-duration: 8s;  animation-delay: 2s;   }
+.d4  { left: 72%; top: 82%; font-size: 1.2rem; animation-duration: 12s; animation-delay: 0.5s; }
+.d5  { left: 50%; top:  8%; font-size: 1rem;   animation-duration: 10s; animation-delay: 3s;   }
+.d6  { left: 80%; top: 50%; font-size: 1.5rem; animation-duration: 7s;  animation-delay: 1.5s; }
+.d7  { left:  3%; top: 45%; font-size: 1.1rem; animation-duration: 13s; animation-delay: 2.5s; }
+.d8  { left: 38%; top: 90%; font-size: 1.3rem; animation-duration: 9s;  animation-delay: 4s;   }
+.d9  { left: 93%; top: 30%; font-size: 1rem;   animation-duration: 11s; animation-delay: 0.8s; }
+.d10 { left: 60%; top: 60%; font-size: 1.2rem; animation-duration: 8s;  animation-delay: 3.5s; }
+
+/* ── Responsive layout ─────────────────────────────────────
+   Phone (default): single column, mode tiles as a bottom strip.
+   Tablet/desktop (>=768px): mode tiles become a left sidebar instead
+   of being stranded at the bottom of a wide screen. */
+.layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .layout {
+    flex-direction: row-reverse;
+    align-items: stretch;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px 4px;
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+
+.modeLabel {
+  font-family: var(--font-head);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-transform: capitalize;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+}
+
+/* Groups the avatar-chooser and settings-gear buttons tightly together —
+   .topBar's justify-content:space-between would otherwise spread every
+   child evenly, pushing them apart instead of reading as a pair. */
+.topBarActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.customizeBtn,
+.settingsBtn {
+  font-size: 1.35rem;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  line-height: 1;
+  box-shadow: 0 4px 0 rgba(91,33,182,0.14), 0 8px 16px rgba(80,40,120,0.16);
+}
+
+.customizeBtn:active { transform: rotate(15deg) scale(0.92); }
+
+.avatarArea {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 6px 0 0;
+  z-index: 1;
+}
+
+.buddyNameTag {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(255,255,255,0.7);
+  padding: 3px 16px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+  box-shadow: 0 4px 0 rgba(91,33,182,0.1);
+}
+
+.bubbleArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  z-index: 1;
+}
+
+.modesArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 4px 16px;
+  flex-shrink: 0;
+  z-index: 1;
+  animation: fadeUp 0.3s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+  .modesArea {
+    width: 230px;
+    flex-shrink: 0;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow-y: auto;
+    padding: 20px 14px;
+    animation: fadeInSide 0.3s ease both;
+  }
+
+  @keyframes fadeInSide {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+}
+
+.voiceArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 1;
+  padding-bottom: 8px;
+}
+
+.noMic {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(255,255,255,0.7);
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.wakeHint {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  margin-top: 8px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+  animation: wakeHintPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes wakeHintPulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+.cameraIndicator {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  animation: camBlink 2.5s ease infinite;
+  margin-right: auto;
+  margin-left: 8px;
+}
+
+@keyframes camBlink {
+  0%, 100% { opacity: 0.9; }
+  50%       { opacity: 0.3; }
+}
+
+.pinDismiss {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: transparent;
+}
+
+/* Parent voice message overlay */
+.msgOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(58,42,93,0.6);
+  backdrop-filter: blur(6px);
+  animation: msgFadeIn 0.25s ease;
+}
+
+@keyframes msgFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.msgBubble {
+  background: #fff;
+  border-radius: var(--r-lg);
+  padding: 36px 28px 28px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: var(--shadow-card);
+  animation: msgScaleIn 0.4s var(--spring);
+}
+
+@keyframes msgScaleIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.msgIcon {
+  font-size: 4.2rem;
+  margin-bottom: 10px;
+  display: block;
+  animation: msgBounce 0.7s ease infinite alternate;
+}
+
+@keyframes msgBounce {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-10px); }
+}
+
+.msgTitle {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 24px;
+  line-height: 1.3;
+}
+
+.msgPlayBtn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--c-grape), var(--c-berry));
+  border-radius: var(--r-md);
+  color: white;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 0 var(--c-grape-d);
+}
+
+.msgPlayBtn:active { transform: translateY(3px) scale(0.97); box-shadow: 0 3px 0 var(--c-grape-d); }
+
+.msgDismissBtn {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  background: #f1ecfb;
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.msgDismissBtn:active { background: #e7defa; }
+
+/* ── Voice-only mode (bedtime / screen-time saver — stays dark on purpose) ── */
+.voicePage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: radial-gradient(circle at 50% 30%, #1a1430 0%, #0a0a12 100%);
+  position: relative;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.voiceSettingsBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 1.4rem;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  line-height: 1;
+  z-index: 10;
+}
+
+.voiceOrb {
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+.orb_idle {
+  background: radial-gradient(circle at 40% 35%, #a78bfa, #5b21b6);
+  box-shadow: 0 0 50px 12px rgba(167,139,250,0.45);
+  animation: orbPulseIdle 3s ease-in-out infinite;
+}
+
+.orb_listening {
+  background: radial-gradient(circle at 40% 35%, #6ee7b7, #15803d);
+  box-shadow: 0 0 70px 22px rgba(110,231,183,0.5);
+  animation: orbPulseListen 0.8s ease-in-out infinite alternate;
+}
+
+.orb_thinking {
+  background: radial-gradient(circle at 40% 35%, #ffd23f, #b45309);
+  box-shadow: 0 0 60px 16px rgba(255,210,63,0.45);
+  animation: orbSpin 1.5s linear infinite;
+}
+
+.orb_speaking {
+  background: radial-gradient(circle at 40% 35%, #4dadf7, #0c4a6e);
+  box-shadow: 0 0 70px 22px rgba(77,173,247,0.5);
+  animation: orbPulseSpeak 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes orbPulseIdle {
+  0%, 100% { transform: scale(1);    opacity: 0.9; }
+  50%       { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes orbPulseListen {
+  from { transform: scale(1);    box-shadow: 0 0 60px 20px rgba(110,231,183,0.5); }
+  to   { transform: scale(1.1);  box-shadow: 0 0 90px 30px rgba(110,231,183,0.7); }
+}
+
+@keyframes orbSpin {
+  0%   { transform: scale(1)    rotate(0deg); }
+  50%  { transform: scale(1.06) rotate(180deg); }
+  100% { transform: scale(1)    rotate(360deg); }
+}
+
+@keyframes orbPulseSpeak {
+  from { transform: scale(1);    box-shadow: 0 0 60px 20px rgba(77,173,247,0.5); }
+  to   { transform: scale(1.08); box-shadow: 0 0 90px 32px rgba(77,173,247,0.65); }
+}
+
+.voiceBuddyText {
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.92);
+  text-align: center;
+  max-width: 80%;
+  line-height: 1.4;
+}
+
+.voiceUserText {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  max-width: 80%;
+}
+
+/* Courses row + trial badge */
+.coursesRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px 2px;
+}
+
+.trialBadge {
+  color: var(--ink);
+  background: rgba(255,255,255,0.7);
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Flashing envelope — parent message indicator in top bar */
+.envelopeBtn {
+  font-size: 1.4rem;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 4px 0 #b91c1c, 0 0 0 3px rgba(239,68,68,0.35);
+  line-height: 1;
+  animation: envelopePulse 0.7s ease-in-out infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes envelopePulse {
+  from { transform: scale(1);    box-shadow: 0 4px 0 #b91c1c, 0 0 0 3px rgba(239,68,68,0.35); }
+  to   { transform: scale(1.12); box-shadow: 0 4px 0 #b91c1c, 0 0 0 8px rgba(239,68,68,0.0); }
+}
+
+/* Floating envelope overlay for sing mode */
+.envelopeFloat {
+  position: fixed;
+  top: 18px;
+  right: 80px;
+  z-index: 300;
+  font-size: 1.6rem;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 4px 0 #b91c1c, 0 0 0 3px rgba(239,68,68,0.35);
+  animation: envelopePulse 0.7s ease-in-out infinite alternate;
+}
