@@ -7,8 +7,16 @@
   transition: background 1.2s ease;
 }
 
-.day {
+.morning {
+  background: linear-gradient(180deg, #ffd8a8 0%, #ffe9c9 30%, #bfe3ff 75%, #dff0ff 100%);
+}
+
+.afternoon {
   background: linear-gradient(180deg, #7db8ff 0%, #bfe3ff 38%, #ffe3f3 100%);
+}
+
+.evening {
+  background: linear-gradient(180deg, #3d3170 0%, #a1518f 40%, #ff8c69 75%, #ffd39c 100%);
 }
 
 .night {
@@ -20,17 +28,26 @@
   position: absolute;
   top: 8%;
   right: 12%;
-  width: 64px;
-  height: 64px;
+  width: 108px;
+  height: 108px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #fff6c8, var(--c-sunny) 60%, #ffb238 100%);
   box-shadow: 0 0 40px 10px rgba(255, 210, 63, 0.55);
   animation: sunDrift 14s ease-in-out infinite alternate;
 }
 
+.sunLow {
+  top: 34%;
+}
+
+.sunEvening {
+  background: radial-gradient(circle at 35% 30%, #ffe0b0, #ff9a3c 55%, #e0562f 100%);
+  box-shadow: 0 0 40px 10px rgba(255, 138, 66, 0.5);
+}
+
 .sunGlow {
   position: absolute;
-  inset: -30px;
+  inset: -44px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 246, 200, 0.45) 0%, transparent 70%);
   animation: glowPulse 4s ease-in-out infinite alternate;
@@ -76,7 +93,7 @@
   to   { opacity: 1; }
 }
 
-/* ── Clouds (day) ── */
+/* ── Clouds (afternoon) ── */
 .cloud {
   position: absolute;
   background: rgba(255, 255, 255, 0.75);
@@ -124,6 +141,88 @@
   to   { transform: translateX(160vw); }
 }
 
+/* ── Birds (morning) ── */
+.birds {
+  position: absolute;
+  inset: 0;
+}
+
+.bird {
+  position: absolute;
+  width: 16px;
+  height: 8px;
+}
+
+.bird1 {
+  top: 20%;
+  left: -8%;
+  animation: birdFly 22s linear infinite;
+}
+
+.bird2 {
+  top: 27%;
+  left: -8%;
+  animation: birdFly 27s linear infinite;
+  animation-delay: -9s;
+}
+
+.wing {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 2px;
+  background: var(--ink-dim);
+  border-radius: var(--r-pill);
+  transform-origin: 0% 50%;
+  animation: birdFlap 0.5s ease-in-out infinite alternate;
+}
+
+.wing:first-child {
+  left: 0;
+  transform: rotate(-28deg);
+}
+
+.wing:last-child {
+  left: 7px;
+  transform: rotate(28deg) scaleX(-1);
+  animation-delay: 0.05s;
+}
+
+@keyframes birdFly {
+  from { transform: translateX(0) translateY(0); }
+  to   { transform: translateX(120vw) translateY(-18px); }
+}
+
+@keyframes birdFlap {
+  from { transform: rotate(-28deg) translateY(0); }
+  to   { transform: rotate(-46deg) translateY(-2px); }
+}
+
+/* ── Fireflies (evening) ── */
+.fireflies {
+  position: absolute;
+  inset: 0;
+}
+
+.firefly {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6b0, #ffd93d 60%, transparent);
+  animation-name: fireflyFloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fireflyFloat {
+  0%   { transform: translate(0, 0);       opacity: 0.2; }
+  25%  { transform: translate(10px, -14px); opacity: 0.9; }
+  50%  { transform: translate(-6px, -22px); opacity: 0.3; }
+  75%  { transform: translate(-14px, -6px); opacity: 0.85; }
+  100% { transform: translate(0, 0);        opacity: 0.2; }
+}
+
 /* ── Stars (night) ── */
 .stars {
   position: absolute;
@@ -140,4 +239,45 @@
 @keyframes twinkleStar {
   from { opacity: 0.25; transform: scale(0.8); }
   to   { opacity: 1;    transform: scale(1.2); }
+}
+
+/* ── Shooting star (night, rare) ── */
+.shootingStar {
+  position: absolute;
+  top: -5%;
+  left: 70%;
+  width: 90px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  animation: shootingStar 28s ease-in infinite;
+}
+
+@keyframes shootingStar {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(-35deg); }
+  1%   { opacity: 1; }
+  4%   { opacity: 0; transform: translate(-260px, 220px) rotate(-35deg); }
+  100% { opacity: 0; transform: translate(-260px, 220px) rotate(-35deg); }
+}
+
+/* ── Sparkles (all realms) ── */
+.sparkles {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+}
+
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff, rgba(255,255,255,0) 70%);
+  animation-name: sparkleDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes sparkleDrift {
+  0%   { transform: translateY(0);     opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
 }

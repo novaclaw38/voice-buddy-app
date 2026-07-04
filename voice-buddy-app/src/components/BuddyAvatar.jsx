@@ -24,6 +24,7 @@ export default function BuddyAvatar({
   size = 170,
   audioRef,
   live = true,
+  partOfDay,
 }) {
   const colors    = STATE_COLORS[status] || STATE_COLORS.idle
   const bodyColor = avatarColor && status === 'idle' ? avatarColor : colors.face
@@ -42,7 +43,7 @@ export default function BuddyAvatar({
   return (
     <div
       ref={containerRef}
-      className={`${styles.container} ${styles[status]} ${live ? '' : styles.static}`}
+      className={`${styles.container} ${styles[status]} ${live ? '' : styles.static} ${partOfDay === 'night' ? styles.nightRing : ''}`}
       style={{ width: size + 20, height: size + 20 }}
       onPointerDown={live ? poke : undefined}
     >

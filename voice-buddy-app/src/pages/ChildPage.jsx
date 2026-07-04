@@ -10,6 +10,7 @@ import WorldBackdrop from '../components/WorldBackdrop.jsx'
 import Clock from '../components/Clock.jsx'
 import { useSpeech } from '../hooks/useSpeech.js'
 import { useChat } from '../hooks/useChat.js'
+import { useTimeOfDay } from '../hooks/useTimeOfDay.js'
 import { getSettings, saveSettings, migratePinIfNeeded } from '../utils/storage.js'
 import { greetingWord } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
@@ -61,6 +62,7 @@ export default function ChildPage({ session }) {
 
   const speech = useSpeech(settings)
   const chat = useChat(settings)
+  const { partOfDay } = useTimeOfDay()
   const [wordIndex, setWordIndex] = useState(-1)
   const rafRef = useRef(null)
   const [showActivity, setShowActivity] = useState(() => !hasGreetedFully && !isDailyActivityDismissed())
@@ -500,10 +502,16 @@ export default function ChildPage({ session }) {
           {/* Top bar */}
           <div className={styles.topBar}>
             <div className={styles.topBarLeft}>
-              <span className={styles.modeLabel}>
-                {chat.mode !== 'chat' ? `${chat.mode} mode` : `${greetingWord()}, ${childName}!`}
-              </span>
-              <Clock className={styles.clockBadge} />
+              <BuddyMenu
+                onSongs={handleStartSing}
+                onLearn={() => navigate('/courses')}
+                onCustomize={() => setShowPicker(true)}
+                onSettings={() => setShowPin(true)}
+              />
+              {chat.mode !== 'chat' && (
+                <span className={styles.modeLabel}>{chat.mode} mode</span>
+              )}
+              <Clock className={styles.clockBadge} partOfDay={partOfDay} />
             </div>
             <div className={styles.topBarRight}>
               {parentMessage && (
@@ -517,12 +525,6 @@ export default function ChildPage({ session }) {
                 </button>
               )}
               {cameraOn && <span className={styles.cameraIndicator} title="Camera on">📹</span>}
-              <BuddyMenu
-                onSongs={handleStartSing}
-                onLearn={() => navigate('/courses')}
-                onCustomize={() => setShowPicker(true)}
-                onSettings={() => setShowPin(true)}
-              />
             </div>
           </div>
 
@@ -536,7 +538,7 @@ export default function ChildPage({ session }) {
               <path d="M0 48 Q100 30 210 45 T375 41 V60 H0 Z" fill="rgba(255,255,255,0.45)" />
             </svg>
             <p className={styles.buddyNameTag}>{buddyName}</p>
-            <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} audioRef={speech.audioRef} />
+            <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} audioRef={speech.audioRef} partOfDay={partOfDay} />
           </div>
 
           {/* Speech bubble */}
