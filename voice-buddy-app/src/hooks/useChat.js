@@ -1,7 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { chatCompletion } from '../services/chatService.js'
 import { addHistory, fetchHistory } from '../services/historyService.js'
-import { PROMPTS, MODE_INTROS } from '../utils/prompts.js'
+import { PROMPTS, MODE_INTROS, pickRandom } from '../utils/prompts.js'
+import { timeContextLine } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
 
 const MAX_HISTORY = 16
@@ -48,21 +49,10 @@ export function useChat(settings) {
   const buildSystemPrompt = useCallback((currentMode) => {
     const childName  = settings?.childName  || 'there'
     const buddyName  = settings?.buddyName  || 'Buddy'
-    let base
-    switch (currentMode) {
-      case 'story':    base = PROMPTS.story(childName, buddyName);    break
-      case 'game':     base = PROMPTS.game(childName, buddyName);     break
-      case 'activity': base = PROMPTS.activity(childName, buddyName); break
-      case 'routine':  base = PROMPTS.routine(childName, buddyName, settings?.morningRoutine || []); break
-      case 'quiz':     base = PROMPTS.quiz(childName, buddyName);     break
-      case 'jokes':    base = PROMPTS.jokes(childName, buddyName);    break
-      case 'sing':     base = PROMPTS.sing(childName, buddyName);     break
-      case 'feelings': base = PROMPTS.feelings(childName, buddyName); break
-      case 'move':     base = PROMPTS.move(childName, buddyName);     break
-      case 'learn':    base = PROMPTS.learn(childName, buddyName);    break
-      default:         base = PROMPTS.chat(childName, buddyName)
-    }
-    return base + memoryRef.current
+    const base = currentMode === 'sing'
+      ? PROMPTS.sing(childName, buddyName)
+      : PROMPTS.chat(childName, buddyName)
+    return base + timeContextLine() + memoryRef.current
   }, [settings])
 
   const switchMode = useCallback((newMode) => {
@@ -76,7 +66,8 @@ export function useChat(settings) {
 
     const childName = settings?.childName || 'there'
     const buddyName = settings?.buddyName  || 'Buddy'
-    return MODE_INTROS[newMode]?.(childName, buddyName) || "Let's play!"
+    const variants = MODE_INTROS[newMode] || MODE_INTROS.chat
+    return pickRandom(variants)(childName, buddyName)
   }, [settings?.childName, settings?.buddyName])
 
   const sendMessage = useCallback(async (userText, currentMode) => {

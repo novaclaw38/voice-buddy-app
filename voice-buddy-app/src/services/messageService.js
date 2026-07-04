@@ -29,6 +29,25 @@ export async function sendVoiceMessage(blob) {
   if (error) throw error
 }
 
+// Realtime only catches messages sent while this page is open — anything
+// sent before that (or while the child's device was offline) needs to be
+// picked up explicitly once the page loads.
+export async function fetchLatestUnplayed() {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('parent_messages')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('played', false)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
 export async function fetchMessages(limit = 20) {
   const { data, error } = await supabase
     .from('parent_messages')

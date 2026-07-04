@@ -1,11 +1,13 @@
 import styles from './SpeechBubble.module.css'
 
-export default function SpeechBubble({ buddyText, userText, status, storyMode, wordIndex }) {
+export default function SpeechBubble({ buddyText, userText, status, wordIndex }) {
   const showThinking = status === 'thinking'
-  const showWordTracker = storyMode && wordIndex >= 0 && buddyText && !showThinking
+  const isSpeaking = status === 'speaking'
+  const showWordTracker = isSpeaking && wordIndex >= 0 && buddyText
 
-  // Bubble is visible when there's text OR when showing thinking dots
-  const isVisible = !!(buddyText || showThinking)
+  // Bubble is only ever visible while Buddy is actively thinking or
+  // speaking — it disappears the moment he stops talking.
+  const isVisible = showThinking || isSpeaking
 
   const renderText = () => {
     if (showThinking) {

@@ -391,25 +391,6 @@ export default function ParentPage() {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>Wake word</label>
-              <div className={styles.toggle}>
-                <input
-                  type="checkbox"
-                  id="wakeWordEnabled"
-                  checked={settings.wakeWordEnabled || false}
-                  onChange={(e) => updateSetting('wakeWordEnabled', e.target.checked)}
-                />
-                <label htmlFor="wakeWordEnabled" className={styles.toggleLabel}>
-                  {settings.wakeWordEnabled ? '🎙️ On — say "Hey Buddy" to start' : 'Off (tap mic to talk)'}
-                </label>
-              </div>
-              <p className={styles.hint}>
-                When on, {settings.childName || 'your child'} can say "Hey {settings.buddyName || 'Buddy'}" to start talking — no tap needed.
-                Works best in a quiet room. Requires microphone permission to stay active.
-              </p>
-            </div>
-
-            <div className={styles.field}>
               <label className={styles.label}>Screen-time saver (voice only)</label>
               <div className={styles.toggle}>
                 <input
