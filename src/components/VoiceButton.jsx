@@ -18,15 +18,6 @@ export default function VoiceButton({ status, onPress, onRelease, tapMode = true
 
   return (
     <div className={styles.wrapper}>
-      {/* Pulse rings */}
-      {isListening && (
-        <>
-          <div className={styles.ring} style={{ animationDelay: '0s' }} />
-          <div className={styles.ring} style={{ animationDelay: '0.4s' }} />
-          <div className={styles.ring} style={{ animationDelay: '0.8s' }} />
-        </>
-      )}
-
       <button
         className={`${styles.button} ${styles[status]}`}
         onPointerDown={handlePress}

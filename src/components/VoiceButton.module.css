@@ -3,15 +3,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 16px 0 20px;
+  gap: 10px;
+  padding: 10px 0 16px;
 }
 
 .button {
   position: relative;
-  z-index: 2;
-  width: 124px;
-  height: 124px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -22,80 +21,63 @@
 }
 
 .button svg {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   stroke: white;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-/* ── States — chunky candy buttons with a 3D bottom lip ── */
+/* ── States — a soft icon disc, not a big candy circle ── */
 .idle {
-  background: linear-gradient(135deg, #b07bff, var(--c-grape));
-  box-shadow: 0 9px 0 var(--c-grape-d), 0 18px 30px rgba(124, 58, 237, 0.45);
-  animation: idlePulse 2.5s ease-in-out infinite;
-}
-
-@keyframes idlePulse {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.05); }
+  background: radial-gradient(circle at 35% 30%, #b07bff, var(--c-grape));
+  box-shadow: 0 4px 0 var(--c-grape-d), 0 8px 16px rgba(124, 58, 237, 0.35);
 }
 
 .idle:active {
-  transform: translateY(6px) scale(0.95) !important;
-  box-shadow: 0 3px 0 var(--c-grape-d), 0 8px 16px rgba(124, 58, 237, 0.4);
-  animation: none;
+  transform: translateY(3px) scale(0.94) !important;
+  box-shadow: 0 1px 0 var(--c-grape-d), 0 4px 10px rgba(124, 58, 237, 0.3);
 }
 
 .listening {
-  background: linear-gradient(135deg, #5ef0b0, var(--c-mint));
-  box-shadow: 0 9px 0 #14935f, 0 18px 30px rgba(61, 220, 151, 0.5);
-  transform: scale(1.08);
-  animation: listenBob 0.5s ease-in-out infinite alternate;
+  background: radial-gradient(circle at 35% 30%, #5ef0b0, var(--c-mint));
+  box-shadow: 0 4px 0 #14935f, 0 8px 16px rgba(61, 220, 151, 0.4);
+  animation: micShake 0.35s ease-in-out infinite;
 }
 
-@keyframes listenBob {
-  from { transform: scale(1.07); }
-  to   { transform: scale(1.1); }
+@keyframes micShake {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-10deg); }
+  75%      { transform: rotate(10deg); }
 }
 
 .speaking {
-  background: linear-gradient(135deg, var(--c-sunny), var(--c-tangerine));
-  box-shadow: 0 9px 0 #c2680c, 0 18px 30px rgba(255, 154, 60, 0.5);
+  background: radial-gradient(circle at 35% 30%, var(--c-sunny), var(--c-tangerine));
+  box-shadow: 0 4px 0 #c2680c, 0 8px 16px rgba(255, 154, 60, 0.4);
   cursor: not-allowed;
   animation: speakBob 0.5s ease-in-out infinite alternate;
 }
 
 @keyframes speakBob {
   from { transform: scale(1); }
-  to   { transform: scale(1.04); }
+  to   { transform: scale(1.06); }
 }
 
 .thinking {
-  background: linear-gradient(135deg, #7cc4fb, var(--c-sky));
-  box-shadow: 0 9px 0 #1e74c4, 0 18px 30px rgba(77, 173, 247, 0.5);
+  background: radial-gradient(circle at 35% 30%, #7cc4fb, var(--c-sky));
+  box-shadow: 0 4px 0 #1e74c4, 0 8px 16px rgba(77, 173, 247, 0.4);
   cursor: not-allowed;
 }
 
-/* ── Pulse rings (listening) ── */
-.ring {
-  position: absolute;
-  z-index: 1;
-  width: 124px;
-  height: 124px;
-  border-radius: 50%;
-  background: rgba(61, 220, 151, 0.4);
-  animation: pulseRing 1.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
-}
-
-@keyframes pulseRing {
-  0%   { transform: scale(1);    opacity: 0.8; }
-  100% { transform: scale(2.5);  opacity: 0; }
+.thinking svg,
+.thinking .spinner {
+  width: 26px;
+  height: 26px;
 }
 
 /* ── Label ── */
 .label {
   font-family: var(--font-head);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--ink);
   text-align: center;

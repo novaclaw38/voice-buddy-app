@@ -7,17 +7,43 @@ import BuddyMenu from '../components/BuddyMenu.jsx'
 import ParentPin from '../components/ParentPin.jsx'
 import AvatarPicker from '../components/AvatarPicker.jsx'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
+import WorldBackdrop from '../components/WorldBackdrop.jsx'
+import Clock from '../components/Clock.jsx'
 import { useSpeech } from '../hooks/useSpeech.js'
 import { useChat } from '../hooks/useChat.js'
 import { useSubscription } from '../hooks/useSubscription.jsx'
 import { getSettings, saveSettings, migratePinIfNeeded } from '../utils/storage.js'
+import { greetingWord } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
-import { fetchMessageById, markPlayed } from '../services/messageService.js'
+import { fetchMessageById, markPlayed, fetchLatestUnplayed } from '../services/messageService.js'
 import SingAlong from '../components/SingAlong.jsx'
 import DailyActivity from '../components/DailyActivity.jsx'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
 import { getModeVoice } from '../utils/modeVoice.js'
+import { pickRandom } from '../utils/prompts.js'
 import styles from './ChildPage.module.css'
+
+const WELCOME_BACK = [
+  (childName, buddyName) => `Hey ${childName}, I'm back! What do you want to do now?`,
+  (childName, buddyName) => `${buddyName}'s here again, ${childName}! Ready to keep having fun?`,
+  (childName, buddyName) => `Ooh, ${childName}! Good to see you again — what's next?`,
+]
+
+// Buddy shouldn't just sit there waiting to be tapped — after a stretch of
+// silence he proactively invites the child to do something.
+const IDLE_NUDGE_MS = 45000
+const IDLE_NUDGES = [
+  (childName) => `Psst, ${childName}! I'm still here — want to chat, sing, or hear a joke?`,
+  (childName) => `Hey ${childName}, I know a fun game — want to play 20 Questions with me?`,
+  (childName) => `${childName}? I'm getting a little bored just sitting here — let's do something fun!`,
+  (childName) => `Did you know I love surprises, ${childName}? Tap the mic and tell me something cool!`,
+]
+
+// This page can remount many times per browser session (parent settings,
+// courses, lessons all navigate away and back) — only the very first mount
+// gets the full greeting + daily activity; every mount after that gets a
+// short varied welcome-back instead of repeating the same speech.
+let hasGreetedFully = false
 
 export default function ChildPage({ session }) {
   const navigate = useNavigate()
@@ -41,7 +67,7 @@ export default function ChildPage({ session }) {
   const [wordIndex, setWordIndex] = useState(-1)
   const [showUpgrade, setShowUpgrade] = useState(false)
   const rafRef = useRef(null)
-  const [showActivity, setShowActivity] = useState(() => !isDailyActivityDismissed())
+  const [showActivity, setShowActivity] = useState(() => !hasGreetedFully && !isDailyActivityDismissed())
   const dailyActivity = getDailyActivity()
   const [parentMessage, setParentMessage] = useState(null)
   // null = nothing pending; 'ask' = Buddy is asking whether to hear it;
@@ -54,8 +80,6 @@ export default function ChildPage({ session }) {
   const childName       = settings.childName       || 'there'
   const buddyName       = settings.buddyName       || 'Buddy'
   const avatarType      = settings.avatarType      || 'bear'
-  const wakeWordEnabled = settings.wakeWordEnabled || false
-  const wakePhrase      = `hey ${buddyName}`.toLowerCase()
 
   const handlePickerSave = ({ type, name, color }) => {
     const next = { ...settings, avatarType: type, buddyName: name, avatarColor: color, onboarded: true }
@@ -150,7 +174,7 @@ export default function ChildPage({ session }) {
     }
   }, [])
 
-  // Realtime: listen for parent voice messages
+  // Realtime: listen for parent voice messages sent while this page is open.
   useEffect(() => {
     let channel
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -171,6 +195,19 @@ export default function ChildPage({ session }) {
         .subscribe()
     })
     return () => { channel?.unsubscribe() }
+  }, [])
+
+  // Catch messages sent before this page was ever opened — realtime only
+  // fires for inserts that happen while subscribed, so anything sent
+  // earlier (or while the child's device was offline) needs an explicit
+  // check on load.
+  useEffect(() => {
+    fetchLatestUnplayed().then((row) => {
+      if (!row) return
+      return fetchMessageById(row.id)
+    }).then((msg) => {
+      if (msg) { setParentMessage(msg); setMsgPhase('ask') }
+    }).catch(() => {})
   }, [])
 
   // Buddy announces the message and asks whether to hear it, then listens
@@ -251,27 +288,53 @@ export default function ChildPage({ session }) {
     setShowActivity(false)
   }
 
-  // Boot greeting
+  // Boot greeting — Buddy announces the daily activity by voice instead of
+  // it sitting in a persistent card; the card itself hides the moment he's
+  // done speaking it. Only the first mount this session gets the full
+  // greeting; returning from parent settings/courses/lessons gets a short
+  // varied welcome-back instead of repeating the same speech.
   useEffect(() => {
-    const activityPart = showActivity
+    const isFirstGreeting = !hasGreetedFully
+    hasGreetedFully = true
+
+    const activityPart = isFirstGreeting && showActivity
       ? ` Oh, and here is today's activity — ${dailyActivity.description}`
       : ''
-    const greet = `Hi ${childName}! I'm ${buddyName}! Pick something to do, or just tap the mic and talk to me!${activityPart}`
+    const greet = isFirstGreeting
+      ? `${greetingWord()}, ${childName}! I'm ${buddyName}! Pick something to do, or just tap the mic and talk to me!${activityPart}`
+      : pickRandom(WELCOME_BACK)(childName, buddyName)
     setBuddyText(greet)
     setUiStatus('speaking')
     speech.speak(greet, () => {
       setUiStatus('idle')
+      if (isFirstGreeting) setShowActivity(false)
       scheduleBubbleClear()
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Idle nudge — Buddy doesn't just wait silently forever for a tap; after
+  // a stretch of quiet he proactively invites the child to do something.
+  useEffect(() => {
+    if (uiStatus !== 'idle' || showPin || showPicker || showUpgrade || msgPhase || chat.mode !== 'chat') return
+    const id = setTimeout(() => {
+      const nudge = pickRandom(IDLE_NUDGES)(childName)
+      setBuddyText(nudge)
+      setUiStatus('speaking')
+      speech.speak(nudge, () => {
+        setUiStatus('idle')
+        scheduleBubbleClear()
+      })
+    }, IDLE_NUDGE_MS)
+    return () => clearTimeout(id)
+  }, [uiStatus, showPin, showPicker, showUpgrade, msgPhase, chat.mode, childName, speech, scheduleBubbleClear])
+
   // Sing mode plays real recordings inside <SingAlong>; no separate
   // background track here (the old Pixabay loop hot-link-404'd anyway).
 
-  // Sing-mode word-by-word reading tracker (karaoke dot)
-  const isTrackedMode = chat.mode === 'sing'
+  // Word-by-word karaoke tracker (bouncing dot + colour highlight) — active
+  // for every reply Buddy speaks, not just special modes.
   useEffect(() => {
-    if (!isTrackedMode || uiStatus !== 'speaking' || !buddyText) {
+    if (uiStatus !== 'speaking' || !buddyText) {
       setWordIndex(-1)
       if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
       return
@@ -301,22 +364,8 @@ export default function ChildPage({ session }) {
       if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
       setWordIndex(-1)
     }
-  }, [isTrackedMode, uiStatus, buddyText]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [uiStatus, buddyText]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleVoicePressRef = useRef(null)
-
-  // Wake word loop — active when idle and wake word is enabled
-  useEffect(() => {
-    if (!wakeWordEnabled || uiStatus !== 'idle') {
-      speech.stopWakeWord()
-      return
-    }
-    speech.startWakeWord(wakePhrase, () => {
-      handleVoicePressRef.current?.()
-    })
-    return () => speech.stopWakeWord()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wakeWordEnabled, uiStatus, wakePhrase])
 
   const handleStartSing = useCallback(() => {
     cancelBubbleClear()
@@ -357,12 +406,9 @@ export default function ChildPage({ session }) {
     }
     if (uiStatus !== 'idle') return
     cancelBubbleClear()
-    speech.stopWakeWord()
     setUiStatus('listening')
     speech.startListening(handleUserSpeech)
   }, [uiStatus, speech, handleUserSpeech, cancelBubbleClear])
-
-  handleVoicePressRef.current = handleVoicePress
 
   const handlePinSuccess = () => {
     setShowPin(false)
@@ -370,12 +416,6 @@ export default function ChildPage({ session }) {
   }
 
   const voiceOnly = settings.voiceOnly || false
-
-  const modeColors = {
-    chat: ['#ff9ecf', '#a78bfa'],
-    sing: ['#ff8fc7', '#b794f6'],
-  }
-  const [from, to] = modeColors[chat.mode] || modeColors.chat
 
   if (voiceOnly) {
     return (
@@ -395,9 +435,6 @@ export default function ChildPage({ session }) {
         {userText ? <p className={styles.voiceUserText}>You: {userText}</p> : null}
 
         <VoiceButton status={uiStatus} onPress={handleVoicePress} buddyName={buddyName} />
-        {wakeWordEnabled && uiStatus === 'idle' && (
-          <p className={styles.wakeHint}>Say &ldquo;Hey {buddyName}&rdquo;</p>
-        )}
 
         {showPin && (
           <>
@@ -450,22 +487,13 @@ export default function ChildPage({ session }) {
   }
 
   return (
-    <div
-      className={styles.page}
-      style={{ background: `linear-gradient(160deg, ${from} 0%, ${to} 100%)` }}
-    >
-      {/* Floating background decorations */}
-      <div className={styles.deco} aria-hidden="true">
-        <span className={styles.d1}>✦</span>
-        <span className={styles.d2}>★</span>
-        <span className={styles.d3}>✧</span>
-        <span className={styles.d4}>☆</span>
-        <span className={styles.d5}>✦</span>
-        <span className={styles.d6}>★</span>
-        <span className={styles.d7}>✧</span>
-        <span className={styles.d8}>✦</span>
-        <span className={styles.d9}>☆</span>
-        <span className={styles.d10}>★</span>
+    <div className={styles.page}>
+      <WorldBackdrop />
+
+      {/* Daily activity — Buddy announces it by voice on boot; this card
+          just echoes it briefly, then fades once he's done speaking. */}
+      <div className={`${styles.activityFloat} ${showActivity && chat.mode === 'chat' ? styles.activityVisible : ''}`}>
+        <DailyActivity activity={dailyActivity} onDismiss={handleDismissActivity} />
       </div>
 
       {/* Layout: stacks vertically on phones (mode tiles at bottom), becomes
@@ -475,26 +503,31 @@ export default function ChildPage({ session }) {
         <div className={styles.mainColumn}>
           {/* Top bar */}
           <div className={styles.topBar}>
-            <span className={styles.modeLabel}>
-              {chat.mode !== 'chat' ? `${chat.mode} mode` : `Hi, ${childName}!`}
-            </span>
-            {parentMessage && (
-              <button
-                className={styles.envelopeBtn}
-                onClick={() => setMsgPhase('ask')}
-                aria-label="Message from your parent, tap to hear it"
-                title="Message from your parent!"
-              >
-                📩
-              </button>
-            )}
-            {cameraOn && <span className={styles.cameraIndicator} title="Camera on">📹</span>}
-            <BuddyMenu
-              onSongs={handleStartSing}
-              onLearn={() => navigate('/courses')}
-              onCustomize={() => setShowPicker(true)}
-              onSettings={() => setShowPin(true)}
-            />
+            <div className={styles.topBarLeft}>
+              <span className={styles.modeLabel}>
+                {chat.mode !== 'chat' ? `${chat.mode} mode` : `${greetingWord()}, ${childName}!`}
+              </span>
+              <Clock className={styles.clockBadge} />
+            </div>
+            <div className={styles.topBarRight}>
+              {parentMessage && (
+                <button
+                  className={styles.envelopeBtn}
+                  onClick={() => setMsgPhase('ask')}
+                  aria-label="Message from your parent, tap to hear it"
+                  title="Message from your parent!"
+                >
+                  📩
+                </button>
+              )}
+              {cameraOn && <span className={styles.cameraIndicator} title="Camera on">📹</span>}
+              <BuddyMenu
+                onSongs={handleStartSing}
+                onLearn={() => navigate('/courses')}
+                onCustomize={() => setShowPicker(true)}
+                onSettings={() => setShowPin(true)}
+              />
+            </div>
           </div>
 
           {/* Avatar */}
@@ -506,8 +539,8 @@ export default function ChildPage({ session }) {
               <path d="M0 35 Q60 16 140 31 T375 26 V60 H0 Z" fill="rgba(255,255,255,0.28)" />
               <path d="M0 48 Q100 30 210 45 T375 41 V60 H0 Z" fill="rgba(255,255,255,0.45)" />
             </svg>
-            <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} audioRef={speech.audioRef} />
             <p className={styles.buddyNameTag}>{buddyName}</p>
+            <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} audioRef={speech.audioRef} />
           </div>
 
           {/* Speech bubble */}
@@ -516,7 +549,6 @@ export default function ChildPage({ session }) {
               buddyText={buddyText}
               userText={userText}
               status={uiStatus}
-              storyMode={isTrackedMode}
               wordIndex={wordIndex}
             />
           </div>
@@ -529,18 +561,12 @@ export default function ChildPage({ session }) {
               </p>
             )}
             <VoiceButton status={uiStatus} onPress={handleVoicePress} buddyName={buddyName} />
-            {wakeWordEnabled && uiStatus === 'idle' && (
-              <p className={styles.wakeHint}>Say &ldquo;Hey {buddyName}&rdquo;</p>
-            )}
           </div>
         </div>
 
-        {/* Mode selector — bottom strip on phone, left sidebar on tablet/desktop */}
+        {/* Trial badge — bottom strip on phone, left sidebar on tablet/desktop */}
         {(uiStatus === 'idle' || uiStatus === 'listening') && (
           <div className={styles.modesArea}>
-            {showActivity && chat.mode === 'chat' && (
-              <DailyActivity activity={dailyActivity} onDismiss={handleDismissActivity} />
-            )}
             {tier === 'trial' && daysLeft !== null && (
               <div className={styles.coursesRow}>
                 <button type="button" className={styles.trialBadge} onClick={() => setShowUpgrade(true)}>

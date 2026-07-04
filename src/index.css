@@ -191,11 +191,24 @@ input, select, textarea {
   }
 }
 
-/* ---- Print Styles ---- */
+/* ---- Print Styles ----
+   #print-portal is nested deep inside the Parent dashboard's own layout,
+   not a direct child of #root — so hiding "everything under #root except
+   #print-portal" via display:none would hide #print-portal too (a hidden
+   ancestor removes its whole subtree, no matter what the descendant's own
+   display is set to). visibility works differently: a descendant CAN
+   override an ancestor's visibility:hidden, so this is the standard
+   "print only this element" trick. */
 @media print {
   body { background: white !important; overflow: visible !important; }
-  #root > *:not(#print-portal) { display: none !important; }
-  #print-portal { display: block !important; }
+  body * { visibility: hidden; }
+  #print-portal, #print-portal * { visibility: visible; }
+  #print-portal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
 
   @page {
     margin: 0.75in;

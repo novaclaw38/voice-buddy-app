@@ -198,68 +198,9 @@ export function useSpeech(settings) {
     rec.start()
   }, [stopSpeaking, stopListening])
 
-  // ── Wake word loop ────────────────────────────────────────────────────────
-  const wakeRef      = useRef(null)   // current SpeechRec instance
-  const wakeActiveRef = useRef(false) // whether the loop is running
-  const wakeCallbackRef = useRef(null)
-  const wakePhraseRef   = useRef('')
-
-  const stopWakeWord = useCallback(() => {
-    wakeActiveRef.current = false
-    if (wakeRef.current) { try { wakeRef.current.stop() } catch (_) {} wakeRef.current = null }
-  }, [])
-
-  const startWakeWord = useCallback((phrase, onTrigger) => {
-    if (!SpeechRec) return
-    stopWakeWord()
-    wakeActiveRef.current  = true
-    wakeCallbackRef.current = onTrigger
-    wakePhraseRef.current  = (phrase || '').toLowerCase().trim()
-
-    const runCycle = () => {
-      if (!wakeActiveRef.current) return
-      const rec = new SpeechRec()
-      wakeRef.current = rec
-      rec.lang = 'en-US'
-      rec.continuous = false
-      rec.interimResults = true
-
-      rec.onresult = (e) => {
-        const heard = Array.from(e.results)
-          .map((r) => r[0].transcript)
-          .join('')
-          .toLowerCase()
-        if (wakePhraseRef.current && heard.includes(wakePhraseRef.current)) {
-          wakeActiveRef.current = false
-          wakeRef.current = null
-          wakeCallbackRef.current?.()
-        }
-      }
-
-      rec.onend = () => {
-        if (!wakeActiveRef.current) return
-        // Restart after a tiny gap so the browser doesn't complain
-        setTimeout(runCycle, 300)
-      }
-
-      rec.onerror = (e) => {
-        if (e.error === 'not-allowed') { wakeActiveRef.current = false; return }
-        if (!wakeActiveRef.current) return
-        setTimeout(runCycle, 1000)
-      }
-
-      try { rec.start() } catch (_) {
-        if (wakeActiveRef.current) setTimeout(runCycle, 1000)
-      }
-    }
-
-    runCycle()
-  }, [stopWakeWord])
-
   return {
     status, transcript, voices, supported,
     startListening, stopListening, speak, stopSpeaking,
-    startWakeWord, stopWakeWord,
     audioRef,          // Google TTS audio element — currentTime/duration for word sync
     boundaryWordRef,   // Web Speech fallback — word index from onboundary event
   }

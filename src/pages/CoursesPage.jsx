@@ -6,7 +6,14 @@ import { useSpeech } from '../hooks/useSpeech.js'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
 import { useState, useEffect } from 'react'
 import { getSettings } from '../utils/storage.js'
+import { pickRandom } from '../utils/prompts.js'
 import styles from './CoursesPage.module.css'
+
+const COURSES_INTRO = [
+  (names) => `Here are your courses! ${names}. Tap one to hear what's inside!`,
+  (names) => `Look what we can learn together! ${names}. Which one sounds fun?`,
+  (names) => `So many things to discover — ${names}. Pick one and let's dive in!`,
+]
 
 // Simple illustrated scene per course, drawn in the same white line-art
 // family as the mode tiles. Sits on the course's gradient header.
@@ -72,7 +79,7 @@ export default function CoursesPage({ session }) {
   // here from text alone. Speaks once per visit.
   useEffect(() => {
     const names = COURSES.map((c) => c.title).join(', ')
-    speech.speak(`Here are your courses! ${names}. Tap one to hear what's inside!`)
+    speech.speak(pickRandom(COURSES_INTRO)(names))
     return () => speech.stopSpeaking()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
