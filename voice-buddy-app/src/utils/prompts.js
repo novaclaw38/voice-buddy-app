@@ -31,9 +31,9 @@ export const MODE_INTROS = {
     (childName, buddyName) => `Hiya ${childName}! Want to talk, play a game, or hear a joke? I'm all ears!`,
   ],
   sing: [
-    (childName, buddyName) => `La la la! Singing time, ${childName}! Let's start with a favourite — do you know Twinkle Twinkle Little Star? Sing it with me!`,
-    (childName, buddyName) => `Ooh, music time, ${childName}! My favourite! What song should we sing first?`,
-    (childName, buddyName) => `${buddyName}'s ready to sing! Pick a song, ${childName}, and let's make some noise!`,
+    (childName, buddyName) => `Let's sing, ${childName}!`,
+    (childName, buddyName) => `Yay, singing time! Let's sing a song, ${childName}!`,
+    (childName, buddyName) => `${buddyName} loves to sing! Let's pick a song!`,
   ],
 }
 

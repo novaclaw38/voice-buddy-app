@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
+import { isValidVoiceKey } from '../utils/voiceOptions.js'
 
 const SpeechRec =
   typeof window !== 'undefined'
@@ -16,6 +17,13 @@ export function useSpeech(settings) {
   const boundaryWordRef = useRef(-1)     // word index from Web Speech onboundary
   const onResultRef = useRef(null)
   const listeningRef = useRef(false)
+  // speak() is async (network round-trip to /api/tts) but stopSpeaking()
+  // only clears whatever audio already exists — if a second speak() call
+  // starts before the first's fetch resolves, stopSpeaking() at the top of
+  // each call finds nothing to stop yet, and both can end up playing at
+  // once. This token lets a stale call's async continuation recognize a
+  // newer call has since taken over and bail out instead of racing it.
+  const speakTokenRef = useRef(0)
 
   const supported = { stt: !!SpeechRec, tts: true }
 
@@ -89,6 +97,9 @@ export function useSpeech(settings) {
     boundaryWordRef.current = -1
     synthRef.current?.cancel()
     setStatus('idle')
+    // Invalidate any speak() call still awaiting its /api/tts response so it
+    // can't play its audio after the fact once this one resolves.
+    speakTokenRef.current++
   }, [])
 
   // ── Google TTS speak ──────────────────────────────────────────────────────
@@ -99,22 +110,27 @@ export function useSpeech(settings) {
     stopSpeaking()
     setStatus('speaking')
 
+    const callId = ++speakTokenRef.current
+    const isStale = () => speakTokenRef.current !== callId
+
     const baseRate  = settings?.robotVoice ? 0.8  : (settings?.speechRate  ?? 0.9)
     const basePitch = settings?.robotVoice ? -8   : 0    // semitones for Google TTS
-    const gender    = settings?.robotVoice ? 'male' : 'female'
+    const voice     = isValidVoiceKey(settings?.voiceName)
+      ? settings.voiceName
+      : (settings?.robotVoice ? 'deep-m' : 'friendly-f')
     const rate  = Math.max(0.25, Math.min(4, baseRate * (voiceOpts.rateMul ?? 1)))
     const pitch = Math.max(-20, Math.min(20, basePitch + (voiceOpts.pitchOffset ?? 0)))
 
     supabase.auth.getSession()
       .then(({ data }) => {
-        const token = data?.session?.access_token
+        const authToken = data?.session?.access_token
         return fetch('/api/tts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
           },
-          body: JSON.stringify({ text, rate, pitch, gender }),
+          body: JSON.stringify({ text, rate, pitch, voice }),
         })
       })
       .then((r) => {
@@ -122,6 +138,7 @@ export function useSpeech(settings) {
         return r.blob()
       })
       .then((blob) => {
+        if (isStale()) return // a newer speak() call has since taken over
         const url = URL.createObjectURL(blob)
         const audio = new Audio(url)
         audioRef.current = audio
@@ -137,15 +154,15 @@ export function useSpeech(settings) {
           // Autoplay blocked — fall back
           URL.revokeObjectURL(url)
           audioRef.current = null
-          fallbackSpeak(text, onDone, voiceOpts)
+          if (!isStale()) fallbackSpeak(text, onDone, voiceOpts)
         })
       })
       .catch(() => {
         // Key not set or network error — fall back to browser TTS silently
-        fallbackSpeak(text, onDone, voiceOpts)
+        if (!isStale()) fallbackSpeak(text, onDone, voiceOpts)
       })
   }, [stopListening, stopSpeaking, fallbackSpeak,
-      settings?.robotVoice, settings?.speechRate])
+      settings?.robotVoice, settings?.speechRate, settings?.voiceName])
 
   // ── Speech recognition ────────────────────────────────────────────────────
   const startListening = useCallback((onResult) => {

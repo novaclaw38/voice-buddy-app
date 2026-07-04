@@ -6,12 +6,10 @@ import VoiceButton from '../components/VoiceButton.jsx'
 import BuddyMenu from '../components/BuddyMenu.jsx'
 import ParentPin from '../components/ParentPin.jsx'
 import AvatarPicker from '../components/AvatarPicker.jsx'
-import UpgradePrompt from '../components/UpgradePrompt.jsx'
 import WorldBackdrop from '../components/WorldBackdrop.jsx'
 import Clock from '../components/Clock.jsx'
 import { useSpeech } from '../hooks/useSpeech.js'
 import { useChat } from '../hooks/useChat.js'
-import { useSubscription } from '../hooks/useSubscription.jsx'
 import { getSettings, saveSettings, migratePinIfNeeded } from '../utils/storage.js'
 import { greetingWord } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
@@ -63,9 +61,7 @@ export default function ChildPage({ session }) {
 
   const speech = useSpeech(settings)
   const chat = useChat(settings)
-  const { tier, daysLeft } = useSubscription()
   const [wordIndex, setWordIndex] = useState(-1)
-  const [showUpgrade, setShowUpgrade] = useState(false)
   const rafRef = useRef(null)
   const [showActivity, setShowActivity] = useState(() => !hasGreetedFully && !isDailyActivityDismissed())
   const dailyActivity = getDailyActivity()
@@ -315,7 +311,7 @@ export default function ChildPage({ session }) {
   // Idle nudge — Buddy doesn't just wait silently forever for a tap; after
   // a stretch of quiet he proactively invites the child to do something.
   useEffect(() => {
-    if (uiStatus !== 'idle' || showPin || showPicker || showUpgrade || msgPhase || chat.mode !== 'chat') return
+    if (uiStatus !== 'idle' || showPin || showPicker || msgPhase || chat.mode !== 'chat') return
     const id = setTimeout(() => {
       const nudge = pickRandom(IDLE_NUDGES)(childName)
       setBuddyText(nudge)
@@ -326,7 +322,7 @@ export default function ChildPage({ session }) {
       })
     }, IDLE_NUDGE_MS)
     return () => clearTimeout(id)
-  }, [uiStatus, showPin, showPicker, showUpgrade, msgPhase, chat.mode, childName, speech, scheduleBubbleClear])
+  }, [uiStatus, showPin, showPicker, msgPhase, chat.mode, childName, speech, scheduleBubbleClear])
 
   // Sing mode plays real recordings inside <SingAlong>; no separate
   // background track here (the old Pixabay loop hot-link-404'd anyway).
@@ -563,19 +559,6 @@ export default function ChildPage({ session }) {
             <VoiceButton status={uiStatus} onPress={handleVoicePress} buddyName={buddyName} />
           </div>
         </div>
-
-        {/* Trial badge — bottom strip on phone, left sidebar on tablet/desktop */}
-        {(uiStatus === 'idle' || uiStatus === 'listening') && (
-          <div className={styles.modesArea}>
-            {tier === 'trial' && daysLeft !== null && (
-              <div className={styles.coursesRow}>
-                <button type="button" className={styles.trialBadge} onClick={() => setShowUpgrade(true)}>
-                  Trial: {daysLeft}d left — Upgrade
-                </button>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* PIN gate */}
@@ -604,11 +587,6 @@ export default function ChildPage({ session }) {
           onSave={handlePickerSave}
           onClose={handlePickerClose}
         />
-      )}
-
-      {/* Upgrade prompt */}
-      {showUpgrade && (
-        <UpgradePrompt session={session} onClose={() => setShowUpgrade(false)} />
       )}
 
       {/* Parent voice message: envelope already lives in the top bar above,

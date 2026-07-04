@@ -189,7 +189,7 @@
   padding: 5px 20px;
   border-radius: var(--r-pill);
   letter-spacing: 0.03em;
-  margin-bottom: 8px;
+  margin-bottom: 22px;
   box-shadow: 0 4px 0 rgba(91,33,182,0.12), 0 8px 16px rgba(80,40,120,0.14);
 }
 
@@ -214,41 +214,6 @@
   width: 100%;
   min-height: 0;
   z-index: 1;
-}
-
-.modesArea {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 4px 16px;
-  flex-shrink: 0;
-  z-index: 1;
-  animation: fadeUp 0.3s ease both;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@media (min-width: 768px) {
-  .modesArea {
-    width: 230px;
-    flex-shrink: 0;
-    height: 100%;
-    justify-content: flex-start;
-    align-items: stretch;
-    overflow-y: auto;
-    padding: 20px 14px;
-    animation: fadeInSide 0.3s ease both;
-  }
-
-  @keyframes fadeInSide {
-    from { opacity: 0; transform: translateX(-10px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
 }
 
 .voiceArea {
@@ -459,24 +424,6 @@
   color: rgba(255,255,255,0.5);
   text-align: center;
   max-width: 80%;
-}
-
-/* Courses row + trial badge */
-.coursesRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 10px 16px 2px;
-}
-
-.trialBadge {
-  color: var(--ink);
-  background: rgba(255,255,255,0.7);
-  padding: 6px 12px;
-  border-radius: var(--r-pill);
-  font-size: 12px;
-  font-weight: 700;
 }
 
 /* Flashing envelope — parent message indicator in top bar */
