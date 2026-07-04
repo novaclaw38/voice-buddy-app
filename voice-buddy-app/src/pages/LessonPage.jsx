@@ -14,6 +14,13 @@ import ActivityCard from '../components/lesson/ActivityCard.jsx'
 import RewardScreen from '../components/lesson/RewardScreen.jsx'
 import styles from './LessonPage.module.css'
 
+// Quiz options and label items are authored as "emoji Text" — strip the
+// emoji off so it reads naturally aloud instead of literally saying "emoji".
+function stripEmojiPrefix(s) {
+  const i = s.indexOf(' ')
+  return i > -1 ? s.slice(i + 1) : s
+}
+
 export default function LessonPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -59,6 +66,23 @@ export default function LessonPage() {
     setBuddyText(narration)
     setUiStatus('speaking')
     speech.speak(narration, () => {
+      // A pre-reader can't tell quiz options or label chips apart from text
+      // alone, so read them aloud right after the question/prompt — the
+      // emoji is a hint, the voice is the real answer key.
+      if (step.type === 'quiz') {
+        const optionsText = step.options.map((o, i) => `${String.fromCharCode(65 + i)}: ${stripEmojiPrefix(o)}.`).join(' ')
+        setBuddyText(optionsText)
+        setUiStatus('speaking')
+        speech.speak(optionsText, () => setUiStatus('idle'))
+        return
+      }
+      if (step.type === 'label') {
+        const itemsText = `Find these: ${step.items.map(stripEmojiPrefix).join(', ')}.`
+        setBuddyText(itemsText)
+        setUiStatus('speaking')
+        speech.speak(itemsText, () => setUiStatus('idle'))
+        return
+      }
       setUiStatus('idle')
       // explain cards auto-complete after narration
       if (step.type === 'explain') setStepComplete(true)
