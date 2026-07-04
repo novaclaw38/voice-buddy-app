@@ -4,13 +4,22 @@ import PrintSheet from '../components/PrintSheet.jsx'
 import { getSettings, saveSettings, migratePinIfNeeded, hashPin } from '../utils/storage.js'
 import { testConnection } from '../services/chatService.js'
 import { fetchHistory, deleteHistory } from '../services/historyService.js'
-import { sendVoiceMessage, fetchMessages } from '../services/messageService.js'
+import { sendVoiceMessage, fetchMessages, fetchMessageById, markPlayed } from '../services/messageService.js'
 import { supabase } from '../lib/supabase.js'
 import { useSpeech } from '../hooks/useSpeech.js'
+import { useCompletions } from '../hooks/useCompletions.js'
 import { VOICE_OPTIONS, DEFAULT_VOICE, isValidVoiceKey } from '../utils/voiceOptions.js'
+import { COURSES } from '../utils/courses.js'
 import styles from './ParentPage.module.css'
 
-const TABS = ['Settings', 'Subscription', 'Account', 'Routines', 'Messages', 'Camera', 'History', 'Print']
+// Grouped so the tab bar reads as clusters of related settings rather than
+// eight flat, same-weight buttons in a row.
+const TAB_GROUPS = [
+  { label: 'Child',    tabs: ['Settings', 'Routines'] },
+  { label: 'Learning', tabs: ['Learning'] },
+  { label: 'Connect',  tabs: ['Messages', 'Camera', 'History', 'Print'] },
+  { label: 'Billing',  tabs: ['Subscription', 'Account'] },
+]
 
 const ICE_SERVERS = {
   iceServers: [
@@ -48,6 +57,16 @@ export default function ParentPage({ session }) {
   const [cancelError, setCancelError] = useState('')
   const [updatePaymentStatus, setUpdatePaymentStatus] = useState('idle') // idle | redirecting | error
   const [updatePaymentError, setUpdatePaymentError] = useState('')
+  const [showSaved, setShowSaved] = useState(false)
+  const savedFlashRef = useRef(null)
+  const [pinStage, setPinStage] = useState('idle') // idle | confirm
+  const [pinPending, setPinPending] = useState('')
+  const [pinError, setPinError] = useState('')
+  const [pinSaved, setPinSaved] = useState(false)
+  const [camConfirming, setCamConfirming] = useState(false)
+  const [playingMsgId, setPlayingMsgId] = useState(null)
+  const playAudioRef = useRef(null)
+  const { completions } = useCompletions()
 
   // One-time migration of any pre-existing plaintext parentPin to a hash.
   useEffect(() => {
@@ -59,6 +78,13 @@ export default function ParentPage({ session }) {
     if (tab !== 'Messages') return
     setMsgsLoading(true)
     fetchMessages().then(setSentMessages).catch(console.error).finally(() => setMsgsLoading(false))
+    return () => { playAudioRef.current?.pause(); setPlayingMsgId(null) }
+  }, [tab])
+
+  // Don't leave a stale "start camera?" confirmation showing if the parent
+  // navigates away from the Camera tab and back.
+  useEffect(() => {
+    if (tab !== 'Camera') setCamConfirming(false)
   }, [tab])
 
   // Load history from Supabase when History tab opens
@@ -145,6 +171,9 @@ export default function ParentPage({ session }) {
       saveSettings(next)
       return next
     })
+    setShowSaved(true)
+    clearTimeout(savedFlashRef.current)
+    savedFlashRef.current = setTimeout(() => setShowSaved(false), 1500)
   }
 
   // Lets a parent hear the currently-selected voice right here, instead of
@@ -154,15 +183,33 @@ export default function ParentPage({ session }) {
     speech.speak("Hi! I'm Buddy, your child's AI friend!", () => setPreviewStatus('idle'))
   }
 
-  // The PIN is never stored or displayed in plaintext, so this field only
-  // ever collects a *new* PIN and writes its hash once 4 digits are entered.
+  // The PIN is never stored or displayed in plaintext. A typo here would
+  // otherwise silently lock a parent out, so the new PIN must be entered
+  // twice — the hash is only written once both entries match.
   const handlePinInput = async (raw) => {
     const digits = raw.replace(/\D/g, '').slice(0, 4)
     setPinInput(digits)
-    if (digits.length === 4) {
-      updateSetting('parentPinHash', await hashPin(digits))
+    setPinError('')
+    if (digits.length !== 4) return
+
+    if (pinStage === 'idle') {
+      setPinPending(digits)
       setPinInput('')
+      setPinStage('confirm')
+      return
     }
+
+    // pinStage === 'confirm'
+    if (digits === pinPending) {
+      updateSetting('parentPinHash', await hashPin(digits))
+      setPinSaved(true)
+      setTimeout(() => setPinSaved(false), 2000)
+    } else {
+      setPinError("Those PINs didn't match — try again.")
+    }
+    setPinInput('')
+    setPinPending('')
+    setPinStage('idle')
   }
 
   const handleTestConnection = async () => {
@@ -192,6 +239,7 @@ export default function ParentPage({ session }) {
 
   const startCamera = async () => {
     if (camStatus !== 'idle' && camStatus !== 'error') return
+    setCamConfirming(false)
     setCamStatus('requesting')
     setCamError(null)
 
@@ -285,6 +333,32 @@ export default function ParentPage({ session }) {
     }
   }
 
+  // Sent Messages only showed a played/unplayed badge with no way to hear
+  // what was actually sent — these are voice recordings (no transcript
+  // exists), so playback is the only way to review one.
+  const handlePlayMessage = async (msg) => {
+    if (playingMsgId === msg.id) {
+      playAudioRef.current?.pause()
+      setPlayingMsgId(null)
+      return
+    }
+    playAudioRef.current?.pause()
+    try {
+      const { audioUrl } = await fetchMessageById(msg.id)
+      const audio = new Audio(audioUrl)
+      playAudioRef.current = audio
+      setPlayingMsgId(msg.id)
+      audio.addEventListener('ended', () => setPlayingMsgId(null))
+      await audio.play()
+      if (!msg.played) {
+        markPlayed(msg.id)
+        setSentMessages((prev) => prev.map((m) => (m.id === msg.id ? { ...m, played: true } : m)))
+      }
+    } catch {
+      setPlayingMsgId(null)
+    }
+  }
+
   const handleClearHistory = async () => {
     if (window.confirm('Clear all chat history? This cannot be undone.')) {
       await deleteHistory()
@@ -321,14 +395,19 @@ export default function ParentPage({ session }) {
 
       {/* Tabs */}
       <div className={styles.tabs}>
-        {TABS.map((t) => (
-          <button
-            key={t}
-            className={`${styles.tab} ${tab === t ? styles.activeTab : ''}`}
-            onClick={() => setTab(t)}
-          >
-            {t}
-          </button>
+        {TAB_GROUPS.map((group, gi) => (
+          <div className={styles.tabGroup} key={group.label}>
+            {group.tabs.map((t) => (
+              <button
+                key={t}
+                className={`${styles.tab} ${tab === t ? styles.activeTab : ''}`}
+                onClick={() => setTab(t)}
+              >
+                {t}
+              </button>
+            ))}
+            {gi < TAB_GROUPS.length - 1 && <span className={styles.tabDivider} aria-hidden="true" />}
+          </div>
         ))}
       </div>
 
@@ -338,7 +417,10 @@ export default function ParentPage({ session }) {
         {/* ---- SETTINGS ---- */}
         {tab === 'Settings' && (
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Child Settings</h2>
+            <div className={styles.sectionHeaderRow}>
+              <h2 className={styles.sectionTitle}>Child Settings</h2>
+              <span className={`${styles.savedFlash} ${showSaved ? styles.savedFlashVisible : ''}`}>✓ Saved</span>
+            </div>
 
             <div className={styles.field}>
               <label className={styles.label} htmlFor="childName">Child's Name</label>
@@ -383,9 +465,17 @@ export default function ParentPage({ session }) {
                 maxLength={4}
                 value={pinInput}
                 onChange={(e) => handlePinInput(e.target.value)}
-                placeholder="Enter new 4-digit PIN"
+                placeholder={pinStage === 'confirm' ? 'Re-enter the same PIN to confirm' : 'Enter new 4-digit PIN'}
               />
-              <p className={styles.hint}>Leave blank to keep your current PIN</p>
+              {pinError ? (
+                <p className={styles.testError}>{pinError}</p>
+              ) : pinSaved ? (
+                <p className={styles.hint}>✓ New PIN saved</p>
+              ) : (
+                <p className={styles.hint}>
+                  {pinStage === 'confirm' ? 'Type it once more to confirm' : 'Leave blank to keep your current PIN'}
+                </p>
+              )}
             </div>
 
             <div className={styles.field}>
@@ -460,17 +550,10 @@ export default function ParentPage({ session }) {
               </p>
             </div>
 
-            <h2 className={styles.sectionTitle} style={{ marginTop: 24 }}>AI Connection</h2>
-
             <div className={styles.field}>
-              <p className={styles.hint} style={{ marginBottom: 10 }}>
-                Buddy's AI connection is set up and ready to go — nothing to configure here.
-              </p>
-              <div className={styles.btnRow}>
-                <button className={styles.btnTest} onClick={handleTestConnection} disabled={testStatus === 'testing'}>
-                  {testStatus === 'testing' ? 'Testing...' : testStatus === 'ok' ? '✓ Connected!' : testStatus === 'fail' ? '✗ Failed' : 'Test Connection'}
-                </button>
-              </div>
+              <button className={styles.linkBtn} onClick={handleTestConnection} disabled={testStatus === 'testing'}>
+                {testStatus === 'testing' ? 'Testing connection...' : testStatus === 'ok' ? '✓ Connected!' : testStatus === 'fail' ? '✗ Connection failed' : "Buddy not responding? Test connection"}
+              </button>
               {testStatus === 'fail' && testError && (
                 <p className={styles.testError}>{testError}</p>
               )}
@@ -585,6 +668,34 @@ export default function ParentPage({ session }) {
           </div>
         )}
 
+        {/* ---- LEARNING ---- */}
+        {tab === 'Learning' && (
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Learning Progress</h2>
+            <p className={styles.hint} style={{ marginBottom: 20 }}>
+              What {settings.childName || 'your child'} has completed in Courses so far.
+            </p>
+            <div className={styles.courseProgressList}>
+              {COURSES.map((course) => {
+                const done = course.lessons.filter((l) => completions.has(`${course.id}:${l.id}`)).length
+                const total = course.lessons.length
+                const pct = total ? Math.round((done / total) * 100) : 0
+                return (
+                  <div key={course.id} className={styles.courseProgressCard}>
+                    <div className={styles.courseProgressHeader}>
+                      <span className={styles.courseProgressName}>{course.title}</span>
+                      <span className={styles.courseProgressCount}>{done}/{total} lessons</span>
+                    </div>
+                    <div className={styles.progressBarTrack}>
+                      <div className={styles.progressBarFill} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ---- MESSAGES ---- */}
         {tab === 'Messages' && (
           <div className={styles.section}>
@@ -631,6 +742,9 @@ export default function ParentPage({ session }) {
                         {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
+                    <button className={styles.btnSmall} onClick={() => handlePlayMessage(msg)}>
+                      {playingMsgId === msg.id ? '⏸ Pause' : '▶ Play what you sent'}
+                    </button>
                   </div>
                 ))}
               </div>
@@ -664,17 +778,30 @@ export default function ParentPage({ session }) {
               )}
             </div>
 
-            <div className={styles.btnRow} style={{ marginTop: 16 }}>
-              {(camStatus === 'idle' || camStatus === 'error') ? (
-                <button className={styles.btnSave} onClick={startCamera}>
-                  📹 Start Camera
-                </button>
-              ) : (
-                <button className={styles.btnDanger} onClick={stopCamera}>
-                  Stop Camera
-                </button>
-              )}
-            </div>
+            {camConfirming ? (
+              <div className={styles.field} style={{ marginTop: 16 }}>
+                <p className={styles.hint} style={{ marginBottom: 10 }}>
+                  This turns on the camera on your child's device right now, without asking
+                  them first. Continue?
+                </p>
+                <div className={styles.btnRow}>
+                  <button className={styles.btnSave} onClick={startCamera}>Yes, start camera</button>
+                  <button className={styles.btnTest} onClick={() => setCamConfirming(false)}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div className={styles.btnRow} style={{ marginTop: 16 }}>
+                {(camStatus === 'idle' || camStatus === 'error') ? (
+                  <button className={styles.btnSave} onClick={() => setCamConfirming(true)}>
+                    📹 Start Camera
+                  </button>
+                ) : (
+                  <button className={styles.btnDanger} onClick={stopCamera}>
+                    Stop Camera
+                  </button>
+                )}
+              </div>
+            )}
 
             <p className={styles.hint} style={{ marginTop: 12 }}>
               A 📹 icon will appear on the kids screen while the camera is active.

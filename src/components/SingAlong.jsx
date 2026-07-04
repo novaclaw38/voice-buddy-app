@@ -4,7 +4,8 @@ import styles from './SingAlong.module.css'
 
 // Sing-along plays a REAL sung recording per song. Recordings have no
 // per-word timestamps, so the karaoke highlight is driven by elapsed
-// playback time, distributed across words by character length (longer
+// playback time within the song's [leadIn, outro] window (see
+// nurseryRhymes.js), distributed across words by character length (longer
 // words get proportionally more time) for a natural-feeling bounce.
 export default function SingAlong({ onExit }) {
   const [screen, setScreen] = useState('pick') // 'pick' | 'sing' | 'credits'
@@ -35,18 +36,28 @@ export default function SingAlong({ onExit }) {
     stopRaf()
     const map = buildWordMap(rhyme)
     const totalChars = map.reduce((s, w) => s + w.len, 0) || 1
+    const leadIn = rhyme.leadIn || 0
     const tick = () => {
       const audio = audioRef.current
       if (audio && audio.duration > 0) {
-        const progress = Math.min(audio.currentTime / audio.duration, 1)
-        const charPos = progress * totalChars
-        let cum = 0
-        let idx = map.length - 1
-        for (let i = 0; i < map.length; i++) {
-          cum += map[i].len
-          if (charPos <= cum) { idx = i; break }
+        // Map word progress across [leadIn, outro] — the part of the
+        // recording that's actually singing — instead of the full file,
+        // so lead-in music and a trailing instrumental don't throw off sync.
+        const outro = rhyme.outro || audio.duration
+        const activeSpan = Math.max(outro - leadIn, 0.01)
+        if (audio.currentTime < leadIn) {
+          setGlobalWord(-1)
+        } else {
+          const progress = Math.min((audio.currentTime - leadIn) / activeSpan, 1)
+          const charPos = progress * totalChars
+          let cum = 0
+          let idx = map.length - 1
+          for (let i = 0; i < map.length; i++) {
+            cum += map[i].len
+            if (charPos <= cum) { idx = i; break }
+          }
+          setGlobalWord(idx)
         }
-        setGlobalWord(idx)
       }
       rafRef.current = requestAnimationFrame(tick)
     }

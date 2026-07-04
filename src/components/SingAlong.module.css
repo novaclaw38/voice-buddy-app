@@ -188,17 +188,18 @@
 .lyricLine {
   font-family: var(--font-head);
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
   line-height: 1.6;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
+  text-shadow: 0 1px 4px rgba(60,10,80,0.35);
   transition: color 0.3s ease, font-size 0.3s ease, transform 0.3s ease;
   padding: 2px 8px;
   border-radius: 10px;
 }
 
 .doneLine {
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.55);
   font-size: 0.95rem;
 }
 
