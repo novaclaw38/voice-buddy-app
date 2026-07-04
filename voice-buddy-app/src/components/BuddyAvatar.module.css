@@ -7,6 +7,10 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
+  /* Idle side-to-side weight shift + occasional full spin (useBuddyLife) —
+     separate from .bodyGroup's own bounce/squash transform below, so the
+     spin rotates around the character's center rather than its feet. */
+  transform: translateX(var(--sway, 0px)) rotate(var(--spin, 0deg));
 }
 
 .glow {
