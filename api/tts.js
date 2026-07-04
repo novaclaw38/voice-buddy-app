@@ -3,12 +3,14 @@
 // distinct voices Google TTS provides. Keys here are shared with the
 // Parent Settings "Voice" dropdown and useSpeech.js's default fallback.
 export const VOICES = {
-  'friendly-f': 'en-US-Neural2-F',
-  'cheerful-f': 'en-US-Neural2-C',
-  'gentle-f':   'en-US-Neural2-G',
-  'calm-m':     'en-US-Neural2-A',
-  'deep-m':     'en-US-Neural2-D',
-  'bright-m':   'en-US-Neural2-J',
+  sunny:   'en-US-Neural2-F', // warm female (default)
+  giggles: 'en-US-Neural2-C', // cheerful female
+  lullaby: 'en-US-Neural2-G', // gentle female
+  sparkle: 'en-US-Neural2-H', // bright female
+  buddy:   'en-US-Neural2-A', // calm male
+  captain: 'en-US-Neural2-I', // adventurous male
+  zippy:   'en-US-Neural2-J', // energetic male
+  robo:    'en-US-Neural2-D', // deep/robot male
 }
 
 import { getUser, allowRequest } from './_auth.js'
@@ -32,7 +34,7 @@ export default async function handler(req, res) {
   const key = process.env.GOOGLE_TTS_KEY
   if (!key) return res.status(503).json({ error: 'GOOGLE_TTS_KEY not configured' })
 
-  const { text, rate = 0.9, pitch = 0, voice = 'friendly-f' } = req.body
+  const { text, rate = 0.9, pitch = 0, voice = 'sunny' } = req.body
   if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text is required' })
   if (text.length > 2000) return res.status(400).json({ error: 'text is too long' })
 
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
         input: { text },
         voice: {
           languageCode: 'en-US',
-          name: VOICES[voice] || VOICES['friendly-f'],
+          name: VOICES[voice] || VOICES.sunny,
         },
         audioConfig: {
           audioEncoding: 'MP3',

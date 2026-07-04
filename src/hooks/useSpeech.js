@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
-import { isValidVoiceKey } from '../utils/voiceOptions.js'
+import { isValidVoiceKey, DEFAULT_VOICE } from '../utils/voiceOptions.js'
 
 const SpeechRec =
   typeof window !== 'undefined'
@@ -39,25 +39,16 @@ export function useSpeech(settings) {
   }, [])
 
   // ── Fallback: browser Web Speech API ──────────────────────────────────────
+  // This only ever runs if Google TTS itself fails, so it can't offer the
+  // same named voices — just pick a reasonable default English voice.
   const getFallbackVoice = useCallback(() => {
     if (!voices.length) return null
     if (settings?.voiceName) {
       const match = voices.find((v) => v.name === settings.voiceName)
       if (match) return match
     }
-    if (settings?.robotVoice) {
-      return (
-        voices.find((v) => v.lang.startsWith('en') && /male|man/i.test(v.name)) ||
-        voices.find((v) => v.lang.startsWith('en')) ||
-        voices[0]
-      )
-    }
-    return (
-      voices.find((v) => v.lang.startsWith('en') && /female|woman/i.test(v.name)) ||
-      voices.find((v) => v.lang.startsWith('en')) ||
-      voices[0]
-    )
-  }, [voices, settings?.voiceName, settings?.robotVoice])
+    return voices.find((v) => v.lang.startsWith('en')) || voices[0]
+  }, [voices, settings?.voiceName])
 
   // voiceOpts lets a caller give a mode/category its own "voice color" on top
   // of the user's own accessibility settings: pitchOffset (~-20..20, same
@@ -67,8 +58,8 @@ export function useSpeech(settings) {
     if (!synthRef.current || !text) { onDone?.(); return }
     synthRef.current.cancel()
     const utter = new SpeechSynthesisUtterance(text)
-    const baseRate  = settings?.robotVoice ? 0.85 : (settings?.speechRate  ?? 0.9)
-    const basePitch = settings?.robotVoice ? 0.3  : (settings?.speechPitch ?? 1.1)
+    const baseRate  = settings?.speechRate  ?? 0.9
+    const basePitch = settings?.speechPitch ?? 1.1
     utter.voice  = getFallbackVoice()
     utter.rate   = Math.max(0.1, Math.min(10, baseRate * (voiceOpts.rateMul ?? 1)))
     utter.pitch  = Math.max(0, Math.min(2, basePitch + (voiceOpts.pitchOffset ?? 0) / 20))
@@ -80,7 +71,7 @@ export function useSpeech(settings) {
     utter.onend  = () => { boundaryWordRef.current = -1; setStatus('idle'); onDone?.() }
     utter.onerror = () => { boundaryWordRef.current = -1; setStatus('idle'); onDone?.() }
     setTimeout(() => synthRef.current?.speak(utter), 0)
-  }, [getFallbackVoice, settings?.robotVoice, settings?.speechRate, settings?.speechPitch])
+  }, [getFallbackVoice, settings?.speechRate, settings?.speechPitch])
 
   // ── Stop helpers ──────────────────────────────────────────────────────────
   const stopListening = useCallback(() => {
@@ -113,13 +104,10 @@ export function useSpeech(settings) {
     const callId = ++speakTokenRef.current
     const isStale = () => speakTokenRef.current !== callId
 
-    const baseRate  = settings?.robotVoice ? 0.8  : (settings?.speechRate  ?? 0.9)
-    const basePitch = settings?.robotVoice ? -8   : 0    // semitones for Google TTS
-    const voice     = isValidVoiceKey(settings?.voiceName)
-      ? settings.voiceName
-      : (settings?.robotVoice ? 'deep-m' : 'friendly-f')
+    const baseRate  = settings?.speechRate ?? 0.9
+    const voice     = isValidVoiceKey(settings?.voiceName) ? settings.voiceName : DEFAULT_VOICE
     const rate  = Math.max(0.25, Math.min(4, baseRate * (voiceOpts.rateMul ?? 1)))
-    const pitch = Math.max(-20, Math.min(20, basePitch + (voiceOpts.pitchOffset ?? 0)))
+    const pitch = Math.max(-20, Math.min(20, voiceOpts.pitchOffset ?? 0))
 
     supabase.auth.getSession()
       .then(({ data }) => {
@@ -133,8 +121,14 @@ export function useSpeech(settings) {
           body: JSON.stringify({ text, rate, pitch, voice }),
         })
       })
-      .then((r) => {
-        if (!r.ok) throw new Error('tts_api_error')
+      .then(async (r) => {
+        if (!r.ok) {
+          // Falls back to browser TTS below, but that silently masks real
+          // failures (wrong/missing key, quota, bad request) as "it just
+          // always sounds the same" — log the real reason so it's debuggable.
+          const body = await r.json().catch(() => ({}))
+          throw new Error(`tts_api_error (${r.status}): ${body.error || 'unknown'}`)
+        }
         return r.blob()
       })
       .then((blob) => {
@@ -157,12 +151,15 @@ export function useSpeech(settings) {
           if (!isStale()) fallbackSpeak(text, onDone, voiceOpts)
         })
       })
-      .catch(() => {
-        // Key not set or network error — fall back to browser TTS silently
+      .catch((err) => {
+        // Falling back is intentional (Buddy should still speak), but the
+        // reason should be visible in the console instead of just quietly
+        // reusing whatever the browser's default voice is every time.
+        console.warn('Google TTS failed, falling back to browser speech:', err.message)
         if (!isStale()) fallbackSpeak(text, onDone, voiceOpts)
       })
   }, [stopListening, stopSpeaking, fallbackSpeak,
-      settings?.robotVoice, settings?.speechRate, settings?.voiceName])
+      settings?.speechRate, settings?.voiceName])
 
   // ── Speech recognition ────────────────────────────────────────────────────
   const startListening = useCallback((onResult) => {

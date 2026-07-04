@@ -198,11 +198,20 @@ input, select, textarea {
    ancestor removes its whole subtree, no matter what the descendant's own
    display is set to). visibility works differently: a descendant CAN
    override an ancestor's visibility:hidden, so this is the standard
-   "print only this element" trick. */
+   "print only this element" trick.
+
+   The body:has(#print-portal) guard matters: RewardScreen and LessonPage
+   have their own, separately-correct print mechanism (a local .screen/
+   .page { display: none } + .printOnly/.printSheet { display: block }
+   toggle). A bare `body * { visibility: hidden }` would inherit onto
+   those too with nothing to reset it back to visible, blanking their
+   printouts. Scoping this rule to only fire when #print-portal actually
+   exists keeps the two mechanisms from stepping on each other. */
 @media print {
   body { background: white !important; overflow: visible !important; }
-  body * { visibility: hidden; }
-  #print-portal, #print-portal * { visibility: visible; }
+  body:has(#print-portal) * { visibility: hidden; }
+  body:has(#print-portal) #print-portal,
+  body:has(#print-portal) #print-portal * { visibility: visible; }
   #print-portal {
     position: absolute;
     top: 0;
