@@ -187,7 +187,7 @@
 
 .lyricLine {
   font-family: var(--font-head);
-  font-size: 1.15rem;
+  font-size: 1.4rem;
   font-weight: 700;
   text-align: center;
   line-height: 1.6;
@@ -200,12 +200,12 @@
 
 .doneLine {
   color: rgba(255,255,255,0.55);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 .activeLine {
   color: white;
-  font-size: 1.3rem;
+  font-size: 1.7rem;
   font-weight: 800;
   background: rgba(255,255,255,0.18);
   border-radius: 14px;
@@ -216,17 +216,23 @@
   padding-top: 1.8em;
 }
 
-/* Karaoke word highlighting */
+/* Karaoke word highlighting — a solid highlighter-style block behind the
+   active word (not colored text) since pale/bright text on this gradient
+   is low-contrast and hard for young kids to pick out at a glance. */
 .word {
   position: relative;
   display: inline-block;
   margin-right: 0.3em;
-  transition: color 0.08s ease;
+  border-radius: 7px;
+  padding: 0 3px;
+  transition: background 0.08s ease, color 0.08s ease;
 }
 
 .activeWord {
-  color: #ffd700;
-  text-shadow: 0 0 12px rgba(255,215,0,0.6);
+  background: var(--c-sunny);
+  color: #3b0764;
+  text-shadow: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 .dot {
@@ -235,10 +241,10 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.7em;
-  color: #ffd700;
+  color: var(--c-berry);
   line-height: 1;
   pointer-events: none;
-  filter: drop-shadow(0 0 4px rgba(255,215,0,0.8));
+  filter: drop-shadow(0 0 3px rgba(255,255,255,0.7));
   animation: dotBounce 0.35s ease-in-out infinite alternate;
 }
 

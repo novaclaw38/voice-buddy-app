@@ -178,9 +178,13 @@ function Ticker() {
 export default function LandingPage() {
   const navigate = useNavigate()
   const [navHidden, setNavHidden] = useState(false)
+  const [pastHero, setPastHero] = useState(false)
   const lastY = useRef(0)
 
-  // Hide nav on scroll down, show on scroll up (rAF-throttled, one measurement per frame)
+  // Hide nav on scroll down, show on scroll up (rAF-throttled, one measurement per frame).
+  // Also tracks whether we've scrolled past the hero, to show a sticky mobile
+  // CTA bar — on a long single-page scroll, the only "Start Free Trial"
+  // button shouldn't require scrolling all the way back to the top.
   useEffect(() => {
     let ticking = false
     const onScroll = () => {
@@ -189,6 +193,7 @@ export default function LandingPage() {
       requestAnimationFrame(() => {
         const y = window.scrollY
         setNavHidden(y > 80 && y > lastY.current)
+        setPastHero(y > window.innerHeight * 0.6)
         lastY.current = y
         ticking = false
       })
@@ -196,18 +201,6 @@ export default function LandingPage() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  // 3D tilt on CTA button
-  const handleTilt = (e) => {
-    const btn = e.currentTarget
-    const rect = btn.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14
-    btn.style.transform = `perspective(600px) rotateX(${y}deg) rotateY(${x}deg) scale(1.04)`
-  }
-  const resetTilt = (e) => {
-    e.currentTarget.style.transform = ''
-  }
 
   return (
     <div className={styles.page}>
@@ -250,8 +243,6 @@ export default function LandingPage() {
           <div className={styles.heroCtas}>
             <button
               className={styles.ctaPrimary}
-              onMouseMove={handleTilt}
-              onMouseLeave={resetTilt}
               onClick={() => navigate('/login')}
             >
               <span className={styles.ctaRipple} />
@@ -467,6 +458,14 @@ export default function LandingPage() {
         </p>
         <p className={styles.footerCopy}>© {new Date().getFullYear()} Buddy. All rights reserved.</p>
       </footer>
+
+      {/* Mobile-only sticky CTA — on a long phone-scroll, the signup button
+          shouldn't require scrolling back to the top. */}
+      <div className={`${styles.stickyCta} ${pastHero ? styles.stickyCtaVisible : ''}`}>
+        <button className={styles.stickyCtaBtn} onClick={() => navigate('/login')}>
+          Start Free Trial →
+        </button>
+      </div>
     </div>
   )
 }
