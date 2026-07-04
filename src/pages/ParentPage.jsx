@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PrintSheet from '../components/PrintSheet.jsx'
-import { getSettings, saveSettings } from '../utils/storage.js'
+import { getSettings, saveSettings, migratePinIfNeeded, hashPin } from '../utils/storage.js'
 import { testConnection } from '../services/chatService.js'
 import { fetchHistory, deleteHistory } from '../services/historyService.js'
 import { sendVoiceMessage, fetchMessages } from '../services/messageService.js'
@@ -21,6 +21,7 @@ export default function ParentPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState('Settings')
   const [settings, setSettings] = useState(() => getSettings())
+  const [pinInput, setPinInput] = useState('')
   const [testStatus, setTestStatus] = useState(null)
   const [testError, setTestError] = useState('')
   const [history, setHistory] = useState([])
@@ -42,6 +43,11 @@ export default function ParentPage() {
   const [subLoading, setSubLoading] = useState(false)
   const [cancelStatus, setCancelStatus] = useState('idle') // idle | confirming | cancelling | done | error
   const [cancelError, setCancelError] = useState('')
+
+  // One-time migration of any pre-existing plaintext parentPin to a hash.
+  useEffect(() => {
+    migratePinIfNeeded(getSettings()).then(setSettings)
+  }, [])
 
   useEffect(() => {
     const load = () => {
@@ -120,6 +126,17 @@ export default function ParentPage() {
       saveSettings(next)
       return next
     })
+  }
+
+  // The PIN is never stored or displayed in plaintext, so this field only
+  // ever collects a *new* PIN and writes its hash once 4 digits are entered.
+  const handlePinInput = async (raw) => {
+    const digits = raw.replace(/\D/g, '').slice(0, 4)
+    setPinInput(digits)
+    if (digits.length === 4) {
+      updateSetting('parentPinHash', await hashPin(digits))
+      setPinInput('')
+    }
   }
 
   const handleTestConnection = async () => {
@@ -264,7 +281,7 @@ export default function ParentPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
       {/* Header */}
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate('/')}>
@@ -298,8 +315,9 @@ export default function ParentPage() {
             <h2 className={styles.sectionTitle}>Child Settings</h2>
 
             <div className={styles.field}>
-              <label className={styles.label}>Child's Name</label>
+              <label className={styles.label} htmlFor="childName">Child's Name</label>
               <input
+                id="childName"
                 className={styles.input}
                 value={settings.childName}
                 onChange={(e) => updateSetting('childName', e.target.value)}
@@ -330,22 +348,24 @@ export default function ParentPage() {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>Parent PIN</label>
+              <label className={styles.label} htmlFor="parentPin">Parent PIN</label>
               <input
+                id="parentPin"
                 className={styles.input}
                 type="password"
                 inputMode="numeric"
                 maxLength={4}
-                value={settings.parentPin}
-                onChange={(e) => updateSetting('parentPin', e.target.value.replace(/\D/g, '').slice(0,4))}
-                placeholder="4-digit PIN"
+                value={pinInput}
+                onChange={(e) => handlePinInput(e.target.value)}
+                placeholder="Enter new 4-digit PIN"
               />
-              <p className={styles.hint}>Default: 1234</p>
+              <p className={styles.hint}>Leave blank to keep your current PIN</p>
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>Speech Rate</label>
+              <label className={styles.label} htmlFor="speechRate">Speech Rate</label>
               <input
+                id="speechRate"
                 type="range"
                 className={styles.slider}
                 min="0.6" max="1.2" step="0.05"
@@ -422,8 +442,9 @@ export default function ParentPage() {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>Voice</label>
+              <label className={styles.label} htmlFor="voiceName">Voice</label>
               <select
+                id="voiceName"
                 className={styles.input}
                 value={settings.voiceName || ''}
                 onChange={(e) => updateSetting('voiceName', e.target.value)}
@@ -753,7 +774,7 @@ export default function ParentPage() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }
 

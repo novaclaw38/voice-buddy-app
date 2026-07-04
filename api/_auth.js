@@ -1,12 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://ykqrmyvizwxgfeevirhr.supabase.co'
+const supabaseUrl = process.env.SUPABASE_URL
 const serviceKey  = process.env.SUPABASE_SERVICE_KEY
 
 // Modes any signed-in user may use without a subscription.
 const FREE_MODES = new Set(['chat', 'story', 'sing'])
 
 function db() {
+  if (!supabaseUrl || !serviceKey) {
+    throw new Error('SUPABASE_URL / SUPABASE_SERVICE_KEY not configured')
+  }
   return createClient(supabaseUrl, serviceKey)
 }
 
@@ -14,7 +17,7 @@ function db() {
 export async function getUser(req) {
   const header = req.headers.authorization || req.headers.Authorization || ''
   const token = header.startsWith('Bearer ') ? header.slice(7) : null
-  if (!token || !serviceKey) return null
+  if (!token) return null
   try {
     const { data, error } = await db().auth.getUser(token)
     if (error || !data?.user) return null
@@ -30,7 +33,7 @@ export function isProMode(mode) {
 
 // True if the user currently has an active trial or paid subscription.
 export async function isEntitled(userId) {
-  if (!serviceKey || !userId) return false
+  if (!userId) return false
   try {
     const { data } = await db()
       .from('subscriptions')
@@ -44,5 +47,27 @@ export async function isEntitled(userId) {
     return false
   } catch {
     return false
+  }
+}
+
+// Per-user fixed-window rate limit backed by the bump_api_usage RPC
+// (supabase/migrations/2026-07-04-api-rate-limits.sql). Returns true if the
+// request is allowed. Fails open on infrastructure errors — the limit is a
+// cost guard, not a security boundary.
+export async function allowRequest(userId, endpoint, limit, windowSeconds) {
+  try {
+    const { data, error } = await db().rpc('bump_api_usage', {
+      p_user_id: userId,
+      p_endpoint: endpoint,
+      p_window_seconds: windowSeconds,
+    })
+    if (error) {
+      console.error('rate limit RPC failed:', error.message)
+      return true
+    }
+    return data <= limit
+  } catch (err) {
+    console.error('rate limit check failed:', err.message)
+    return true
   }
 }

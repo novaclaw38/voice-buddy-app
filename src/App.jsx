@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './lib/supabase.js'
 import { SubscriptionProvider } from './hooks/useSubscription.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import { authHeaders } from './services/chatService.js'
 
 const ChildPage   = lazy(() => import('./pages/ChildPage.jsx'))
 const ParentPage  = lazy(() => import('./pages/ParentPage.jsx'))
@@ -25,11 +26,11 @@ export default function App() {
       const s = data.session
       setSession(s)
       // Provision trial row for new users
-      if (s?.user) ensureSubscription(s.user.id)
+      if (s?.user) ensureSubscription()
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s)
-      if (s?.user) ensureSubscription(s.user.id)
+      if (s?.user) ensureSubscription()
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -64,21 +65,16 @@ export default function App() {
   )
 }
 
-async function ensureSubscription(userId) {
-  const { data } = await supabase
-    .from('subscriptions')
-    .select('id')
-    .eq('user_id', userId)
-    .maybeSingle()
-
-  if (!data) {
-    const trialEnd = new Date()
-    trialEnd.setDate(trialEnd.getDate() + 10)
-    await supabase.from('subscriptions').insert({
-      user_id:     userId,
-      status:      'trial',
-      trial_start: new Date().toISOString(),
-      trial_end:   trialEnd.toISOString(),
-    })
+// Trial rows are provisioned server-side (service key) so a client can never
+// mint or extend its own entitlement. Idempotent; safe to call on every load.
+let ensureTrialDone = false
+async function ensureSubscription() {
+  if (ensureTrialDone) return
+  ensureTrialDone = true
+  try {
+    const res = await fetch('/api/ensure-trial', { method: 'POST', headers: await authHeaders() })
+    if (!res.ok) ensureTrialDone = false
+  } catch {
+    ensureTrialDone = false // network hiccup — retry on next auth event
   }
 }

@@ -128,30 +128,6 @@
   text-shadow: 0 1px 0 rgba(255,255,255,0.55);
 }
 
-/* Groups the avatar-chooser and settings-gear buttons tightly together —
-   .topBar's justify-content:space-between would otherwise spread every
-   child evenly, pushing them apart instead of reading as a pair. */
-.topBarActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.customizeBtn,
-.settingsBtn {
-  font-size: 1.35rem;
-  width: 46px;
-  height: 46px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #fff;
-  line-height: 1;
-  box-shadow: 0 4px 0 rgba(91,33,182,0.14), 0 8px 16px rgba(80,40,120,0.16);
-}
-
-.customizeBtn:active { transform: rotate(15deg) scale(0.92); }
-
 .avatarArea {
   position: relative;
   display: flex;
@@ -372,18 +348,10 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.voiceSettingsBtn {
+.voiceMenuWrap {
   position: absolute;
   top: 14px;
   right: 14px;
-  font-size: 1.4rem;
-  width: 46px;
-  height: 46px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  line-height: 1;
   z-index: 10;
 }
 
