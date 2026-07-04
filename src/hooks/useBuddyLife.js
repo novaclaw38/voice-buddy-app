@@ -24,6 +24,9 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     sq: 0, sqVel: 0,
     // bounce
     by: 0, byVel: 0, bouncing: false, nextBounceAt: 0,
+    // sway (continuous idle weight-shift) + spontaneous spin
+    sway: 0,
+    spinning: false, spinStart: 0, spinDeg: 0, nextSpinAt: 0,
     // mouth
     mouth: 0,
     // timing
@@ -75,6 +78,8 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     el.style.setProperty('--sx', '1')
     el.style.setProperty('--sy', '1')
     el.style.setProperty('--by', '0px')
+    el.style.setProperty('--sway', '0px')
+    el.style.setProperty('--spin', '0deg')
     el.style.setProperty('--mouth', '0')
     el.style.setProperty('--shadow-scale', '1')
   }, [])
@@ -88,6 +93,7 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     st.nextBlinkAt  = now + 2000 + Math.random() * 3000
     st.nextGlanceAt = now + 3000 + Math.random() * 4000
     st.nextBounceAt = now + 10000 + Math.random() * 5000
+    st.nextSpinAt   = now + 14000 + Math.random() * 10000
 
     const loop = () => {
       rafRef.current = requestAnimationFrame(loop)
@@ -145,6 +151,29 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
         }
       }
 
+      // ---- Sway (continuous side-to-side weight shift, idle only) ----
+      const swayTarget = (status === 'idle' && !reduced) ? Math.sin(t / 1400) * 6 : 0
+      st.sway += (swayTarget - st.sway) * Math.min(1, dt * 3)
+
+      // ---- Spontaneous spin (idle only, not reduced) ----
+      if (status === 'idle' && !reduced && !st.spinning && t >= st.nextSpinAt) {
+        st.spinning = true
+        st.spinStart = t
+        st.nextSpinAt = t + 18000 + Math.random() * 12000
+      }
+      if (st.spinning) {
+        const dur = 700
+        const elapsed = t - st.spinStart
+        if (elapsed >= dur) {
+          st.spinning = false
+          st.spinDeg = 0
+        } else {
+          const p = elapsed / dur
+          const eased = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2
+          st.spinDeg = eased * 360
+        }
+      }
+
       // ---- Squash spring (underdamped => jelly wobble) ----
       if (!reduced) {
         const stiffness = 240, damping = 13
@@ -170,6 +199,8 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
       el.style.setProperty('--sx', sx.toFixed(3))
       el.style.setProperty('--sy', sy.toFixed(3))
       el.style.setProperty('--by', st.by.toFixed(2) + 'px')
+      el.style.setProperty('--sway', st.sway.toFixed(2) + 'px')
+      el.style.setProperty('--spin', st.spinDeg.toFixed(1) + 'deg')
       el.style.setProperty('--mouth', st.mouth.toFixed(3))
       // Ground shadow shrinks as Buddy rises during a bounce (st.by goes
       // negative while airborne), clamped so it never vanishes entirely.
