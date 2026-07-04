@@ -1,11 +1,90 @@
 .clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-head);
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--ink);
   background: rgba(255,255,255,0.7);
-  padding: 4px 12px;
+  padding: 3px 12px 3px 5px;
   border-radius: var(--r-pill);
   letter-spacing: 0.02em;
   white-space: nowrap;
+}
+
+.face {
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.rim {
+  fill: #ffffff;
+  stroke: var(--c-grape);
+  stroke-width: 1.6;
+}
+
+.tick {
+  fill: var(--ink-dim);
+}
+
+.tickSun {
+  fill: var(--c-sunny);
+}
+
+.tickMoon {
+  fill: #cbd5e1;
+}
+
+.hourHand,
+.minuteHand,
+.secondHand {
+  stroke-linecap: round;
+  transform-origin: 20px 20px;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.hourHand {
+  stroke: var(--ink);
+  stroke-width: 2;
+  animation-name: clockSweep;
+  animation-duration: 43200s;
+}
+
+.minuteHand {
+  stroke: var(--ink);
+  stroke-width: 1.4;
+  animation-name: clockSweep;
+  animation-duration: 3600s;
+}
+
+.secondHand {
+  stroke: var(--c-pink);
+  stroke-width: 0.9;
+  animation-name: clockSweep;
+  animation-duration: 60s;
+}
+
+.pin {
+  fill: var(--c-grape);
+}
+
+.digital {
+  line-height: 1;
+}
+
+@keyframes clockSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hourHand,
+  .minuteHand,
+  .secondHand {
+    animation: none;
+  }
 }
