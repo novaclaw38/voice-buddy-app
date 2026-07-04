@@ -52,7 +52,8 @@
   border: none;
   color: var(--c-grape);
   font-weight: 700;
-  padding: 9px 18px;
+  padding: 13px 18px;
+  min-height: 44px;
   border-radius: var(--r-pill);
   cursor: pointer;
   font-size: 14px;
@@ -64,7 +65,8 @@
   background: linear-gradient(135deg, var(--c-grape), var(--c-berry));
   border: none;
   color: white;
-  padding: 11px 22px;
+  padding: 14px 22px;
+  min-height: 44px;
   border-radius: var(--r-pill);
   cursor: pointer;
   font-size: 14px;
@@ -173,7 +175,7 @@
   transition: box-shadow 0.2s, transform 0.15s var(--spring);
   overflow: hidden;
 }
-.ctaPrimary:active { transform: translateY(4px) scale(0.99) !important; box-shadow: 0 4px 0 var(--c-pink-d); }
+.ctaPrimary:active { transform: translateY(4px) scale(0.99); box-shadow: 0 4px 0 var(--c-pink-d); }
 
 @keyframes ripple {
   0%   { transform: scale(0); opacity: 0.5; }
@@ -287,6 +289,12 @@
   opacity: 0.25;
   border-radius: 50%;
   animation: twinkle var(--dur, 8s) var(--delay, 0s) ease-in-out infinite;
+}
+
+/* Fewer concurrent animated particles on phones/tablets — this is the
+   primary device class for the app, including lower-end hardware. */
+@media (max-width: 700px) {
+  .particle:nth-child(n+17) { display: none; }
 }
 
 @keyframes twinkle {
@@ -842,3 +850,42 @@
   font-size: 12px;
   margin: 0;
 }
+
+/* ── STICKY MOBILE CTA ── */
+.stickyCta {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0));
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(124,58,237,0.12);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stickyCtaVisible { transform: translateY(0); }
+
+@media (max-width: 700px) {
+  .stickyCta { display: block; }
+  .footer { padding-bottom: 88px; }
+}
+
+.stickyCtaBtn {
+  width: 100%;
+  padding: 14px;
+  min-height: 48px;
+  background: linear-gradient(135deg, var(--c-grape), var(--c-berry));
+  border: none;
+  color: white;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 16px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--c-grape-d);
+}
+.stickyCtaBtn:active { transform: translateY(3px) scale(0.98); box-shadow: 0 2px 0 var(--c-grape-d); }
