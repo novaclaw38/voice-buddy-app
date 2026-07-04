@@ -1,6 +1,14 @@
-const VOICES = {
-  female: 'en-US-Neural2-F',
-  male:   'en-US-Neural2-D',
+// Named Google Cloud TTS voices a parent can actually pick between — the
+// old setup only ever offered a binary female/male, ignoring the many
+// distinct voices Google TTS provides. Keys here are shared with the
+// Parent Settings "Voice" dropdown and useSpeech.js's default fallback.
+export const VOICES = {
+  'friendly-f': 'en-US-Neural2-F',
+  'cheerful-f': 'en-US-Neural2-C',
+  'gentle-f':   'en-US-Neural2-G',
+  'calm-m':     'en-US-Neural2-A',
+  'deep-m':     'en-US-Neural2-D',
+  'bright-m':   'en-US-Neural2-J',
 }
 
 import { getUser, allowRequest } from './_auth.js'
@@ -24,7 +32,7 @@ export default async function handler(req, res) {
   const key = process.env.GOOGLE_TTS_KEY
   if (!key) return res.status(503).json({ error: 'GOOGLE_TTS_KEY not configured' })
 
-  const { text, rate = 0.9, pitch = 0, gender = 'female' } = req.body
+  const { text, rate = 0.9, pitch = 0, voice = 'friendly-f' } = req.body
   if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text is required' })
   if (text.length > 2000) return res.status(400).json({ error: 'text is too long' })
 
@@ -37,7 +45,7 @@ export default async function handler(req, res) {
         input: { text },
         voice: {
           languageCode: 'en-US',
-          name: VOICES[gender] || VOICES.female,
+          name: VOICES[voice] || VOICES['friendly-f'],
         },
         audioConfig: {
           audioEncoding: 'MP3',

@@ -6,9 +6,10 @@ import { testConnection } from '../services/chatService.js'
 import { fetchHistory, deleteHistory } from '../services/historyService.js'
 import { sendVoiceMessage, fetchMessages } from '../services/messageService.js'
 import { supabase } from '../lib/supabase.js'
+import { VOICE_OPTIONS, DEFAULT_VOICE, isValidVoiceKey } from '../utils/voiceOptions.js'
 import styles from './ParentPage.module.css'
 
-const TABS = ['Settings', 'Subscription', 'Routines', 'Messages', 'Camera', 'History', 'Print']
+const TABS = ['Settings', 'Subscription', 'Account', 'Routines', 'Messages', 'Camera', 'History', 'Print']
 
 const ICE_SERVERS = {
   iceServers: [
@@ -17,7 +18,7 @@ const ICE_SERVERS = {
   ],
 }
 
-export default function ParentPage() {
+export default function ParentPage({ session }) {
   const navigate = useNavigate()
   const [tab, setTab] = useState('Settings')
   const [settings, setSettings] = useState(() => getSettings())
@@ -28,7 +29,6 @@ export default function ParentPage() {
   const [historyLoading, setHistoryLoading] = useState(false)
   const [printData, setPrintData] = useState(null)
   const [printType, setPrintType] = useState('story')
-  const [voices, setVoices] = useState([])
   const [recStatus, setRecStatus] = useState('idle') // idle | recording | sending | sent | error
   const [sentMessages, setSentMessages] = useState([])
   const [msgsLoading, setMsgsLoading] = useState(false)
@@ -43,20 +43,12 @@ export default function ParentPage() {
   const [subLoading, setSubLoading] = useState(false)
   const [cancelStatus, setCancelStatus] = useState('idle') // idle | confirming | cancelling | done | error
   const [cancelError, setCancelError] = useState('')
+  const [updatePaymentStatus, setUpdatePaymentStatus] = useState('idle') // idle | redirecting | error
+  const [updatePaymentError, setUpdatePaymentError] = useState('')
 
   // One-time migration of any pre-existing plaintext parentPin to a hash.
   useEffect(() => {
     migratePinIfNeeded(getSettings()).then(setSettings)
-  }, [])
-
-  useEffect(() => {
-    const load = () => {
-      const v = window.speechSynthesis?.getVoices() || []
-      if (v.length) setVoices(v)
-    }
-    load()
-    window.speechSynthesis?.addEventListener('voiceschanged', load)
-    return () => window.speechSynthesis?.removeEventListener('voiceschanged', load)
   }, [])
 
   // Load sent messages when Messages tab opens
@@ -97,6 +89,30 @@ export default function ParentPage() {
       setSubInfo(result?.data || null)
     }).catch(console.error).finally(() => setSubLoading(false))
   }, [tab])
+
+  const handleUpdatePayment = async () => {
+    setUpdatePaymentStatus('redirecting')
+    setUpdatePaymentError('')
+    try {
+      const { data: { session: freshSession } } = await supabase.auth.getSession()
+      const res = await fetch('/api/payfast-update-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${freshSession?.access_token}`,
+        },
+        body: JSON.stringify({
+          firstName: freshSession?.user?.user_metadata?.full_name?.split(' ')[0] || 'Parent',
+        }),
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error || 'Could not start payment update')
+      window.location.href = body.paymentUrl
+    } catch (err) {
+      setUpdatePaymentStatus('error')
+      setUpdatePaymentError(err.message || 'Something went wrong')
+    }
+  }
 
   const handleCancelSubscription = async () => {
     setCancelStatus('cancelling')
@@ -427,26 +443,15 @@ export default function ParentPage() {
               <select
                 id="voiceName"
                 className={styles.input}
-                value={settings.voiceName || ''}
+                value={isValidVoiceKey(settings.voiceName) ? settings.voiceName : DEFAULT_VOICE}
                 onChange={(e) => updateSetting('voiceName', e.target.value)}
               >
-                <option value="">Auto (best match)</option>
-                {voices
-                  .filter((v) => v.lang.startsWith('en'))
-                  .map((v) => (
-                    <option key={v.name} value={v.name}>{v.name}</option>
-                  ))}
-                {voices.filter((v) => !v.lang.startsWith('en')).length > 0 && (
-                  <option disabled>── Other languages ──</option>
-                )}
-                {voices
-                  .filter((v) => !v.lang.startsWith('en'))
-                  .map((v) => (
-                    <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>
-                  ))}
+                {VOICE_OPTIONS.map((v) => (
+                  <option key={v.key} value={v.key}>{v.label}</option>
+                ))}
               </select>
               <p className={styles.hint}>
-                Google voices (e.g. "Google US English") sound best. On Android: Settings → Accessibility → Text-to-speech → install Google TTS.
+                This is the actual voice Buddy speaks with.
               </p>
             </div>
 
@@ -525,6 +530,37 @@ export default function ParentPage() {
                 )}
               </>
             )}
+          </div>
+        )}
+
+        {/* ---- ACCOUNT ---- */}
+        {tab === 'Account' && (
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Account</h2>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Email</label>
+              <input className={styles.input} value={session?.user?.email || ''} disabled readOnly />
+            </div>
+
+            <div className={styles.field} style={{ marginTop: 20 }}>
+              <label className={styles.label}>Payment Method</label>
+              <p className={styles.hint} style={{ marginBottom: 10 }}>
+                Update the card used for your monthly Buddy Pro subscription. You'll be taken to
+                PayFast's secure page to enter a new card — nothing changes until you complete it,
+                and your next charge still happens on your normal renewal date.
+              </p>
+              <button
+                className={styles.btnTest}
+                onClick={handleUpdatePayment}
+                disabled={updatePaymentStatus === 'redirecting'}
+              >
+                {updatePaymentStatus === 'redirecting' ? 'Redirecting to PayFast...' : 'Update Payment Method'}
+              </button>
+              {updatePaymentStatus === 'error' && (
+                <p className={styles.testError} style={{ marginTop: 10 }}>{updatePaymentError}</p>
+              )}
+            </div>
           </div>
         )}
 
