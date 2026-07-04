@@ -464,9 +464,7 @@ export default function ParentPage({ session }) {
 
             <div className={styles.field}>
               <p className={styles.hint} style={{ marginBottom: 10 }}>
-                Buddy uses Groq (free). The API key is set by the app — no key entry needed here.
-                To use your own key: add <strong>GROQ_API_KEY</strong> to your Vercel project's
-                Environment Variables at <strong>vercel.com → Project → Settings → Environment Variables</strong>.
+                Buddy's AI connection is set up and ready to go — nothing to configure here.
               </p>
               <div className={styles.btnRow}>
                 <button className={styles.btnTest} onClick={handleTestConnection} disabled={testStatus === 'testing'}>
