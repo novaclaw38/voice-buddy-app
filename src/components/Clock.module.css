@@ -1,23 +1,23 @@
 .clock {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-head);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--ink);
+  justify-content: center;
   background: rgba(255,255,255,0.7);
-  padding: 3px 12px 3px 5px;
+  padding: 4px 8px;
   border-radius: var(--r-pill);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
 }
 
 .face {
-  width: 25px;
-  height: 25px;
+  width: 34px;
+  height: 39px;
   flex-shrink: 0;
   overflow: visible;
+}
+
+.bell {
+  fill: #e9e4fb;
+  stroke: var(--c-grape);
+  stroke-width: 1.4;
 }
 
 .rim {
@@ -42,7 +42,7 @@
 .minuteHand,
 .secondHand {
   stroke-linecap: round;
-  transform-origin: 20px 20px;
+  transform-origin: 20px 27px;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
@@ -72,8 +72,23 @@
   fill: var(--c-grape);
 }
 
-.digital {
-  line-height: 1;
+.clapper {
+  transform-origin: 20px 8px;
+  animation: clapperSwing 4s ease-in-out infinite;
+}
+
+.clapperArm {
+  stroke: var(--c-berry);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+
+.clapperBall {
+  fill: var(--c-berry);
+}
+
+.foot {
+  fill: var(--c-grape-d);
 }
 
 @keyframes clockSweep {
@@ -81,10 +96,16 @@
   to { transform: rotate(360deg); }
 }
 
+@keyframes clapperSwing {
+  0%, 100% { transform: rotate(-7deg); }
+  50%      { transform: rotate(7deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hourHand,
   .minuteHand,
-  .secondHand {
+  .secondHand,
+  .clapper {
     animation: none;
   }
 }
