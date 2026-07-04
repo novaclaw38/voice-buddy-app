@@ -61,6 +61,7 @@ export default async function handler(req, res) {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
+    console.error('Google TTS error:', response.status, err.error?.message || JSON.stringify(err))
     return res.status(response.status).json({ error: err.error?.message || 'Google TTS error' })
   }
 
