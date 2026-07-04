@@ -6,6 +6,7 @@ import { testConnection } from '../services/chatService.js'
 import { fetchHistory, deleteHistory } from '../services/historyService.js'
 import { sendVoiceMessage, fetchMessages } from '../services/messageService.js'
 import { supabase } from '../lib/supabase.js'
+import { useSpeech } from '../hooks/useSpeech.js'
 import { VOICE_OPTIONS, DEFAULT_VOICE, isValidVoiceKey } from '../utils/voiceOptions.js'
 import styles from './ParentPage.module.css'
 
@@ -22,6 +23,8 @@ export default function ParentPage({ session }) {
   const navigate = useNavigate()
   const [tab, setTab] = useState('Settings')
   const [settings, setSettings] = useState(() => getSettings())
+  const speech = useSpeech(settings)
+  const [previewStatus, setPreviewStatus] = useState('idle') // idle | speaking
   const [pinInput, setPinInput] = useState('')
   const [testStatus, setTestStatus] = useState(null)
   const [testError, setTestError] = useState('')
@@ -142,6 +145,13 @@ export default function ParentPage({ session }) {
       saveSettings(next)
       return next
     })
+  }
+
+  // Lets a parent hear the currently-selected voice right here, instead of
+  // switching to the child page just to test it.
+  const handlePreviewVoice = () => {
+    setPreviewStatus('speaking')
+    speech.speak("Hi! I'm Buddy, your child's AI friend!", () => setPreviewStatus('idle'))
   }
 
   // The PIN is never stored or displayed in plaintext, so this field only
@@ -423,33 +433,28 @@ export default function ParentPage({ session }) {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>Buddy's Voice</label>
-              <div className={styles.toggle}>
-                <input
-                  type="checkbox"
-                  id="robotVoice"
-                  checked={settings.robotVoice || false}
-                  onChange={(e) => updateSetting('robotVoice', e.target.checked)}
-                />
-                <label htmlFor="robotVoice" className={styles.toggleLabel}>
-                  {settings.robotVoice ? '🤖 Robot (deep male voice)' : '😊 Friendly (default)'}
-                </label>
+              <label className={styles.label} htmlFor="voiceName">Buddy's Voice</label>
+              <div className={styles.btnRow}>
+                <select
+                  id="voiceName"
+                  className={styles.input}
+                  style={{ flex: 1 }}
+                  value={isValidVoiceKey(settings.voiceName) ? settings.voiceName : DEFAULT_VOICE}
+                  onChange={(e) => updateSetting('voiceName', e.target.value)}
+                >
+                  {VOICE_OPTIONS.map((v) => (
+                    <option key={v.key} value={v.key}>{v.label}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className={styles.btnTest}
+                  onClick={handlePreviewVoice}
+                  disabled={previewStatus === 'speaking'}
+                >
+                  {previewStatus === 'speaking' ? '🔊 Playing...' : '▶ Preview'}
+                </button>
               </div>
-              <p className={styles.hint}>Robot mode uses a deep, low-pitch male voice. Exact sound depends on your device.</p>
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="voiceName">Voice</label>
-              <select
-                id="voiceName"
-                className={styles.input}
-                value={isValidVoiceKey(settings.voiceName) ? settings.voiceName : DEFAULT_VOICE}
-                onChange={(e) => updateSetting('voiceName', e.target.value)}
-              >
-                {VOICE_OPTIONS.map((v) => (
-                  <option key={v.key} value={v.key}>{v.label}</option>
-                ))}
-              </select>
               <p className={styles.hint}>
                 This is the actual voice Buddy speaks with.
               </p>
