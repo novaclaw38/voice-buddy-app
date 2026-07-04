@@ -4,6 +4,7 @@ import { useSubscription } from '../hooks/useSubscription.jsx'
 import { useCompletions } from '../hooks/useCompletions.js'
 import { useSpeech } from '../hooks/useSpeech.js'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
+import BuddyAvatar from '../components/BuddyAvatar.jsx'
 import { useState, useEffect } from 'react'
 import { getSettings } from '../utils/storage.js'
 import { pickRandom } from '../utils/prompts.js'
@@ -107,8 +108,13 @@ export default function CoursesPage({ session }) {
 
       <header className={styles.header}>
         <button className={styles.back} onClick={() => { speech.stopSpeaking(); navigate('/app') }}>← Back to Buddy</button>
-        <h1 className={styles.title}>Courses</h1>
-        <p className={styles.sub}>Interactive lessons taught by Buddy, just for you</p>
+        <div className={styles.hero}>
+          <BuddyAvatar status="happy" size={72} live={false} avatarColor={settings.avatarColor} type={settings.avatarType || 'bear'} />
+          <div className={styles.heroBubble}>
+            <h1 className={styles.title}>Courses</h1>
+            <p className={styles.sub}>Interactive lessons taught by Buddy, just for you</p>
+          </div>
+        </div>
       </header>
 
       <div className={styles.grid}>
