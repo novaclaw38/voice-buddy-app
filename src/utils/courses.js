@@ -30,10 +30,28 @@ export const COURSES = [
             correct: 0,
           },
           {
+            type: 'explain',
+            narration: 'A sprouting seed does something amazing — it sends roots DOWN into the soil, and a stem UP toward the light, at the very same time!',
+            narrations: [
+              'A sprouting seed does something amazing — it sends roots DOWN into the soil, and a stem UP toward the light, at the very same time!',
+              'Here\'s a cool seed trick — it always knows which way is down and which way is up, even in the dark!',
+            ],
+            narrationYoung: 'A seed sends roots down and a stem up, even in the dark!',
+            emoji: '🧭',
+            fact: 'A germinating seed always grows roots downward and its stem upward — it can sense gravity, even buried in the dark!',
+          },
+          {
             type: 'label',
             narration: 'Amazing! Now let\'s name the parts of a plant. Tap each label in order!',
             visual: '🌱',
             items: ['🌿 Roots', '🌾 Stem', '🍃 Leaves', '🌸 Flower'],
+          },
+          {
+            type: 'quiz',
+            narration: 'One more question! Which way does a seed\'s root always grow?',
+            question: 'Which way do roots grow?',
+            options: ['⬇️ Down, into the soil', '⬆️ Up, toward the sky', '➡️ Sideways only'],
+            correct: 0,
           },
           {
             type: 'activity',
@@ -48,7 +66,7 @@ export const COURSES = [
           title: 'How Seeds Grow',
           facts: [
             'Seeds need water and warmth to wake up and start growing.',
-            'Roots drink water from the soil.',
+            'Roots always grow down and stems always grow up.',
             'Leaves catch sunlight to make food for the plant.',
           ],
           colourPrompt: 'Colour the plant and draw raindrops falling on it!',
@@ -90,6 +108,19 @@ export const COURSES = [
             fact: 'Earthworms improve the soil by tunnelling through it and mixing in nutrients. They are a plant\'s best friend!',
           },
           {
+            type: 'label',
+            narration: 'Plants have four things on their shopping list! Tap each one in order.',
+            visual: '🛒',
+            items: ['☀️ Sunlight', '💧 Water', '💨 Air', '🌍 Soil'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What do we call it when a plant makes its own food from sunlight?',
+            question: 'Making food from sunlight is called…',
+            options: ['🌞 Photosynthesis', '🎨 Painting', '🍳 Cooking', '🧪 Mixing'],
+            correct: 0,
+          },
+          {
             type: 'activity',
             narration: 'Wonderful! Can you name all four things a plant needs to grow? Say them out loud!',
             narrations: [
@@ -126,6 +157,24 @@ export const COURSES = [
             fact: 'Bean seeds sprout in 5 to 10 days! Keep the soil damp and put your cup in a sunny spot.',
           },
           {
+            type: 'quiz',
+            narration: 'How deep should you plant a bean seed?',
+            question: 'How deep does a bean seed go?',
+            options: ['👍 About 2 cm — thumb depth', '⬇️ Very deep — 10 cm', '🪴 Just sit on top of soil'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Once your bean sprouts, don\'t give it too much water — soggy soil can rot the roots! A little water every few days is just right.',
+            narrations: [
+              'Once your bean sprouts, don\'t give it too much water — soggy soil can rot the roots! A little water every few days is just right.',
+              'Here\'s a gardener\'s secret — more water isn\'t always better! Too much water can actually hurt your plant\'s roots.',
+            ],
+            narrationYoung: 'Don\'t give your plant too much water — a little bit every few days is just right!',
+            emoji: '💧',
+            fact: 'Overwatering can rot a plant\'s roots. Check that the soil feels dry before watering again.',
+          },
+          {
             type: 'label',
             narration: 'Here are the steps to plant your bean seed. Tap them in order!',
             visual: '🪴',
@@ -133,9 +182,9 @@ export const COURSES = [
           },
           {
             type: 'quiz',
-            narration: 'How deep should you plant a bean seed?',
-            question: 'How deep does a bean seed go?',
-            options: ['👍 About 2 cm — thumb depth', '⬇️ Very deep — 10 cm', '🪴 Just sit on top of soil'],
+            narration: 'True or false — a plant needs a huge amount of water every single day?',
+            question: 'Should you water a plant every single day, a lot?',
+            options: ['❌ No — a little, every few days', '✅ Yes — as much as possible'],
             correct: 0,
           },
           {
@@ -193,6 +242,19 @@ export const COURSES = [
             fact: 'A single ladybug can eat up to 5 000 aphids in its lifetime, protecting plants from damage.',
           },
           {
+            type: 'label',
+            narration: 'Meet the garden helper team! Tap each one in order.',
+            visual: '🌻',
+            items: ['🐝 Bee — pollinates flowers', '🐞 Ladybug — eats bad bugs', '🪱 Earthworm — improves soil', '🦋 Butterfly — pollinates too'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What do we call it when a bee moves pollen from flower to flower?',
+            question: 'Moving pollen between flowers is called…',
+            options: ['🐝 Pollination', '🎨 Painting', '🏃 Racing', '🎵 Singing'],
+            correct: 0,
+          },
+          {
             type: 'activity',
             narration: 'Which garden bug is your favourite, and why? Tell me!',
             narrations: [
@@ -210,6 +272,140 @@ export const COURSES = [
           ],
           colourPrompt: 'Draw a bee visiting a flower and colour the whole garden scene!',
           visual: '🌸',
+        },
+      },
+      {
+        id: 'fruits-veg',
+        title: 'Fruits & Vegetables',
+        emoji: '🍎',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Every fruit and vegetable we eat is actually a different part of a plant! Carrots are roots, celery is a stem, and lettuce is leaves.',
+            narrations: [
+              'Every fruit and vegetable we eat is actually a different part of a plant! Carrots are roots, celery is a stem, and lettuce is leaves.',
+              'Here\'s a fun food secret — every vegetable you eat is really a plant part! Want to find out which part your favourites are?',
+            ],
+            narrationYoung: 'Carrots are roots, celery is a stem, and lettuce is leaves — all from plants!',
+            emoji: '🥕',
+            fact: 'Carrots and beets are roots. Celery is a stem. Lettuce and spinach are leaves. Broccoli is actually a flower!',
+          },
+          {
+            type: 'quiz',
+            narration: 'Which part of the plant is a carrot?',
+            question: 'A carrot is a plant\'s…',
+            options: ['🌿 Root', '🍃 Leaf', '🌸 Flower', '🌾 Stem'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'A fruit is the part of a plant that holds the seeds — that means tomatoes, cucumbers, and even pumpkins are technically fruits, not vegetables!',
+            narrations: [
+              'A fruit is the part of a plant that holds the seeds — that means tomatoes, cucumbers, and even pumpkins are technically fruits, not vegetables!',
+              'Here\'s a surprise — a tomato is actually a FRUIT, not a vegetable! Want to know the trick to telling them apart?',
+            ],
+            narrationYoung: 'If it has seeds inside, it\'s a fruit — even a tomato!',
+            emoji: '🍅',
+            fact: 'Any plant part that grows from a flower and holds seeds is a fruit — that includes tomatoes, peppers, and pumpkins!',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s sort these foods by plant part! Tap each one in order.',
+            visual: '🥗',
+            items: ['🥕 Carrot — root', '🥬 Lettuce — leaf', '🥦 Broccoli — flower', '🍅 Tomato — fruit'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What makes something a fruit instead of a vegetable?',
+            question: 'A fruit always has…',
+            options: ['🌱 Seeds inside', '🟢 Green colour', '🍬 Sweet taste', '🧊 Cold storage'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'What is your favourite fruit or vegetable, and do you know what part of the plant it is?',
+            narrations: [
+              'What is your favourite fruit or vegetable, and do you know what part of the plant it is?',
+              'You know your plant parts now! Tell me your favourite fruit or veggie — can you guess what part it is?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Fruits & Vegetables',
+          facts: [
+            'Carrots are roots, celery is a stem, lettuce is leaves.',
+            'Broccoli is actually a flower we eat!',
+            'A fruit is any plant part with seeds inside — even tomatoes!',
+          ],
+          colourPrompt: 'Draw your favourite fruits and vegetables and label which plant part each one is!',
+          visual: '🍎',
+        },
+      },
+      {
+        id: 'seasons',
+        title: 'Seasons & Your Garden',
+        emoji: '🍂',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Gardens change with the seasons! Spring is for planting seeds, summer is for growing and sunshine, autumn is for harvesting, and winter is for resting.',
+            narrations: [
+              'Gardens change with the seasons! Spring is for planting seeds, summer is for growing and sunshine, autumn is for harvesting, and winter is for resting.',
+              'Did you know a garden has its own yearly routine? Let\'s go through what happens in each season!',
+            ],
+            narrationYoung: 'Spring is for planting, summer is for growing, autumn is for picking, winter is for resting!',
+            emoji: '📅',
+            fact: 'Most vegetable seeds are planted in spring, grow through summer, and are harvested in autumn before winter\'s cold arrives.',
+          },
+          {
+            type: 'quiz',
+            narration: 'Which season is the best time to plant most seeds?',
+            question: 'When do we usually plant seeds?',
+            options: ['🌸 Spring', '❄️ Winter', '🍂 Autumn'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Some plants love the cold! Carrots and cabbages can grow even in cooler weather, while tomatoes and watermelons need lots of warm summer sun.',
+            narrations: [
+              'Some plants love the cold! Carrots and cabbages can grow even in cooler weather, while tomatoes and watermelons need lots of warm summer sun.',
+              'Not every plant likes the same weather — some love the cold, and some need lots of hot sunshine! Let\'s find out which is which.',
+            ],
+            narrationYoung: 'Carrots like cool weather. Tomatoes like hot summer sun!',
+            emoji: '🥶',
+            fact: 'Cool-weather crops like carrots and cabbage can handle a light frost, while warm-weather crops like tomatoes need summer heat.',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s put the garden year in order! Tap each season in order.',
+            visual: '🔄',
+            items: ['🌸 Spring — plant seeds', '☀️ Summer — grow & sunshine', '🍂 Autumn — harvest', '❄️ Winter — rest'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Which season is harvest time, when we pick our grown food?',
+            question: 'When do we harvest our vegetables?',
+            options: ['🍂 Autumn', '🌸 Spring', '❄️ Winter'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'What season is it where you live right now? What could you plant today?',
+            narrations: [
+              'What season is it where you live right now? What could you plant today?',
+              'You know the garden calendar now! What season is it for you right now, and what would you plant?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Seasons & Your Garden',
+          facts: [
+            'Spring is for planting, summer for growing, autumn for harvesting, winter for resting.',
+            'Carrots and cabbages like cool weather; tomatoes need summer heat.',
+            'Most vegetables are harvested in autumn before the cold arrives.',
+          ],
+          colourPrompt: 'Draw a garden calendar — one picture for each season showing what happens in your garden!',
+          visual: '🍂',
         },
       },
     ],
@@ -245,10 +441,28 @@ export const COURSES = [
             correct: 0,
           },
           {
+            type: 'explain',
+            narration: 'Not all robots look like people! Some are arms in a car factory, some are tiny and fly like drones, and some are shaped like vacuum cleaners.',
+            narrations: [
+              'Not all robots look like people! Some are arms in a car factory, some are tiny and fly like drones, and some are shaped like vacuum cleaners.',
+              'Here\'s a surprise — most robots don\'t look like the ones in movies at all! Let\'s see some real robot shapes.',
+            ],
+            narrationYoung: 'Robots come in all shapes — arms, flying drones, and round vacuum robots!',
+            emoji: '🔧',
+            fact: 'Robots come in many shapes: factory arms that build cars, flying drones, and round cleaning robots — very few look like humans!',
+          },
+          {
             type: 'label',
             narration: 'Every robot has three parts. Tap the labels to match them!',
             visual: '🤖',
             items: ['👁️ Sensors (sense)', '💻 Computer (think)', '⚙️ Motors (act)'],
+          },
+          {
+            type: 'quiz',
+            narration: 'True or false — most real robots look exactly like people?',
+            question: 'Do most robots look like people?',
+            options: ['❌ No — many different shapes', '✅ Yes — always human-shaped'],
+            correct: 0,
           },
           {
             type: 'activity',
@@ -264,7 +478,7 @@ export const COURSES = [
           facts: [
             'Robots can sense, think, and act.',
             'A robot vacuum cleaner senses dirt and navigates around your house.',
-            'Mars rovers are robots that explore another planet!',
+            'Robots come in many shapes — very few actually look like people!',
           ],
           colourPrompt: 'Draw your own robot and label its sensors (eyes), computer brain, and motors (legs or wheels)!',
           visual: '🤖',
@@ -294,10 +508,28 @@ export const COURSES = [
             correct: 0,
           },
           {
+            type: 'explain',
+            narration: 'A self-driving car is covered in sensors — cameras to see the road, radar to spot other cars, and GPS to know exactly where it is!',
+            narrations: [
+              'A self-driving car is covered in sensors — cameras to see the road, radar to spot other cars, and GPS to know exactly where it is!',
+              'Here\'s a robot with a very big job — a self-driving car! It uses dozens of sensors all working together to stay safe.',
+            ],
+            narrationYoung: 'A self-driving car uses cameras and other sensors to see the road!',
+            emoji: '🚗',
+            fact: 'Self-driving cars combine cameras, radar, and GPS so the robot brain always knows what\'s around it and where it is.',
+          },
+          {
             type: 'label',
             narration: 'Match each sensor to what it does for the robot!',
             visual: '🤖',
             items: ['📷 Camera = Eyes', '🎙️ Microphone = Ears', '🤚 Touch pad = Skin'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Which sensor works like a robot\'s ears?',
+            question: 'Which sensor is like ears?',
+            options: ['🎙️ Microphone', '📷 Camera', '🤚 Touch pad', '🌡️ Thermometer'],
+            correct: 0,
           },
           {
             type: 'activity',
@@ -313,7 +545,7 @@ export const COURSES = [
           facts: [
             'Cameras help robots see their environment.',
             'Microphones help robots hear and understand speech.',
-            'Touch sensors help robots feel and handle objects safely.',
+            'Self-driving cars combine many sensors to stay safe.',
           ],
           colourPrompt: 'Draw a robot and add its sensors — label the camera (eyes), microphone (ears), and touch sensor (hands)!',
           visual: '👁️',
@@ -336,6 +568,24 @@ export const COURSES = [
             fact: 'Robots follow code instructions perfectly. If you make even one mistake in your code, the robot does the wrong thing!',
           },
           {
+            type: 'quiz',
+            narration: 'What is code most like?',
+            question: 'Code is most like a…',
+            options: ['📖 Recipe with exact steps', '💭 Random idea', '✨ Magic spell', '🎨 Drawing'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'A "loop" is a coding trick that makes a robot repeat the same steps over and over — like telling it "sweep the floor, and keep sweeping until it\'s clean!"',
+            narrations: [
+              'A "loop" is a coding trick that makes a robot repeat the same steps over and over — like telling it "sweep the floor, and keep sweeping until it\'s clean!"',
+              'Here\'s a handy coding trick called a LOOP — it makes a robot repeat an action instead of writing it out a hundred times!',
+            ],
+            narrationYoung: 'A loop makes a robot do the same thing over and over, like sweeping until it\'s clean!',
+            emoji: '🔁',
+            fact: 'Loops let coders write one instruction that repeats, instead of writing the same step over and over by hand.',
+          },
+          {
             type: 'label',
             narration: 'Here is a robot\'s morning routine algorithm. Tap the steps in order!',
             visual: '🤖',
@@ -343,9 +593,9 @@ export const COURSES = [
           },
           {
             type: 'quiz',
-            narration: 'What is code most like?',
-            question: 'Code is most like a…',
-            options: ['📖 Recipe with exact steps', '💭 Random idea', '✨ Magic spell', '🎨 Drawing'],
+            narration: 'What do we call a coding trick that repeats the same steps over and over?',
+            question: 'Repeating steps in code is called a…',
+            options: ['🔁 Loop', '🛑 Stop', '❓ Question', '🎯 Target'],
             correct: 0,
           },
           {
@@ -392,10 +642,28 @@ export const COURSES = [
             correct: 0,
           },
           {
+            type: 'explain',
+            narration: 'After engineers build a robot, they test it again and again — and it almost never works perfectly the first time! Testing and fixing mistakes is a normal part of inventing.',
+            narrations: [
+              'After engineers build a robot, they test it again and again — and it almost never works perfectly the first time! Testing and fixing mistakes is a normal part of inventing.',
+              'Here\'s a secret every engineer knows — your first try almost never works! Testing and trying again is how great robots get made.',
+            ],
+            narrationYoung: 'Robots almost never work perfectly the first try — testing again and again is how we make them better!',
+            emoji: '🔨',
+            fact: 'Engineers expect mistakes! Testing, finding problems, and fixing them again and again is exactly how good inventions get made.',
+          },
+          {
             type: 'label',
             narration: 'Engineers follow a design loop. Tap the steps in order!',
             visual: '🔧',
             items: ['🔍 Sense the problem', '💡 Plan a solution', '🔨 Build and test', '✨ Improve it'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What should you do if your robot design doesn\'t work the first time?',
+            question: 'If your robot doesn\'t work at first, you should…',
+            options: ['🔄 Test it and try again', '😢 Give up completely', '🙈 Pretend it worked'],
+            correct: 0,
           },
           {
             type: 'activity',
@@ -410,11 +678,145 @@ export const COURSES = [
           title: 'Design Your Own Robot',
           facts: [
             'Always start with the problem your robot will solve.',
-            'Sensors help the robot sense its environment.',
+            'Testing and fixing mistakes is a normal part of building robots.',
             'Motors make the robot move, grab, and interact.',
           ],
           colourPrompt: 'Draw your dream robot! Label its sensors, computer brain, and motors. Give it a name!',
           visual: '🔧',
+        },
+      },
+      {
+        id: 'helper-robots',
+        title: 'Robots That Help People',
+        emoji: '🏥',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Robots have amazing jobs! Some help doctors do careful surgery, some deliver packages, and some even explore other planets for us.',
+            narrations: [
+              'Robots have amazing jobs! Some help doctors do careful surgery, some deliver packages, and some even explore other planets for us.',
+              'Robots have some incredible jobs around the world — let\'s meet a few of the hardest-working robots out there!',
+            ],
+            narrationYoung: 'Robots help doctors, deliver packages, and even explore space!',
+            emoji: '🏥',
+            fact: 'Surgical robots help doctors make tiny, precise movements during operations — steadier than a human hand alone!',
+          },
+          {
+            type: 'quiz',
+            narration: 'Which robot job did we just talk about?',
+            question: 'What is one real robot job?',
+            options: ['🚀 Exploring space', '🍦 Selling ice cream', '⚽ Playing football professionally', '🎬 Directing movies'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'The Mars rovers are some of the most famous robots ever built! They drive around another planet all by themselves, taking photos and testing rocks.',
+            narrations: [
+              'The Mars rovers are some of the most famous robots ever built! They drive around another planet all by themselves, taking photos and testing rocks.',
+              'Here\'s a robot with the coolest job of all — exploring Mars! It drives around a whole other planet, all on its own.',
+            ],
+            narrationYoung: 'Mars rovers are robots that drive around another planet all by themselves!',
+            emoji: '🚀',
+            fact: 'Mars rovers use sensors to avoid rocks, cameras to take photos, and tools to study Martian soil — millions of kilometres from home!',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s match each helper robot to its job. Tap them in order!',
+            visual: '🤝',
+            items: ['🏥 Surgical robot — helps doctors', '📦 Delivery robot — brings packages', '🚀 Mars rover — explores space', '🏭 Factory arm — builds cars'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What does a Mars rover do?',
+            question: 'A Mars rover\'s job is to…',
+            options: ['🪐 Explore another planet', '🍽️ Wash dishes', '📚 Read bedtime stories', '🚗 Drive kids to school'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'If you could invent a robot to help people, what job would you give it?',
+            narrations: [
+              'If you could invent a robot to help people, what job would you give it?',
+              'So many robots help people every day! If you invented one, what job would you give your robot?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Robots That Help People',
+          facts: [
+            'Surgical robots help doctors make careful, steady movements.',
+            'Mars rovers explore another planet all by themselves.',
+            'Robots also deliver packages and build cars in factories.',
+          ],
+          colourPrompt: 'Draw a helper robot doing a job you\'d love it to do, and write (or tell a grown-up) what its job is!',
+          visual: '🏥',
+        },
+      },
+      {
+        id: 'robot-safety',
+        title: 'Staying Safe Around Machines',
+        emoji: '🦺',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Robots and machines are helpful, but they need rules to keep everyone safe — just like we look both ways before crossing the street!',
+            narrations: [
+              'Robots and machines are helpful, but they need rules to keep everyone safe — just like we look both ways before crossing the street!',
+              'Machines are wonderful helpers, but being safe around them matters too — let\'s learn the simple rules!',
+            ],
+            narrationYoung: 'Machines are helpful, but we always follow safety rules around them!',
+            emoji: '🦺',
+            fact: 'Factory robots often work behind safety fences, and warning lights or sounds let people know when a machine is moving.',
+          },
+          {
+            type: 'quiz',
+            narration: 'Why do factories put fences around big robots?',
+            question: 'Why do robots have safety fences?',
+            options: ['🛡️ To keep people safe', '🎨 To look pretty', '❄️ To keep them cold', '🔇 To make them quiet'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'The most important safety rule is simple: only a grown-up should turn machines on, and you should always ask before touching one.',
+            narrations: [
+              'The most important safety rule is simple: only a grown-up should turn machines on, and you should always ask before touching one.',
+              'Here\'s the number one machine safety rule — always ask a grown-up first, every single time!',
+            ],
+            narrationYoung: 'Always ask a grown-up before touching any machine!',
+            emoji: '🙋',
+            fact: 'Always ask a trusted grown-up before touching or turning on any machine — that keeps everyone safe.',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s remember our machine safety rules. Tap each one in order!',
+            visual: '🦺',
+            items: ['🙋 Ask a grown-up first', '👀 Watch for warning lights', '🛑 Stay behind the fence', '🤲 Never touch moving parts'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What should you always do before touching a machine?',
+            question: 'Before touching a machine, you should…',
+            options: ['🙋 Ask a grown-up', '🏃 Run toward it fast', '🙈 Just try it yourself'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'Can you tell me one safety rule to remember around machines and robots?',
+            narrations: [
+              'Can you tell me one safety rule to remember around machines and robots?',
+              'You\'re a safety expert now! Tell me one rule you\'d follow around a machine or robot.',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Staying Safe Around Machines',
+          facts: [
+            'Factories use fences and warning lights to keep people safe around robots.',
+            'Always ask a grown-up before touching or turning on a machine.',
+            'Never touch the moving parts of any machine.',
+          ],
+          colourPrompt: 'Draw a machine with its safety fence and warning light, and colour it in!',
+          visual: '🦺',
         },
       },
     ],
@@ -443,6 +845,24 @@ export const COURSES = [
             fact: 'Acids and bases react together to make carbon dioxide gas. The bubbles rush out so fast they look like a volcano erupting!',
           },
           {
+            type: 'quiz',
+            narration: 'Why does the baking soda volcano fizz?',
+            question: 'Why does the volcano fizz?',
+            options: ['⚗️ An acid meets a base', '🔥 It gets too hot', '💧 Water is boiling', '✨ Magic!'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'The gas made in this reaction is called carbon dioxide — the same gas that makes fizzy drinks bubbly, and the same gas you breathe out!',
+            narrations: [
+              'The gas made in this reaction is called carbon dioxide — the same gas that makes fizzy drinks bubbly, and the same gas you breathe out!',
+              'That fizzy volcano gas has a name — carbon dioxide! It\'s the very same gas in your fizzy drinks and even in your own breath!',
+            ],
+            narrationYoung: 'The fizzy gas is called carbon dioxide — the same gas in fizzy drinks!',
+            emoji: '💨',
+            fact: 'Carbon dioxide gas is invisible, but you can see it as bubbles when it forms quickly in liquid, like in a volcano or a fizzy drink!',
+          },
+          {
             type: 'label',
             narration: 'What do you need for the volcano experiment? Tap the ingredients in order!',
             visual: '🌋',
@@ -450,9 +870,9 @@ export const COURSES = [
           },
           {
             type: 'quiz',
-            narration: 'Why does the baking soda volcano fizz?',
-            question: 'Why does the volcano fizz?',
-            options: ['⚗️ An acid meets a base', '🔥 It gets too hot', '💧 Water is boiling', '✨ Magic!'],
+            narration: 'What gas is made when baking soda and vinegar react?',
+            question: 'What gas makes the fizzy bubbles?',
+            options: ['💨 Carbon dioxide', '🎈 Helium', '💧 Water vapour', '🌬️ Oxygen only'],
             correct: 0,
           },
           {
@@ -499,10 +919,28 @@ export const COURSES = [
             correct: 0,
           },
           {
+            type: 'explain',
+            narration: 'A rainbow in the sky forms when sunlight shines through raindrops. That\'s why you often see rainbows right after it rains, with the sun still out!',
+            narrations: [
+              'A rainbow in the sky forms when sunlight shines through raindrops. That\'s why you often see rainbows right after it rains, with the sun still out!',
+              'Ever wonder why rainbows show up after rain? Tiny raindrops in the sky do the exact same colour-splitting trick as a glass of water!',
+            ],
+            narrationYoung: 'Sky rainbows happen when sun shines through tiny raindrops!',
+            emoji: '🌦️',
+            fact: 'A sky rainbow forms when sunlight passes through millions of tiny raindrops, each one splitting the light — that\'s why you need both sun AND rain!',
+          },
+          {
             type: 'label',
             narration: 'Rainbows always have the same colours in the same order. Tap them from top to bottom!',
             visual: '🌈',
             items: ['🔴 Red', '🟡 Yellow', '🟢 Green', '🔵 Blue'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What two things do you need in the sky to see a rainbow?',
+            question: 'A sky rainbow needs sun and…',
+            options: ['🌧️ Rain', '❄️ Snow', '💨 Wind', '☁️ Fog only'],
+            correct: 0,
           },
           {
             type: 'activity',
@@ -518,7 +956,7 @@ export const COURSES = [
           facts: [
             'White light contains all the colours of the rainbow mixed together.',
             'Water and glass bend light to reveal all the colours.',
-            'Rainbow colours always appear in order: red, orange, yellow, green, blue, violet.',
+            'Sky rainbows need both sunlight and rain at the same time.',
           ],
           colourPrompt: 'Colour in the rainbow using all the colours in the right order from top to bottom!',
           visual: '🌈',
@@ -548,10 +986,28 @@ export const COURSES = [
             correct: 0,
           },
           {
+            type: 'explain',
+            narration: 'You can turn a "sinker" into a "floater"! A ball of clay sinks, but shape that same clay into a hollow bowl shape, and it will float!',
+            narrations: [
+              'You can turn a "sinker" into a "floater"! A ball of clay sinks, but shape that same clay into a hollow bowl shape, and it will float!',
+              'Here\'s a fun trick — the exact same amount of clay can sink OR float, just by changing its shape! Want to know how?',
+            ],
+            narrationYoung: 'A ball of clay sinks, but a bowl shape made from the same clay can float!',
+            emoji: '🥣',
+            fact: 'Shaping an object so it takes up more space (like a hollow bowl) helps it push aside more water, so the very same material can float instead of sink.',
+          },
+          {
             type: 'label',
             narration: 'Can you sort these objects? Tap them in order — which float first, then which sink!',
             visual: '🌊',
             items: ['🪶 Cork (floats)', '🪵 Wood (floats)', '🪙 Coin (sinks)', '🪨 Rock (sinks)'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Could the exact same lump of clay both sink and float, depending on its shape?',
+            question: 'Can shape change if something floats?',
+            options: ['✅ Yes — a bowl shape can float', '❌ No — shape never matters'],
+            correct: 0,
           },
           {
             type: 'activity',
@@ -567,10 +1023,211 @@ export const COURSES = [
           facts: [
             'Objects float when they weigh less than the water they push aside.',
             'Ships are hollow, so they push out lots of water and float.',
-            'Density is how heavy something is for its size.',
+            'The same material can sink or float depending on its shape!',
           ],
           colourPrompt: 'Draw objects floating and sinking in a bucket of water. Label each one "floats" or "sinks"!',
           visual: '🌊',
+        },
+      },
+      {
+        id: 'magnets',
+        title: 'Magnet Magic',
+        emoji: '🧲',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Magnets have an invisible pulling force! They stick to things made of iron or steel, like paperclips, spoons, and fridge doors.',
+            narrations: [
+              'Magnets have an invisible pulling force! They stick to things made of iron or steel, like paperclips, spoons, and fridge doors.',
+              'Magnets seem like magic, but it\'s really an invisible force! Let\'s find out what they do and don\'t stick to.',
+            ],
+            narrationYoung: 'Magnets pull on metal things like paperclips and spoons!',
+            emoji: '🧲',
+            fact: 'Magnets attract objects made of iron, nickel, or steel — but not wood, plastic, glass, or paper!',
+          },
+          {
+            type: 'quiz',
+            narration: 'Which of these would a magnet stick to?',
+            question: 'A magnet would stick to a…',
+            options: ['🥄 Steel spoon', '📄 Piece of paper', '🪵 Wooden block', '🍎 Apple'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Every magnet has two ends called poles — a north pole and a south pole. Matching poles push apart, but opposite poles pull together!',
+            narrations: [
+              'Every magnet has two ends called poles — a north pole and a south pole. Matching poles push apart, but opposite poles pull together!',
+              'Here\'s the trick behind magnets — they have two special ends called poles! Some poles push away, and some pull together.',
+            ],
+            narrationYoung: 'Magnets have two ends. Same ends push apart, different ends pull together!',
+            emoji: '🔁',
+            fact: 'North and south poles attract each other, but two north poles (or two south poles) push each other away!',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s sort what magnets stick to. Tap each one in order!',
+            visual: '🧲',
+            items: ['🥄 Steel spoon — sticks', '📎 Paperclip — sticks', '🪵 Wood block — no', '📄 Paper — no'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What happens when you put two north poles of a magnet together?',
+            question: 'Two matching magnet poles will…',
+            options: ['↔️ Push apart', '🤝 Pull together', '💥 Explode'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'Can you think of something magnetic in your house? Tell me what it is!',
+            narrations: [
+              'Can you think of something magnetic in your house? Tell me what it is!',
+              'You know all about magnets now! Can you find something at home a magnet would stick to? Tell me what it is!',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Magnet Magic',
+          facts: [
+            'Magnets attract iron, nickel, and steel — not wood, paper, or plastic.',
+            'Every magnet has a north pole and a south pole.',
+            'Matching poles push apart; opposite poles pull together.',
+          ],
+          colourPrompt: 'Draw a magnet and some objects — colour the ones it would stick to!',
+          visual: '🧲',
+        },
+      },
+      {
+        id: 'sound',
+        title: 'Sound & Vibration',
+        emoji: '🔊',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Every sound is made by something vibrating — shaking back and forth really fast! When you talk, tiny parts in your throat called vocal cords vibrate.',
+            narrations: [
+              'Every sound is made by something vibrating — shaking back and forth really fast! When you talk, tiny parts in your throat called vocal cords vibrate.',
+              'Here\'s something you can\'t see but always hear — vibration! It\'s the secret behind every single sound.',
+            ],
+            narrationYoung: 'Sounds happen when something shakes really fast — that\'s called vibrating!',
+            emoji: '🔊',
+            fact: 'You can feel your own vibrations! Gently touch your throat while you hum — you\'ll feel it buzz.',
+          },
+          {
+            type: 'quiz',
+            narration: 'What makes a sound happen?',
+            question: 'What causes sound?',
+            options: ['📳 Something vibrating', '🌡️ Something heating up', '💡 Something glowing', '🧊 Something freezing'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Sound needs something to travel through, like air or water! That\'s why sound travels well underwater, but there\'s no sound at all in outer space, where there\'s no air.',
+            narrations: [
+              'Sound needs something to travel through, like air or water! That\'s why sound travels well underwater, but there\'s no sound at all in outer space, where there\'s no air.',
+              'Here\'s a wild space fact — sound cannot travel at all in outer space! Let\'s find out why.',
+            ],
+            narrationYoung: 'Sound needs air or water to travel — that\'s why space is totally silent!',
+            emoji: '🌌',
+            fact: 'Space is a vacuum with no air, so sound waves have nothing to travel through — it is completely silent out there!',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s explore sound! Tap each one in order.',
+            visual: '🔊',
+            items: ['🗣️ Vocal cords vibrate', '🎸 Guitar string vibrates', '🥁 Drum skin vibrates', '👂 Your ear catches it'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Why is outer space completely silent?',
+            question: 'Why is there no sound in space?',
+            options: ['🌌 No air for sound to travel through', '🥶 It\'s too cold', '⭐ Too many stars', '🚀 Rockets are too loud'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'Can you make a sound right now and tell me what vibrated to make it?',
+            narrations: [
+              'Can you make a sound right now and tell me what vibrated to make it?',
+              'You\'re a sound scientist now! Make a noise and tell me — what do you think vibrated to make that sound?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Sound & Vibration',
+          facts: [
+            'Every sound is made by something vibrating.',
+            'Sound needs air or water to travel through.',
+            'Outer space is silent because there is no air.',
+          ],
+          colourPrompt: 'Draw things that make sound — a drum, a guitar, and your own mouth — and show them vibrating with wiggly lines!',
+          visual: '🔊',
+        },
+      },
+      {
+        id: 'states-of-matter',
+        title: 'Ice, Water & Steam',
+        emoji: '🧊',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Water can be a solid, a liquid, or a gas! Ice is solid water, the water you drink is liquid, and steam is water turned into gas.',
+            narrations: [
+              'Water can be a solid, a liquid, or a gas! Ice is solid water, the water you drink is liquid, and steam is water turned into gas.',
+              'Here\'s something amazing — water can change into three totally different forms! Let\'s meet all three.',
+            ],
+            narrationYoung: 'Water can be solid ice, liquid water, or steamy gas!',
+            emoji: '🧊',
+            fact: 'It is all still water — just at different temperatures! Cold makes it solid ice, warm keeps it liquid, and very hot turns it into gas.',
+          },
+          {
+            type: 'quiz',
+            narration: 'What is frozen, solid water called?',
+            question: 'Solid water is called…',
+            options: ['🧊 Ice', '☁️ Cloud', '🌫️ Fog', '🫧 Bubbles'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Heat is what changes water from one form to another. Add heat to ice, and it melts into liquid water. Add even more heat, and it turns into steam!',
+            narrations: [
+              'Heat is what changes water from one form to another. Add heat to ice, and it melts into liquid water. Add even more heat, and it turns into steam!',
+              'Want to know the magic trick behind water changing forms? It\'s all about heat — adding it, or taking it away!',
+            ],
+            narrationYoung: 'Heat melts ice into water, and lots of heat turns water into steam!',
+            emoji: '🔥',
+            fact: 'Adding heat melts ice into water and boils water into steam. Taking heat away freezes water back into ice!',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s put water\'s three forms in order from coldest to hottest. Tap them in order!',
+            visual: '🌡️',
+            items: ['🧊 Ice — solid', '💧 Water — liquid', '💨 Steam — gas'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What do you need to add to turn ice into liquid water?',
+            question: 'What melts ice into water?',
+            options: ['🔥 Heat', '❄️ More cold', '💨 Wind', '🌑 Darkness'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'Have you ever watched ice melt or water boil? Tell me what you saw happen!',
+            narrations: [
+              'Have you ever watched ice melt or water boil? Tell me what you saw happen!',
+              'You know all three forms of water now! Have you ever watched ice melt, or steam rise from hot water? Tell me about it!',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Ice, Water & Steam',
+          facts: [
+            'Water can be solid ice, liquid water, or gas steam.',
+            'Heat melts ice into water and boils water into steam.',
+            'Taking heat away freezes water back into ice.',
+          ],
+          colourPrompt: 'Draw the three forms of water — an ice cube, a puddle, and a steamy kettle!',
+          visual: '🧊',
         },
       },
     ],
