@@ -1,30 +1,36 @@
 import { useState, useEffect } from 'react'
+import { hashPin, getPinLock, savePinLock } from '../utils/storage.js'
 import styles from './ParentPin.module.css'
 
 const MAX_ATTEMPTS = 5
 const LOCKOUT_MS = 30000
 
-export default function ParentPin({ correctPin = '1234', onSuccess }) {
+export default function ParentPin({ correctPinHash, onSuccess }) {
   const [input, setInput] = useState('')
   const [shake, setShake] = useState(false)
-  const [attempts, setAttempts] = useState(0)
-  const [lockedUntil, setLockedUntil] = useState(0)
+  // Persisted across reloads so the lockout can't be dodged by refreshing.
+  const [lock, setLock] = useState(() => getPinLock())
   const [remaining, setRemaining] = useState(0)
 
   const locked = remaining > 0
 
   // Tick down the lockout countdown.
   useEffect(() => {
-    if (lockedUntil <= Date.now()) { setRemaining(0); return }
+    if (lock.lockedUntil <= Date.now()) { setRemaining(0); return }
     const id = setInterval(() => {
-      const left = Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000))
+      const left = Math.max(0, Math.ceil((lock.lockedUntil - Date.now()) / 1000))
       setRemaining(left)
-      if (left === 0) { setAttempts(0); clearInterval(id) }
+      if (left === 0) {
+        const cleared = { attempts: 0, lockedUntil: 0 }
+        setLock(cleared)
+        savePinLock(cleared)
+        clearInterval(id)
+      }
     }, 250)
     return () => clearInterval(id)
-  }, [lockedUntil])
+  }, [lock.lockedUntil])
 
-  const handleDigit = (d) => {
+  const handleDigit = async (d) => {
     if (locked) return
     const next = input + d
     if (next.length < 4) {
@@ -32,15 +38,21 @@ export default function ParentPin({ correctPin = '1234', onSuccess }) {
     } else {
       const attempt = next
       setInput('')
-      if (attempt === correctPin) {
-        setAttempts(0)
+      const attemptHash = await hashPin(attempt)
+      if (correctPinHash && attemptHash === correctPinHash) {
+        const cleared = { attempts: 0, lockedUntil: 0 }
+        setLock(cleared)
+        savePinLock(cleared)
         onSuccess()
       } else {
-        const tries = attempts + 1
-        setAttempts(tries)
+        const tries = lock.attempts + 1
+        const nextLock = tries >= MAX_ATTEMPTS
+          ? { attempts: tries, lockedUntil: Date.now() + LOCKOUT_MS }
+          : { attempts: tries, lockedUntil: 0 }
+        setLock(nextLock)
+        savePinLock(nextLock)
         setShake(true)
         setTimeout(() => setShake(false), 500)
-        if (tries >= MAX_ATTEMPTS) setLockedUntil(Date.now() + LOCKOUT_MS)
       }
     }
   }
@@ -55,8 +67,8 @@ export default function ParentPin({ correctPin = '1234', onSuccess }) {
         <p className={styles.sub}>
           {locked
             ? `Too many tries — wait ${remaining}s`
-            : attempts > 0
-              ? `Enter your PIN (${MAX_ATTEMPTS - attempts} left)`
+            : lock.attempts > 0
+              ? `Enter your PIN (${MAX_ATTEMPTS - lock.attempts} left)`
               : 'Enter your PIN'}
         </p>
 

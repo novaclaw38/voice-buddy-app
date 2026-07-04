@@ -1,8 +1,10 @@
-import { getUser, isProMode, isEntitled } from './_auth.js'
+import { getUser, isProMode, isEntitled, allowRequest } from './_auth.js'
 
 const MAX_HISTORY = 17 // 1 system prompt + up to 16 turns, matches client's MAX_HISTORY
 const MAX_MESSAGE_CHARS = 4000
 const MAX_TOKENS_CAP = 800
+const RATE_LIMIT_PER_MIN = 20
+const RATE_LIMIT_PER_DAY = 500
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -13,6 +15,12 @@ export default async function handler(req, res) {
   const user = await getUser(req)
   if (!user) {
     return res.status(401).json({ error: { message: 'Sign in to chat with Buddy.' } })
+  }
+
+  // Cost guard: cap how fast and how much any one account can spend.
+  if (!(await allowRequest(user.id, 'chat-1m', RATE_LIMIT_PER_MIN, 60)) ||
+      !(await allowRequest(user.id, 'chat-1d', RATE_LIMIT_PER_DAY, 86400))) {
+    return res.status(429).json({ error: { message: 'Too many requests — take a short break.' } })
   }
 
   const { messages, maxTokens = 300, temperature = 0.85, mode } = req.body

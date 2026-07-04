@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase.js'
 
 // Attach the current Supabase access token so the API can authenticate the user.
-async function authHeaders() {
+export async function authHeaders() {
   const { data } = await supabase.auth.getSession()
   const token = data?.session?.access_token
   return {

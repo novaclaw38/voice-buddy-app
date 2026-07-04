@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import BuddyAvatar from '../components/BuddyAvatar.jsx'
 import SpeechBubble from '../components/SpeechBubble.jsx'
 import VoiceButton from '../components/VoiceButton.jsx'
-import ModeSelector from '../components/ModeSelector.jsx'
+import BuddyMenu from '../components/BuddyMenu.jsx'
 import ParentPin from '../components/ParentPin.jsx'
 import AvatarPicker from '../components/AvatarPicker.jsx'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
 import { useSpeech } from '../hooks/useSpeech.js'
 import { useChat } from '../hooks/useChat.js'
 import { useSubscription } from '../hooks/useSubscription.jsx'
-import { getSettings, saveSettings } from '../utils/storage.js'
+import { getSettings, saveSettings, migratePinIfNeeded } from '../utils/storage.js'
 import { supabase } from '../lib/supabase.js'
 import { fetchMessageById, markPlayed } from '../services/messageService.js'
 import SingAlong from '../components/SingAlong.jsx'
@@ -22,6 +22,11 @@ import styles from './ChildPage.module.css'
 export default function ChildPage({ session }) {
   const navigate = useNavigate()
   const [settings, setSettings] = useState(() => getSettings())
+
+  // One-time migration of any pre-existing plaintext parentPin to a hash.
+  useEffect(() => {
+    migratePinIfNeeded(getSettings()).then(setSettings)
+  }, [])
   const [buddyText, setBuddyText] = useState('')
   const [userText, setUserText] = useState('')
   const [showPin, setShowPin] = useState(false)
@@ -263,8 +268,8 @@ export default function ChildPage({ session }) {
   // Sing mode plays real recordings inside <SingAlong>; no separate
   // background track here (the old Pixabay loop hot-link-404'd anyway).
 
-  // Story/sing-mode word-by-word reading tracker (karaoke dot)
-  const isTrackedMode = chat.mode === 'story' || chat.mode === 'sing'
+  // Sing-mode word-by-word reading tracker (karaoke dot)
+  const isTrackedMode = chat.mode === 'sing'
   useEffect(() => {
     if (!isTrackedMode || uiStatus !== 'speaking' || !buddyText) {
       setWordIndex(-1)
@@ -313,24 +318,17 @@ export default function ChildPage({ session }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wakeWordEnabled, uiStatus, wakePhrase])
 
-  const handleModeSelect = useCallback((modeId) => {
-    // The Learn tile opens the structured Courses experience instead of a
-    // chat mode — keeps course access in one place instead of a separate
-    // bottom-row button.
-    if (modeId === 'learn') {
-      navigate('/courses')
-      return
-    }
+  const handleStartSing = useCallback(() => {
     cancelBubbleClear()
-    const intro = chat.switchMode(modeId)
+    const intro = chat.switchMode('sing')
     setBuddyText(intro)
     setUserText('')
     setUiStatus('speaking')
     speech.speak(intro, () => {
       setUiStatus('idle')
       scheduleBubbleClear()
-    }, getModeVoice(modeId))
-  }, [chat, speech, scheduleBubbleClear, cancelBubbleClear, navigate])
+    }, getModeVoice('sing'))
+  }, [chat, speech, scheduleBubbleClear, cancelBubbleClear])
 
   const handleUserSpeech = useCallback((transcript) => {
     cancelBubbleClear()
@@ -374,28 +372,23 @@ export default function ChildPage({ session }) {
   const voiceOnly = settings.voiceOnly || false
 
   const modeColors = {
-    chat:     ['#ff9ecf', '#a78bfa'],
-    story:    ['#b794f6', '#7cc4fb'],
-    game:     ['#ff8fc7', '#d56bf0'],
-    activity: ['#ffb15c', '#ffd76b'],
-    routine:  ['#6ee7b7', '#7cc4fb'],
-    quiz:     ['#7cc4fb', '#a78bfa'],
-    jokes:    ['#ffd76b', '#ffa94d'],
-    sing:     ['#ff8fc7', '#b794f6'],
-    feelings: ['#8ec5ff', '#b794f6'],
-    move:     ['#6ee7b7', '#ffd76b'],
-    learn:    ['#a78bfa', '#7cc4fb'],
+    chat: ['#ff9ecf', '#a78bfa'],
+    sing: ['#ff8fc7', '#b794f6'],
   }
   const [from, to] = modeColors[chat.mode] || modeColors.chat
 
   if (voiceOnly) {
     return (
       <div className={styles.voicePage}>
-        <button
-          className={styles.voiceSettingsBtn}
-          onClick={() => setShowPin(true)}
-          aria-label="Parent settings"
-        >⚙️</button>
+        <div className={styles.voiceMenuWrap}>
+          <BuddyMenu
+            variant="dark"
+            onSongs={handleStartSing}
+            onLearn={() => navigate('/courses')}
+            onCustomize={() => setShowPicker(true)}
+            onSettings={() => setShowPin(true)}
+          />
+        </div>
 
         <div className={`${styles.voiceOrb} ${styles[`orb_${uiStatus}`]}`} />
         <p className={styles.voiceBuddyText}>{buddyText}</p>
@@ -408,7 +401,7 @@ export default function ChildPage({ session }) {
 
         {showPin && (
           <>
-            <ParentPin correctPin={settings.parentPin} onSuccess={handlePinSuccess} />
+            <ParentPin correctPinHash={settings.parentPinHash} onSuccess={handlePinSuccess} />
             <button className={styles.pinDismiss} onClick={() => setShowPin(false)} aria-label="Cancel" />
           </>
         )}
@@ -496,22 +489,12 @@ export default function ChildPage({ session }) {
               </button>
             )}
             {cameraOn && <span className={styles.cameraIndicator} title="Camera on">📹</span>}
-            <div className={styles.topBarActions}>
-              <button
-                className={styles.customizeBtn}
-                onClick={() => setShowPicker(true)}
-                aria-label="Customise buddy"
-              >
-                🎨
-              </button>
-              <button
-                className={styles.settingsBtn}
-                onClick={() => setShowPin(true)}
-                aria-label="Parent settings"
-              >
-                ⚙️
-              </button>
-            </div>
+            <BuddyMenu
+              onSongs={handleStartSing}
+              onLearn={() => navigate('/courses')}
+              onCustomize={() => setShowPicker(true)}
+              onSettings={() => setShowPin(true)}
+            />
           </div>
 
           {/* Avatar */}
@@ -558,16 +541,11 @@ export default function ChildPage({ session }) {
             {showActivity && chat.mode === 'chat' && (
               <DailyActivity activity={dailyActivity} onDismiss={handleDismissActivity} />
             )}
-            <ModeSelector
-              currentMode={chat.mode}
-              onSelect={handleModeSelect}
-              onUpgrade={() => setShowUpgrade(true)}
-            />
-            {/* Courses now live behind the Learn tile above; this just keeps
-                the trial-days-left indicator visible. */}
             {tier === 'trial' && daysLeft !== null && (
               <div className={styles.coursesRow}>
-                <span className={styles.trialBadge}>Trial: {daysLeft}d left</span>
+                <button type="button" className={styles.trialBadge} onClick={() => setShowUpgrade(true)}>
+                  Trial: {daysLeft}d left — Upgrade
+                </button>
               </div>
             )}
           </div>
@@ -577,7 +555,7 @@ export default function ChildPage({ session }) {
       {/* PIN gate */}
       {showPin && (
         <ParentPin
-          correctPin={settings.parentPin}
+          correctPinHash={settings.parentPinHash}
           onSuccess={handlePinSuccess}
         />
       )}

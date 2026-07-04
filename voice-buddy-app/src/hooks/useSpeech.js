@@ -119,23 +119,23 @@ export function useSpeech(settings) {
       })
       .then((r) => {
         if (!r.ok) throw new Error('tts_api_error')
-        return r.json()
+        return r.blob()
       })
-      .then(({ audioContent }) => {
-        const audio = new Audio(`data:audio/mp3;base64,${audioContent}`)
+      .then((blob) => {
+        const url = URL.createObjectURL(blob)
+        const audio = new Audio(url)
         audioRef.current = audio
-        audio.onended = () => {
+        const finish = () => {
+          URL.revokeObjectURL(url)
           audioRef.current = null
           setStatus('idle')
           onDone?.()
         }
-        audio.onerror = () => {
-          audioRef.current = null
-          setStatus('idle')
-          onDone?.()
-        }
+        audio.onended = finish
+        audio.onerror = finish
         audio.play().catch(() => {
           // Autoplay blocked — fall back
+          URL.revokeObjectURL(url)
           audioRef.current = null
           fallbackSpeak(text, onDone, voiceOpts)
         })

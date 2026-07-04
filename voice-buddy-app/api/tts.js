@@ -3,7 +3,10 @@ const VOICES = {
   male:   'en-US-Neural2-D',
 }
 
-import { getUser } from './_auth.js'
+import { getUser, allowRequest } from './_auth.js'
+
+const RATE_LIMIT_PER_MIN = 30
+const RATE_LIMIT_PER_DAY = 1000
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -11,6 +14,12 @@ export default async function handler(req, res) {
   // Require a signed-in user — this endpoint spends paid Google TTS credits.
   const user = await getUser(req)
   if (!user) return res.status(401).json({ error: 'Sign in to use Buddy.' })
+
+  // Cost guard: cap how fast and how much any one account can spend.
+  if (!(await allowRequest(user.id, 'tts-1m', RATE_LIMIT_PER_MIN, 60)) ||
+      !(await allowRequest(user.id, 'tts-1d', RATE_LIMIT_PER_DAY, 86400))) {
+    return res.status(429).json({ error: 'Too many requests — take a short break.' })
+  }
 
   const key = process.env.GOOGLE_TTS_KEY
   if (!key) return res.status(503).json({ error: 'GOOGLE_TTS_KEY not configured' })
@@ -45,6 +54,11 @@ export default async function handler(req, res) {
     return res.status(response.status).json({ error: err.error?.message || 'Google TTS error' })
   }
 
+  // Google returns base64; send raw MP3 bytes so the client skips the ~33%
+  // base64 transfer overhead and plays via an object URL.
   const { audioContent } = await response.json()
-  res.status(200).json({ audioContent })
+  const audio = Buffer.from(audioContent, 'base64')
+  res.setHeader('Content-Type', 'audio/mpeg')
+  res.setHeader('Cache-Control', 'no-store')
+  res.status(200).send(audio)
 }
