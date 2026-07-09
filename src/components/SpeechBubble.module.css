@@ -57,6 +57,9 @@
   text-align: center;
   color: var(--ink);
   word-break: break-word;
+  max-height: 34vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .userBubble {

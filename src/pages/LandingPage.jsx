@@ -335,9 +335,9 @@ export default function LandingPage() {
             <div className={styles.featureTag}>Learn Something New</div>
             <h2 className={styles.featureTitle}>Interactive courses your child will love</h2>
             <p className={styles.featureDesc}>
-              Buddy guides kids through real lessons in gardening, robotics, and science
-              experiments, all delivered conversationally, at their pace, with no screens
-              or worksheets required.
+              Buddy guides kids through real lessons in gardening, robotics, science,
+              cooking, animals, and space, all delivered conversationally, at their pace,
+              with no screens or worksheets required.
             </p>
             <div className={styles.featureChips}>
               <span>🌱 Gardening</span>
