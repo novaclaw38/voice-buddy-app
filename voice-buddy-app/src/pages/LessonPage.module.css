@@ -135,10 +135,19 @@
   max-width: 500px;
   padding: 8px 16px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   z-index: 1;
+}
+
+/* Centers the step card when it fits, but degrades to top-aligned +
+   scrollable when it's taller than the slot — an item can't be both
+   centered and fully scroll-reachable via align-items alone. */
+.cardArea > * {
+  margin: auto 0;
 }
 
 /* ── Navigation ── */
