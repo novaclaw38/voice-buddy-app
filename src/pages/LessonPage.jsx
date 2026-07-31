@@ -149,7 +149,7 @@ export default function LessonPage({ session }) {
       }
     })
     return () => speech.stopSpeaking()
-  }, [stepIndex, isPro]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stepIndex, isPro, lesson]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Entitlement is checked before the lesson-presence guard below: for a free
   // user, lesson content is never fetched (the effect above short-circuits on
