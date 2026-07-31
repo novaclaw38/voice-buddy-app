@@ -8,6 +8,7 @@ import { authHeaders } from './services/chatService.js'
 const ChildPage   = lazy(() => import('./pages/ChildPage.jsx'))
 const ParentPage  = lazy(() => import('./pages/ParentPage.jsx'))
 const AuthPage    = lazy(() => import('./pages/AuthPage.jsx'))
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage.jsx'))
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'))
 const CoursesPage = lazy(() => import('./pages/CoursesPage.jsx'))
 const LessonPage  = lazy(() => import('./pages/LessonPage.jsx'))
@@ -53,6 +54,7 @@ export default function App() {
           {/* Public */}
           <Route path="/"      element={session ? <Navigate to="/app" replace /> : <LandingPage />} />
           <Route path="/login" element={session ? <Navigate to="/app" replace /> : <AuthPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/data-deletion" element={<DataDeletionPage />} />
           <Route path="/terms" element={<TermsOfServicePage />} />
