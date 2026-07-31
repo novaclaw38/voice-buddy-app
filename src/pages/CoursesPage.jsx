@@ -26,7 +26,7 @@ export default function CoursesPage({ session }) {
   const [settings] = useState(() => getSettings())
   const durationLabel = (settings.childAge || 7) <= 6 ? '~15 min' : '~30 min'
   const { completions } = useProgress()
-  const { courses: COURSES, loading: catalogLoading } = useCourseCatalog()
+  const { courses: COURSES, loading: catalogLoading, error: catalogError } = useCourseCatalog()
   const speech = useSpeech(settings)
 
   const orderedSubjects = useMemo(
@@ -77,6 +77,12 @@ export default function CoursesPage({ session }) {
           </div>
         </div>
       </header>
+
+      {catalogError && (
+        <p className={styles.sub} role="alert">
+          {catalogError.message || 'Could not load courses. Please try again.'}
+        </p>
+      )}
 
       {orderedSubjects.map((subject) => (
         <section key={subject.id} className={styles.subjectSection}>
