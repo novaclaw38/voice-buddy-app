@@ -843,16 +843,6 @@
 .planBtnPro:active { transform: translateY(3px) scale(0.98); box-shadow: 0 3px 0 var(--c-grape-d); }
 
 /* ── FOOTER ── */
-.footerArt {
-  height: clamp(140px, 20vw, 260px);
-  background-image:
-    linear-gradient(to bottom, #f3ecff 0%, rgba(243, 236, 255, 0) 20%, rgba(255, 241, 250, 0) 72%, #fff1fa 96%),
-    url('/footer-skyline.webp');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
-}
-
 .footer {
   border-top: 1px solid rgba(124,58,237,0.1);
   padding: 56px 24px 32px;

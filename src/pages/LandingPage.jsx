@@ -468,7 +468,6 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <div className={styles.footerArt} aria-hidden="true" />
       <footer className={styles.footer}>
         <div className={styles.footerTop}>
           <div className={styles.footerBrand}>
