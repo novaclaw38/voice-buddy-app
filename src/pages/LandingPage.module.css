@@ -112,22 +112,6 @@
   align-items: center;
 }
 
-.heroBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  display: inline-block;
-  background: #fff;
-  color: var(--c-grape);
-  padding: 8px 20px;
-  border-radius: var(--r-pill);
-  font-size: 13px;
-  font-weight: 800;
-  margin-bottom: 28px;
-  letter-spacing: 0.02em;
-  box-shadow: 0 5px 0 rgba(91,33,182,0.1);
-}
-
 .heroTitle {
   font-family: var(--font-head);
   font-size: clamp(42px, 8vw, 80px);
@@ -697,6 +681,10 @@
 .pricing {
   padding: 80px 24px 100px;
   text-align: center;
+  background-image: url('/pricing-clouds.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .pricingLabel {
@@ -855,6 +843,16 @@
 .planBtnPro:active { transform: translateY(3px) scale(0.98); box-shadow: 0 3px 0 var(--c-grape-d); }
 
 /* ── FOOTER ── */
+.footerArt {
+  height: clamp(140px, 20vw, 260px);
+  background-image:
+    linear-gradient(to bottom, #f3ecff 0%, rgba(243, 236, 255, 0) 20%, rgba(255, 241, 250, 0) 72%, #fff1fa 96%),
+    url('/footer-skyline.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
 .footer {
   border-top: 1px solid rgba(124,58,237,0.1);
   padding: 48px 24px;
@@ -902,6 +900,20 @@
   color: #b6abce;
   font-size: 12px;
   margin: 0;
+}
+
+.paymentLogos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  opacity: 0.85;
+}
+
+.paymentLogos img {
+  height: 20px;
+  width: auto;
 }
 
 /* ── STICKY MOBILE CTA ── */

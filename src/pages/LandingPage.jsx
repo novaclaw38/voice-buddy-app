@@ -254,7 +254,6 @@ export default function LandingPage() {
       <section className={styles.hero}>
         <Particles />
         <div className={styles.heroContent}>
-          <div className={styles.heroBadge}><IconSparkle size={15} /> 10 days free, no card needed</div>
           <h1 className={styles.heroTitle}>
             Meet <span className={styles.gradientText}>Buddy</span>
             <br />your child's AI best friend
@@ -469,6 +468,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
+      <div className={styles.footerArt} aria-hidden="true" />
       <footer className={styles.footer}>
         <div className={styles.footerLogo}>
           <svg viewBox="0 0 40 40" width="28" height="28">
@@ -486,6 +486,12 @@ export default function LandingPage() {
           <span>·</span>
           <button onClick={() => navigate('/login')}>Log In</button>
         </p>
+        <div className={styles.paymentLogos} aria-label="Accepted payment methods via PayFast">
+          <img src="/payment-logos/visa.svg" alt="Visa" width="63" height="21" loading="lazy" />
+          <img src="/payment-logos/mastercard.svg" alt="Mastercard" width="34" height="21" loading="lazy" />
+          <img src="/payment-logos/instant-eft.svg" alt="Instant EFT" width="90" height="30" loading="lazy" />
+          <img src="/payment-logos/snapscan.svg" alt="SnapScan" width="90" height="23" loading="lazy" />
+        </div>
         <p className={styles.footerCopy}>© {new Date().getFullYear()} Buddy. All rights reserved.</p>
       </footer>
 
