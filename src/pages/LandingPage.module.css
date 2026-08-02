@@ -84,6 +84,10 @@
   justify-content: center;
   overflow: hidden;
   padding-top: 66px;
+  background-image: url('/hero-clouds.webp');
+  background-size: cover;
+  background-position: center 75%;
+  background-repeat: no-repeat;
 }
 
 .hero::before {
@@ -91,8 +95,9 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 107, 169, 0.22) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 85% 80%, rgba(77, 173, 247, 0.2) 0%, transparent 60%);
+    linear-gradient(to bottom, #fff1fa 0%, rgba(255, 241, 250, 0.55) 22%, rgba(255, 241, 250, 0) 48%),
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 107, 169, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 85% 80%, rgba(77, 173, 247, 0.15) 0%, transparent 60%);
   pointer-events: none;
 }
 
