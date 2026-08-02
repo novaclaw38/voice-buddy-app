@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import styles from './LandingPage.module.css'
 import {
   IconSparkle, IconCamera, IconLock, IconBolt, IconMic, IconMail, IconHeart,
@@ -470,29 +470,48 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <div className={styles.footerArt} aria-hidden="true" />
       <footer className={styles.footer}>
-        <div className={styles.footerLogo}>
-          <svg viewBox="0 0 40 40" width="28" height="28">
-            <circle cx="9" cy="9" r="7" fill="#7c3aed" />
-            <circle cx="31" cy="9" r="7" fill="#7c3aed" />
-            <circle cx="20" cy="24" r="16" fill="#7c3aed" />
-            <circle cx="14" cy="21" r="4" fill="white" />
-            <circle cx="26" cy="21" r="4" fill="white" />
-          </svg>
-          <span>Buddy</span>
+        <div className={styles.footerTop}>
+          <div className={styles.footerBrand}>
+            <div className={styles.footerLogo}>
+              <svg viewBox="0 0 40 40" width="28" height="28">
+                <circle cx="9" cy="9" r="7" fill="#7c3aed" />
+                <circle cx="31" cy="9" r="7" fill="#7c3aed" />
+                <circle cx="20" cy="24" r="16" fill="#7c3aed" />
+                <circle cx="14" cy="21" r="4" fill="white" />
+                <circle cx="26" cy="21" r="4" fill="white" />
+              </svg>
+              <span>Buddy</span>
+            </div>
+            <p className={styles.footerTagline}>
+              Your child's AI best friend. Made with ❤️ in South Africa.
+            </p>
+            <div className={styles.paymentLogos} aria-label="Accepted payment methods via PayFast">
+              <img src="/payment-logos/visa.svg" alt="Visa" width="63" height="21" loading="lazy" />
+              <img src="/payment-logos/mastercard.svg" alt="Mastercard" width="34" height="21" loading="lazy" />
+              <img src="/payment-logos/instant-eft.svg" alt="Instant EFT" width="90" height="30" loading="lazy" />
+              <img src="/payment-logos/snapscan.svg" alt="SnapScan" width="90" height="23" loading="lazy" />
+            </div>
+          </div>
+
+          <div className={styles.footerCol}>
+            <span className={styles.footerColTitle}>Product</span>
+            <button onClick={() => navigate('/login')}>Start Free Trial</button>
+            <button onClick={() => navigate('/login')}>Log In</button>
+          </div>
+
+          <div className={styles.footerCol}>
+            <span className={styles.footerColTitle}>Legal</span>
+            <Link to="/terms">Terms of Service</Link>
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/refunds">Refund &amp; Cancellation</Link>
+            <Link to="/cookies">Cookie Policy</Link>
+            <Link to="/data-deletion">Data Deletion</Link>
+          </div>
         </div>
-        <p className={styles.footerTagline}>Made with ❤️ in South Africa</p>
-        <p className={styles.footerLinks}>
-          <button onClick={() => navigate('/login')}>Start Free Trial</button>
-          <span>·</span>
-          <button onClick={() => navigate('/login')}>Log In</button>
-        </p>
-        <div className={styles.paymentLogos} aria-label="Accepted payment methods via PayFast">
-          <img src="/payment-logos/visa.svg" alt="Visa" width="63" height="21" loading="lazy" />
-          <img src="/payment-logos/mastercard.svg" alt="Mastercard" width="34" height="21" loading="lazy" />
-          <img src="/payment-logos/instant-eft.svg" alt="Instant EFT" width="90" height="30" loading="lazy" />
-          <img src="/payment-logos/snapscan.svg" alt="SnapScan" width="90" height="23" loading="lazy" />
+
+        <div className={styles.footerBottom}>
+          <p className={styles.footerCopy}>© {new Date().getFullYear()} Buddy. All rights reserved.</p>
         </div>
-        <p className={styles.footerCopy}>© {new Date().getFullYear()} Buddy. All rights reserved.</p>
       </footer>
 
       {/* Mobile-only sticky CTA — on a long phone-scroll, the signup button
