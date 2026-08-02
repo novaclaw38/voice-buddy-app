@@ -240,9 +240,10 @@ export default function ChildPage({ session }) {
 
   // Realtime: listen for parent voice messages sent while this page is open.
   useEffect(() => {
+    let mounted = true
     let channel
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.user) return
+      if (!session?.user || !mounted) return
       const userId = session.user.id
       channel = supabase
         .channel('child-messages-' + userId)
@@ -258,7 +259,7 @@ export default function ChildPage({ session }) {
         })
         .subscribe()
     })
-    return () => { channel?.unsubscribe() }
+    return () => { mounted = false; channel?.unsubscribe() }
   }, [])
 
   // Catch messages sent before this page was ever opened — realtime only

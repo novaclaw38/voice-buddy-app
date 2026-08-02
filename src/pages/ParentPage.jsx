@@ -526,6 +526,7 @@ export default function ParentPage({ session }) {
                 value={settings.childName}
                 onChange={(e) => updateSetting('childName', e.target.value)}
                 placeholder="e.g. Byron"
+                autoComplete="off"
               />
             </div>
 

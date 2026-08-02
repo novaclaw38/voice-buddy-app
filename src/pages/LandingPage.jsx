@@ -228,7 +228,9 @@ export default function LandingPage() {
   return (
     <div className={styles.page} ref={pageRef}>
       {/* ── NAV ── */}
-      <nav className={`${styles.nav} ${navHidden ? styles.navHidden : ''}`}>
+      {/* inert (not just the transform) keeps the off-screen nav's buttons out of
+          the tab order and accessibility tree while it's visually hidden. */}
+      <nav className={`${styles.nav} ${navHidden ? styles.navHidden : ''}`} inert={navHidden ? '' : undefined}>
         <div className={styles.navInner}>
           <div className={styles.logo}>
             <svg viewBox="0 0 40 40" width="36" height="36">

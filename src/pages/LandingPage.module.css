@@ -819,7 +819,7 @@
 }
 .planFeatures li { font-size: 14px; font-weight: 600; line-height: 1.4; }
 .yes { color: var(--ink); }
-.no  { color: #c3b9d6; text-decoration: line-through; }
+.no  { color: var(--ink-dim); text-decoration: line-through; }
 
 .planBtn {
   width: 100%;
