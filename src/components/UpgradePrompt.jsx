@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabase.js'
+import useFocusTrap from '../hooks/useFocusTrap.js'
 import styles from './UpgradePrompt.module.css'
 import { IconX, IconStar, IconCheck } from './icons.jsx'
 
@@ -22,6 +23,8 @@ const TRIGGERS = {
 
 export default function UpgradePrompt({ onClose, session, trigger }) {
   const [loading, setLoading] = useState(false)
+  const trapRef = useRef(null)
+  useFocusTrap(trapRef, true, onClose)
   const copy = TRIGGERS[trigger] || { title: 'Unlock Buddy Pro', sub: 'This feature is part of Buddy Pro' }
 
   const handleUpgrade = async () => {
@@ -48,8 +51,8 @@ export default function UpgradePrompt({ onClose, session, trigger }) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.card} onClick={e => e.stopPropagation()}>
+    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label="Upgrade to Buddy Pro">
+      <div className={styles.card} onClick={e => e.stopPropagation()} ref={trapRef}>
         <div className={styles.glow} />
         <button className={styles.close} onClick={onClose} aria-label="Close"><IconX size={18} /></button>
 

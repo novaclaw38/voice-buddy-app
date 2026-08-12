@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
+import SkipLink from '../components/SkipLink.jsx'
 import styles from './AuthPage.module.css'
 import { IconArrowLeft, IconEye, IconEyeOff } from '../components/icons.jsx'
 
@@ -81,9 +82,11 @@ export default function AuthPage() {
 
   return (
     <div className={styles.page}>
+      <SkipLink />
       <button className={styles.home} onClick={() => navigate('/')}>
         <IconArrowLeft size={16} /> Home
       </button>
+      <main id="main">
       <div className={styles.card}>
         {/* Bear logo */}
         <div className={styles.logo}>
@@ -255,6 +258,7 @@ export default function AuthPage() {
           </>
         )}
       </div>
+      </main>
     </div>
   )
 }

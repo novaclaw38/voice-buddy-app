@@ -9,6 +9,7 @@ import { useSubscription } from '../hooks/useSubscription.jsx'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
 import BuddyAvatar from '../components/BuddyAvatar.jsx'
 import SpeechBubble from '../components/SpeechBubble.jsx'
+import SkipLink from '../components/SkipLink.jsx'
 import ExplainCard from '../components/lesson/ExplainCard.jsx'
 import QuizCard from '../components/lesson/QuizCard.jsx'
 import LabelCard from '../components/lesson/LabelCard.jsx'
@@ -214,8 +215,9 @@ export default function LessonPage({ session }) {
 
   return (
   <>
-    <div className={styles.page}>
-      {/* Header */}
+    <div className={styles.page} id="main">
+    <SkipLink />
+    {/* Header */}
       <div className={styles.header}>
         <button className={styles.back} onClick={handleBack}><IconArrowLeft size={17} /> Back</button>
         <span className={styles.lessonTitle}>{lesson.emoji} {lesson.title}</span>

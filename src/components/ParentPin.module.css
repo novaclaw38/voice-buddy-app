@@ -57,7 +57,7 @@
   height: 16px;
   border-radius: 50%;
   background: #ece4fb;
-  transition: all 0.15s var(--spring);
+  transition: all 0.15s var(--spring-subtle);
 }
 
 .filled {

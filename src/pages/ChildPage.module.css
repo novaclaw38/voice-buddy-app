@@ -278,7 +278,7 @@
   border-radius: 20px;
   color: #fff;
   box-shadow: 0 5px 0 rgba(91, 33, 182, 0.18), 0 10px 20px rgba(80, 40, 120, 0.18);
-  transition: transform 0.12s var(--spring);
+  transition: transform 0.12s var(--spring-subtle);
 }
 
 .dockBtn:active .dockIcon { transform: scale(0.9); }

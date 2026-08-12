@@ -81,7 +81,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--ink-dim);
-  transition: all 0.15s var(--spring);
+  transition: all 0.15s var(--spring-subtle);
 }
 
 .activeTab {

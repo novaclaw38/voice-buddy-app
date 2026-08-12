@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import SkipLink from '../components/SkipLink.jsx'
 import styles from './LandingPage.module.css'
 import {
   IconSparkle, IconCamera, IconLock, IconBolt, IconMic, IconMail, IconHeart,
@@ -226,7 +227,9 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className={styles.page} ref={pageRef}>
+    <>
+      <SkipLink />
+      <div className={styles.page} ref={pageRef}>
       {/* ── NAV ── */}
       {/* inert (not just the transform) keeps the off-screen nav's buttons out of
           the tab order and accessibility tree while it's visually hidden. */}
@@ -253,6 +256,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ── */}
+      <main id="main">
       <section className={styles.hero}>
         <Particles />
         <div className={styles.heroContent}>
@@ -522,6 +526,8 @@ export default function LandingPage() {
           Start Free Trial
         </button>
       </div>
+      </main>
     </div>
+    </>
   )
 }

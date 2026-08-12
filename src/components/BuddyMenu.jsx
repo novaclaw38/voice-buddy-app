@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from './BuddyMenu.module.css'
 import { IconMenu, IconMusic, IconBook, IconPalette, IconGear } from './icons.jsx'
+import useFocusTrap from '../hooks/useFocusTrap.js'
 
 // Single overflow menu replacing the old scattered top-bar buttons (customise,
 // settings) and mode tiles (songs, learn) — one predictable place for the
@@ -8,6 +9,8 @@ import { IconMenu, IconMusic, IconBook, IconPalette, IconGear } from './icons.js
 export default function BuddyMenu({ onSongs, onLearn, onCustomize, onSettings, variant = 'light' }) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef(null)
+  const menuRef = useRef(null)
+  useFocusTrap(menuRef, open, () => setOpen(false))
 
   useEffect(() => {
     if (!open) return
@@ -35,7 +38,7 @@ export default function BuddyMenu({ onSongs, onLearn, onCustomize, onSettings, v
         <IconMenu size={22} />
       </button>
       {open && (
-        <div className={styles.menu} role="menu">
+        <div className={styles.menu} role="menu" ref={menuRef}>
           <button className={styles.item} role="menuitem" onClick={pick(onSongs)}>
             <span className={styles.itemIcon} style={{ color: 'var(--c-pink-d)' }}><IconMusic /></span> Songs
           </button>

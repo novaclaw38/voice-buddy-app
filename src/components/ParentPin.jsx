@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { hashPin, getPinLock, savePinLock } from '../utils/storage.js'
+import useFocusTrap from '../hooks/useFocusTrap.js'
 import styles from './ParentPin.module.css'
 import { IconLock } from './icons.jsx'
 
@@ -10,6 +11,8 @@ export default function ParentPin({ correctPinHash, onSuccess, onCreate }) {
   // With no PIN on file this is a first-run setup, not a challenge. Accounts
   // used to be given a default of 1234, which made the gate meaningless.
   const isSetup = !correctPinHash
+  const trapRef = useRef(null)
+  useFocusTrap(trapRef, true, null) // Escape-to-close not needed here; PIN has no X button
   const [stage, setStage] = useState('enter') // 'enter' | 'confirm'
   const [firstPin, setFirstPin] = useState('')
   const [input, setInput] = useState('')
@@ -84,8 +87,8 @@ export default function ParentPin({ correctPinHash, onSuccess, onCreate }) {
   const handleDelete = () => setInput((p) => p.slice(0, -1))
 
   return (
-    <div className={styles.overlay}>
-      <div className={`${styles.card} ${shake ? styles.shake : ''}`}>
+    <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={isSetup ? 'Set up parent PIN' : 'Parent area access'}>
+      <div className={`${styles.card} ${shake ? styles.shake : ''}`} ref={trapRef}>
         <div className={styles.lock}><IconLock size={30} /></div>
         <h2 className={styles.title}>{isSetup ? 'Set Up Parent PIN' : 'Parent Area'}</h2>
         <p className={styles.sub}>

@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s var(--spring), box-shadow 0.2s ease, background 0.35s;
+  transition: transform 0.15s var(--spring-subtle), box-shadow 0.2s ease, background 0.35s;
   -webkit-user-select: none;
   user-select: none;
 }

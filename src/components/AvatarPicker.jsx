@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import BuddyAvatar from './BuddyAvatar.jsx'
 import UpgradePrompt from './UpgradePrompt.jsx'
 import { useSubscription } from '../hooks/useSubscription.jsx'
 import { COSTUME_OVERLAY_IDS } from './BuddyCostumeOverlays.jsx'
+import useFocusTrap from '../hooks/useFocusTrap.js'
 import styles from './AvatarPicker.module.css'
 import { IconPencil, IconSparkle, IconLock, IconX } from './icons.jsx'
 
@@ -31,6 +32,8 @@ export default function AvatarPicker({ currentType, currentName, currentColor, c
   const [selCostume, setSelCostume] = useState(currentCostume || null)
   const [selAge, setSelAge] = useState(currentAge ?? null)
   const [showUpgrade, setShowUpgrade] = useState(false)
+  const trapRef = useRef(null)
+  useFocusTrap(trapRef, true, onClose)
   // No age on file means this is first-run onboarding: age is required and
   // the sheet can't be dismissed, because every lesson and prompt depends on it.
   const isFirstRun = currentAge == null
@@ -54,7 +57,7 @@ export default function AvatarPicker({ currentType, currentName, currentColor, c
   }
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Choose your Buddy" ref={trapRef}>
       <div className={styles.panel}>
         <h2 className={styles.title}>Choose Your Buddy!</h2>
 

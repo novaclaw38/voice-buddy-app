@@ -23,6 +23,7 @@ import { fetchLatestUndelivered, markStoryDelivered } from '../services/storyReq
 import SingAlong from '../components/SingAlong.jsx'
 import DailyActivity from '../components/DailyActivity.jsx'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
+import SkipLink from '../components/SkipLink.jsx'
 import { getModeVoice } from '../utils/modeVoice.js'
 import { pickRandom } from '../utils/prompts.js'
 import styles from './ChildPage.module.css'
@@ -600,7 +601,9 @@ export default function ChildPage({ session }) {
   // upgrade prompt already open instead of just granting more time.
   if (showFreeLimit) {
     return (
-      <div className={styles.windDownPage}>
+      <>
+        <SkipLink />
+        <main className={styles.windDownPage} id="main">
         <BuddyAvatar status="idle" avatarColor={settings.avatarColor} type={avatarType} costume={settings.costume} size={150} live={false} />
         <h1 className={styles.windDownTitle}>Great chatting today, {childName}!</h1>
         <p className={styles.windDownSub}>{buddyName} needs a little rest from today's free chats. Ask a grown-up to unlock unlimited chatting!</p>
@@ -621,7 +624,8 @@ export default function ChildPage({ session }) {
             <button className={styles.pinDismiss} onClick={() => setShowFreeLimitPin(false)} aria-label="Cancel" />
           </>
         )}
-      </div>
+      </main>
+      </>
     )
   }
 
@@ -629,7 +633,9 @@ export default function ChildPage({ session }) {
 
   if (voiceOnly) {
     return (
-      <div className={styles.voicePage}>
+      <>
+        <SkipLink />
+        <main className={styles.voicePage} id="main">
         <div className={styles.voiceMenuWrap}>
           <BuddyMenu
             variant="dark"
@@ -662,7 +668,8 @@ export default function ChildPage({ session }) {
           onReplay={replayParentMessage}
           onDismiss={dismissParentMessage}
         />
-      </div>
+      </main>
+      </>
     )
   }
 
@@ -702,7 +709,10 @@ export default function ChildPage({ session }) {
   const isDarkRealm = partOfDay === 'evening' || partOfDay === 'night'
 
   return (
-    <div className={`${styles.page} ${isDarkRealm ? styles.darkRealm : ''}`}>
+    <>
+      <SkipLink />
+      <div className={`${styles.page} ${isDarkRealm ? styles.darkRealm : ''}`}>
+      <main id="main">
       <WorldBackdrop />
 
       {/* Daily activity — Buddy announces it by voice on boot; this card
@@ -780,8 +790,8 @@ export default function ChildPage({ session }) {
                 Voice not supported in this browser. Try Chrome!
               </p>
             )}
-            <div className={styles.dock}>
-              <div className={styles.dockSide}>
+            <nav className={styles.dock} aria-label="Navigation">
+            <div className={styles.dockSide}>
                 <button className={styles.dockBtn} onClick={handleStartSing}>
                   <span className={`${styles.dockIcon} ${styles.dockPink}`}><IconMusic size={26} /></span>
                   <span className={styles.dockLabel}>Songs</span>
@@ -806,7 +816,7 @@ export default function ChildPage({ session }) {
                   <span className={styles.dockLabel}>Parents</span>
                 </button>
               </div>
-            </div>
+            </nav>
           </div>
         </div>
       </div>
@@ -873,7 +883,9 @@ export default function ChildPage({ session }) {
           </div>
         </div>
       )}
+    </main>
     </div>
+    </>
   )
 }
 

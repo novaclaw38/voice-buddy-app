@@ -15,6 +15,7 @@ import { useCourseCatalog } from '../hooks/useCourseCatalog.js'
 import { SUBJECTS } from '../utils/subjects.js'
 import { updateChild } from '../services/childrenService.js'
 import ChildrenManager from '../components/ChildrenManager.jsx'
+import SkipLink from '../components/SkipLink.jsx'
 import styles from './ParentPage.module.css'
 import {
   IconArrowLeft, IconCheck, IconX, IconMic, IconSpeaker, IconPlay, IconPause,
@@ -456,7 +457,9 @@ export default function ParentPage({ session }) {
   }
 
   return (
-    <main className={styles.page}>
+    <>
+      <SkipLink />
+      <main className={styles.page} id="main">
       {/* Header */}
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate('/')}>
@@ -483,7 +486,7 @@ export default function ParentPage({ session }) {
       )}
 
       {/* Tabs */}
-      <div className={styles.tabs}>
+      <div className={styles.tabs} role="tablist">
         {TAB_GROUPS.map((group, gi) => (
           <div className={styles.tabGroup} key={group.label}>
             {group.tabs.map((t) => (
@@ -491,6 +494,8 @@ export default function ParentPage({ session }) {
                 key={t}
                 className={`${styles.tab} ${tab === t ? styles.activeTab : ''}`}
                 onClick={() => setTab(t)}
+                role="tab"
+                aria-selected={tab === t}
               >
                 {t}
               </button>
@@ -803,7 +808,7 @@ export default function ParentPage({ session }) {
                       <span className={styles.courseProgressCount}>{done}/{total} lessons</span>
                     </div>
                     <div className={styles.progressBarTrack}>
-                      <div className={styles.progressBarFill} style={{ width: `${pct}%` }} />
+                      <div className={styles.progressBarFill} style={{ transform: `scaleX(${pct / 100})` }} />
                     </div>
                   </div>
                 )
@@ -1168,6 +1173,7 @@ export default function ParentPage({ session }) {
         />
       )}
     </main>
+    </>
   )
 }
 

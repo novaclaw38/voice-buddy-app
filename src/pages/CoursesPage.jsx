@@ -6,6 +6,7 @@ import { useCourseCatalog } from '../hooks/useCourseCatalog.js'
 import { useSpeech } from '../hooks/useSpeech.js'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
 import BuddyAvatar from '../components/BuddyAvatar.jsx'
+import SkipLink from '../components/SkipLink.jsx'
 import { useState, useEffect, useMemo } from 'react'
 import { getSettings } from '../utils/storage.js'
 import { pickRandom } from '../utils/prompts.js'
@@ -61,12 +62,14 @@ export default function CoursesPage({ session }) {
     navigate(`/lesson?course=${courseId}&lesson=${lessonId}`)
   }
 
-  if (catalogLoading) return <div className={styles.page}><div className={styles.bg} /></div>
+  if (catalogLoading) return <div className={styles.page}><SkipLink /><div className={styles.bg} /></div>
 
   return (
     <div className={styles.page}>
+      <SkipLink />
       <div className={styles.bg} />
 
+      <main id="main">
       <header className={styles.header}>
         <button className={styles.back} onClick={() => { speech.stopSpeaking(); navigate('/app') }}><IconArrowLeft size={17} /> Back to Buddy</button>
         <div className={styles.hero}>
@@ -150,6 +153,7 @@ export default function CoursesPage({ session }) {
       {showUpgrade && (
         <UpgradePrompt session={session} trigger="courses" onClose={() => setShowUpgrade(false)} />
       )}
+    </main>
     </div>
   )
 }

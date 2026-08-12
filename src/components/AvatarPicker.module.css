@@ -40,10 +40,7 @@
   font-family: var(--font-head);
   font-size: 1.6rem;
   font-weight: 700;
-  background: linear-gradient(90deg, var(--c-grape), var(--c-pink), var(--c-tangerine));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--c-grape);
   text-align: center;
   margin: 0;
 }
@@ -104,7 +101,7 @@
   padding: 12px 6px 8px;
   border-radius: var(--r-md);
   background: #f7f4fd;
-  transition: transform 0.15s var(--spring), background 0.15s;
+  transition: transform 0.15s var(--spring-subtle), background 0.15s;
   cursor: pointer;
 }
 
@@ -149,7 +146,7 @@
   padding: 8px 4px 6px;
   border-radius: var(--r-sm);
   background: #f7f4fd;
-  transition: transform 0.15s var(--spring), background 0.15s;
+  transition: transform 0.15s var(--spring-subtle), background 0.15s;
 }
 
 .costumeBtn:active { transform: scale(0.93); }

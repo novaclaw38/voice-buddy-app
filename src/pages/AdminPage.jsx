@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchOverview, cancelSubscription } from '../services/adminService.js'
+import SkipLink from '../components/SkipLink.jsx'
 import styles from './AdminPage.module.css'
 
 const TIER_LABEL = { free: 'Free', trial: 'Trial', pro: 'Pro' }
@@ -47,12 +48,13 @@ export default function AdminPage() {
   }
 
   if (loading) {
-    return <div className={styles.page}><p className={styles.loading}>Loading…</p></div>
+    return <div className={styles.page}><SkipLink /><p className={styles.loading}>Loading…</p></div>
   }
 
   if (error) {
     return (
       <div className={styles.page}>
+        <SkipLink />
         <p className={styles.errorMsg} role="alert">{error}</p>
         <button className={styles.retryBtn} onClick={load}>Retry</button>
       </div>
@@ -62,7 +64,7 @@ export default function AdminPage() {
   const maxDay = Math.max(1, ...stats.signupsByDay.map((d) => d.count))
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} id="main">
       <header className={styles.header}>
         <h1 className={styles.title}>Admin</h1>
         <button className={styles.back} onClick={() => navigate('/app')}>Back to app</button>

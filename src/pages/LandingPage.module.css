@@ -39,10 +39,7 @@
   font-family: var(--font-head);
   font-size: 22px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--c-grape), var(--c-pink));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--c-grape);
 }
 
 .navActions { display: flex; gap: 10px; align-items: center; }
@@ -123,18 +120,8 @@
 }
 
 .gradientText {
-  background: linear-gradient(135deg, var(--c-grape) 0%, var(--c-pink) 50%, var(--c-tangerine) 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 4s linear infinite;
-}
-
-@keyframes shimmer {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  color: var(--c-pink);
+  font-weight: 800;
 }
 
 .heroSub {
@@ -164,7 +151,7 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 8px 0 var(--c-pink-d);
-  transition: box-shadow 0.2s, transform 0.15s var(--spring);
+  transition: box-shadow 0.2s, transform 0.15s var(--spring-subtle);
   overflow: hidden;
 }
 .ctaPrimary:active { transform: translateY(4px) scale(0.99); box-shadow: 0 4px 0 var(--c-pink-d); }
