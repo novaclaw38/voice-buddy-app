@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import BuddyAvatar from '../components/BuddyAvatar.jsx'
 import SkipLink from '../components/SkipLink.jsx'
 import styles from './LandingPage.module.css'
 import {
@@ -37,35 +38,34 @@ function Particles({ count = 36 }) {
   )
 }
 
-// Bear SVG (reused from auth, enhanced with glow)
+// Hero buddy — uses the real BuddyAvatar component so visitors see the
+// actual animated character their child will play with (including the
+// double-tap celebration discovery).
 function BuddyHero() {
   return (
     <div className={styles.buddyWrap}>
       <div className={styles.buddyGlow} />
       <div className={styles.buddyRing} />
-      <svg viewBox="0 0 100 100" className={styles.buddySvg}>
-        <circle cx="22" cy="24" r="18" fill="#7c3aed" />
-        <circle cx="78" cy="24" r="18" fill="#7c3aed" />
-        <circle cx="22" cy="24" r="11" fill="rgba(255,190,190,0.45)" />
-        <circle cx="78" cy="24" r="11" fill="rgba(255,190,190,0.45)" />
-        <circle cx="50" cy="58" r="39" fill="#7c3aed" />
-        <ellipse cx="50" cy="71" rx="17" ry="12" fill="rgba(255,255,255,0.18)" />
-        {/* Eyes with glow */}
-        <circle cx="35" cy="50" r="9" fill="white" />
-        <circle cx="37" cy="50" r="5" fill="#1e1b4b" />
-        <circle className={styles.eyeGlow} cx="38" cy="48" r="2" fill="white" />
-        <circle cx="65" cy="50" r="9" fill="white" />
-        <circle cx="63" cy="50" r="5" fill="#1e1b4b" />
-        <circle className={styles.eyeGlow} cx="64" cy="48" r="2" fill="white" />
-        <ellipse cx="50" cy="63" rx="5.5" ry="4" fill="rgba(0,0,0,0.35)" />
-        <path d="M 38 72 Q 50 81 62 72" stroke="rgba(255,255,255,0.7)" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <circle cx="24" cy="65" r="9" fill="rgba(255,140,140,0.22)" />
-        <circle cx="76" cy="65" r="9" fill="rgba(255,140,140,0.22)" />
-      </svg>
+      <div className={styles.buddyFloat}>
+        <BuddyAvatar
+          status="happy"
+          avatarColor="#7c3aed"
+          type="bear"
+          size={190}
+          live={true}
+        />
+      </div>
       {/* Speech bubble — hints at the real product experience, not just the mascot */}
       <div className={styles.heroBubble}>
         Hi! Want to hear a story about a cloud kingdom? ✨
       </div>
+      <button
+        className={styles.tapHint}
+        onClick={(e) => { e.stopPropagation(); }}
+        aria-label="Tap Buddy to see him react! He loves attention."
+      >
+        👆 Tap Buddy!
+      </button>
     </div>
   )
 }
@@ -260,27 +260,34 @@ export default function LandingPage() {
       <section className={styles.hero}>
         <Particles />
         <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>
-            Meet <span className={styles.gradientText}>Buddy</span>
-            <br />your child's AI best friend
-          </h1>
-          <p className={styles.heroSub}>
-            An always-on companion that tells stories, teaches courses, sings songs,
-            and gives parents peace of mind, all in one magical app.
-          </p>
-          <div className={styles.heroCtas}>
-            <button
-              className={styles.ctaPrimary}
-              onClick={() => navigate('/login')}
-            >
-              <span className={styles.ctaRipple} />
-              Start Free Trial
-            </button>
-            <button className={styles.ctaGhost} onClick={() => navigate('/login')}>
-              Log In
-            </button>
+          <div className={styles.heroText}>
+            <h1 className={styles.heroTitle}>
+              Meet <span className={styles.gradientText}>Buddy</span> — your child's AI best <wbr />friend
+            </h1>
+            <p className={styles.heroSub}>
+              An always-on companion that tells stories, teaches courses, sings songs,
+              and gives parents peace of mind, all in one magical app.
+            </p>
+            <div className={styles.heroCtas}>
+              <button
+                className={styles.ctaPrimary}
+                onClick={() => navigate('/login')}
+              >
+                <span className={styles.ctaRipple} />
+                Start Free Trial
+              </button>
+              <a
+                href="#"
+                className={styles.heroLoginLink}
+                onClick={(e) => { e.preventDefault(); navigate('/login') }}
+              >
+                Already have an account? Log in
+              </a>
+            </div>
           </div>
-          <BuddyHero />
+          <div className={styles.heroBuddy}>
+            <BuddyHero />
+          </div>
         </div>
       </section>
 
