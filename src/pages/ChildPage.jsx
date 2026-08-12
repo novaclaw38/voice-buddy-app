@@ -711,9 +711,24 @@ export default function ChildPage({ session }) {
   return (
     <>
       <SkipLink />
-      <div className={`${styles.page} ${isDarkRealm ? styles.darkRealm : ''}`}>
+      <div className={`${styles.page} ${isDarkRealm ? styles.darkRealm : ''} ${styles[`realmTint${partOfDay.charAt(0).toUpperCase() + partOfDay.slice(1)}`]}`}>
       <main id="main">
       <WorldBackdrop />
+      {/* Ground plane and floating sky decorations — paper planes, kites,
+          butterflies, bubbles that drift across the sky above Buddy. */}
+      <div className={styles.ground} />
+      <div className={styles.skyDeco}>
+        <span className={styles.sdB1}>✈️</span>
+        <span className={styles.sdP1}>🎈</span>
+        <span className={styles.sdP2}>🦋</span>
+        <span className={styles.sdB2}>✈️</span>
+        <span className={styles.sdS1}>⭐</span>
+        <span className={styles.sdP3}>🎈</span>
+        <span className={styles.sdB3}>🦋</span>
+        <span className={styles.sdP4}>✈️</span>
+        <span className={styles.sdS2}>⭐</span>
+        <span className={styles.sdP5}>🎈</span>
+      </div>
 
       {/* Daily activity — Buddy announces it by voice on boot; this card
           just echoes it briefly, then fades once he's done speaking. */}
@@ -762,11 +777,12 @@ export default function ChildPage({ session }) {
           {/* Avatar */}
           <div className={styles.avatarArea}>
             {/* Rolling hills — gives Buddy a ground to stand on, right behind
-                his feet. The translucent white fills auto-tint to whichever
-                mode gradient is behind them. */}
-            <svg className={styles.hills} viewBox="0 0 375 60" preserveAspectRatio="none" aria-hidden="true">
-              <path d="M0 35 Q60 16 140 31 T375 26 V60 H0 Z" fill="rgba(255,255,255,0.28)" />
-              <path d="M0 48 Q100 30 210 45 T375 41 V60 H0 Z" fill="rgba(255,255,255,0.45)" />
+                his feet. Three translucent layers auto-tint to whichever
+                mode gradient is behind them, creating depth. */}
+            <svg className={styles.hills} viewBox="0 0 375 72" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 50 Q60 12 140 33 T375 20 V72 H0 Z" fill="rgba(255,255,255,0.22)" />
+              <path d="M0 58 Q100 26 210 41 T375 34 V72 H0 Z" fill="rgba(255,255,255,0.38)" />
+              <path d="M0 64 Q80 42 160 52 T375 46 V72 H0 Z" fill="rgba(255,255,255,0.14)" />
             </svg>
             <p className={styles.buddyNameTag}>{buddyName}</p>
             <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} costume={settings.costume} size={222} audioRef={speech.audioRef} partOfDay={partOfDay} />

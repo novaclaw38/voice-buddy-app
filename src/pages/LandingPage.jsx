@@ -262,7 +262,9 @@ export default function LandingPage() {
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
             <h1 className={styles.heroTitle}>
-              Meet <span className={styles.gradientText}>Buddy</span> — your child's AI best <wbr />friend
+              Meet <span className={styles.gradientText}>Buddy</span>
+              <br />
+              your child's AI best friend
             </h1>
             <p className={styles.heroSub}>
               An always-on companion that tells stories, teaches courses, sings songs,
