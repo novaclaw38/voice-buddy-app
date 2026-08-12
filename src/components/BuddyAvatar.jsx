@@ -37,7 +37,7 @@ export default function BuddyAvatar({
   const isConfused  = status === 'confused'
 
   const getMouthLevel = useMouthLevel(audioRef, isSpeaking && live)
-  const { containerRef, poke } = useBuddyLife({ status, live, getMouthLevel })
+  const { containerRef, poke, celebratingRef } = useBuddyLife({ status, live, getMouthLevel })
 
   const eyeR = isListening ? 10 : 9
   const gradId = useId()
@@ -165,6 +165,15 @@ export default function BuddyAvatar({
               <circle className={styles.thinkDot3} cx="62" cy="90" r="3.2" fill="rgba(255,255,255,0.75)" />
             </g>
           )}
+
+          {/* Celebration burst (double-tap discovery) — extra sparkles that */}
+          {/* only appear when --celebrating is 1 */}
+          <g className={styles.celeSparkle}>
+            <polygon points="50,25 54,33 62,33 56,38 59,46 50,41 41,46 44,38 38,33 46,33" fill="#fcd34d" />
+            <polygon points="50,75 54,67 62,67 56,62 59,54 50,59 41,54 44,62 38,67 46,67" fill="#f9a8d4" />
+            <circle cx="25" cy="50" r="2.5" fill="#86efac" />
+            <circle cx="75" cy="50" r="2" fill="#a855f7" />
+          </g>
 
           {/* Premium costume (Pro) — drawn last so it sits on top of everything */}
           <CostumeOverlay costumeId={costume} />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 const POKE_COOLDOWN_MS = 1500
+const DOUBLE_TAP_WINDOW_MS = 500
 
 // Gaze target per status: [x, y] in px, applied to pupils.
 function gazeFor(status) {
@@ -14,6 +15,8 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
   const rafRef       = useRef(0)
   const sfxCtxRef    = useRef(null)
   const lastPokeRef  = useRef(0)
+  const lastTapRef   = useRef(0)  // for double-tap discovery detection
+  const celebratingRef = useRef(false)  // exposed so BuddyAvatar can render celebration sparkles
 
   const S = useRef({
     // blink
@@ -29,6 +32,8 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     spinning: false, spinStart: 0, spinDeg: 0, nextSpinAt: 0,
     // mouth
     mouth: 0,
+    // celebration dance (triggered by double-tap discovery)
+    celebrating: false, celeStart: 0,
     // timing
     last: 0,
   })
@@ -65,7 +70,18 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     // Squash impulse -> underdamped spring gives the jelly wobble.
     S.current.sq = 0.28
     S.current.sqVel = -1.5
-    if (!reduced) boing()
+    // Double-tap discovery: two quick pokes make Buddy celebrate with a
+    // little dance — a reward for curiosity, not something advertised.
+    if (!reduced) {
+      if (now - lastTapRef.current < DOUBLE_TAP_WINDOW_MS) {
+        S.current.celebrating = true
+        S.current.celeStart = performance.now()
+        boing()
+        setTimeout(boing, 120)  // second chirp shortly after the first
+      }
+      lastTapRef.current = now
+      boing()
+    }
   }, [boing, reduced])
 
   // Write neutral values once, for static (live=false) or reduced use.
@@ -81,6 +97,8 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     el.style.setProperty('--sway', '0px')
     el.style.setProperty('--spin', '0deg')
     el.style.setProperty('--mouth', '0')
+    el.style.setProperty('--celebrating', '0')
+    el.style.setProperty('--cele', '0')
     el.style.setProperty('--shadow-scale', '1')
   }, [])
 
@@ -174,13 +192,33 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
         }
       }
 
-      // ---- Squash spring (underdamped => jelly wobble) ----
+      // ---- Celebration dance (double-tap discovery) ----
+      if (st.celebrating) {
+        celebratingRef.current = true
+        const celeElapsed = t - st.celeStart
+        if (celeElapsed >= 1500) {
+          st.celebrating = false
+        } else {
+          // Override spin: full 360° turn with a bouncy ease
+          const p = celeElapsed / 1500
+          const eased = 1 - Math.cos(p * Math.PI * 2) * 0.5  // gentle bump at start/end
+          st.spinDeg = eased * 360
+          // Extra excited wobble
+          st.sway = Math.sin(celeElapsed / 150) * 8
+          st.sq += (Math.sin(celeElapsed / 120) * 0.15 - st.sq) * Math.min(1, dt * 5)
+        }
+      } else {
+        celebratingRef.current = false
+      }
+
+      // ---- Squash spring (underdamped => jelly wobble) — also drives the celebration
+      // dance wobble when a child double-taps Buddy for attention.
       if (!reduced) {
         const stiffness = 240, damping = 13
         const acc = -stiffness * st.sq - damping * st.sqVel
         st.sqVel += acc * dt
         st.sq += st.sqVel * dt
-        if (Math.abs(st.sq) < 0.001 && Math.abs(st.sqVel) < 0.01) { st.sq = 0; st.sqVel = 0 }
+        if (!st.celebrating && Math.abs(st.sq) < 0.001 && Math.abs(st.sqVel) < 0.01) { st.sq = 0; st.sqVel = 0 }
       } else {
         st.sq = 0; st.sqVel = 0
       }
@@ -202,6 +240,8 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
       el.style.setProperty('--sway', st.sway.toFixed(2) + 'px')
       el.style.setProperty('--spin', st.spinDeg.toFixed(1) + 'deg')
       el.style.setProperty('--mouth', st.mouth.toFixed(3))
+      el.style.setProperty('--celebrating', st.celebrating ? '1' : '0')
+      el.style.setProperty('--cele', st.celebrating ? '1' : '0')
       // Ground shadow shrinks as Buddy rises during a bounce (st.by goes
       // negative while airborne), clamped so it never vanishes entirely.
       const shadowScale = Math.max(0.6, 1 + st.by / 60)
@@ -219,5 +259,5 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
     }
   }, [])
 
-  return { containerRef, poke }
+  return { containerRef, poke, celebratingRef: celebratingRef }
 }
