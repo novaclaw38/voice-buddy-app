@@ -1,7 +1,7 @@
-import { ServerOptions, cli, defineAgent, inference, voice } from '@livekit/agents';
+import { AgentSessionEventTypes, ServerOptions, cli, defineAgent, inference, voice } from '@livekit/agents';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'node:url';
-import { createAgent } from './agent.ts';
+import { createAgent, type ChildInfo } from './agent.ts';
 import { GoogleSTT } from './googleStt.ts';
 import { GoogleTTS } from './googleTts.ts';
 
@@ -10,8 +10,37 @@ import { GoogleTTS } from './googleTts.ts';
 // GROQ_API_KEY, and GOOGLE_TTS_KEY when running locally or self-hosting.
 dotenv.config({ path: '.env.local' });
 
+function parseChildInfo(metadata: string | undefined): ChildInfo {
+  if (!metadata) return {};
+  try {
+    const parsed = JSON.parse(metadata);
+    return {
+      childName: typeof parsed.childName === 'string' ? parsed.childName : undefined,
+      buddyName: typeof parsed.buddyName === 'string' ? parsed.buddyName : undefined,
+      childAge: typeof parsed.childAge === 'number' ? parsed.childAge : undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
 export default defineAgent({
   entry: async (ctx) => {
+    const t0 = Date.now();
+
+    // Connect first (recommended by the framework — see JobContext.connect
+    // docs) so room metadata (set by api/livekit-agent.js from the child's
+    // current settings) is available before we build Buddy's personality.
+    await ctx.connect();
+    console.log(`[timing] connected at +${Date.now() - t0}ms`);
+
+    // ctx.room.metadata (the rtc-node client's local cache) isn't
+    // guaranteed to be synced yet the instant connect() resolves. The job
+    // dispatch snapshot (ctx.job.room.metadata) already carries the room
+    // metadata set by api/livekit-agent.js, so prefer that and only fall
+    // back to the live client value if the snapshot is somehow missing it.
+    const childInfo = parseChildInfo(ctx.job.room?.metadata || ctx.room.metadata);
+
     const session = new voice.AgentSession({
       // Ears: Google Cloud Speech-to-Text (non-streaming, matches the
       // app's existing tap-to-talk push style — the framework wraps this
@@ -29,15 +58,20 @@ export default defineAgent({
       },
     });
 
-    await session.start({
-      agent: createAgent(),
-      room: ctx.room,
+    session.on(AgentSessionEventTypes.SpeechCreated, (ev) => {
+      console.log(`[timing] speech_created (${ev.source}) at +${Date.now() - t0}ms`);
     });
 
-    await ctx.connect();
+    await session.start({
+      agent: createAgent(childInfo),
+      room: ctx.room,
+    });
+    console.log(`[timing] session started at +${Date.now() - t0}ms`);
 
     session.generateReply({
-      instructions: 'Greet the child warmly and ask what they want to do today.',
+      instructions: childInfo.childName
+        ? `Greet ${childInfo.childName} warmly by name and ask what they want to do today. Keep it to one short sentence.`
+        : 'Greet the child warmly and ask what they want to do today. Keep it to one short sentence.',
     });
   },
 });

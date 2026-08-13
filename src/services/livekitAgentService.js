@@ -13,7 +13,7 @@ export function isLiveKitAvatarVoiceEnabled() {
   return !!enabled
 }
 
-export async function startLiveKitAvatarSession({ roomName, participantName }) {
+export async function startLiveKitAvatarSession({ roomName, participantName, childName, buddyName, childAge }) {
   if (!isLiveKitAvatarVoiceEnabled()) {
     throw new Error('LiveKit avatar voice is disabled')
   }
@@ -21,7 +21,7 @@ export async function startLiveKitAvatarSession({ roomName, participantName }) {
   const response = await fetch('/api/livekit-agent', {
     method: 'POST',
     headers: await authHeaders(),
-    body: JSON.stringify({ roomName, participantName }),
+    body: JSON.stringify({ roomName, participantName, childName, buddyName, childAge }),
   })
 
   if (!response.ok) {

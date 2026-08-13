@@ -98,6 +98,7 @@ class ChunkedStream extends tts.ChunkedStream {
   }
 
   protected async run() {
+    const t0 = Date.now();
     try {
       const voiceName = VOICES[(this.#opts.voice as keyof typeof VOICES) ?? 'sunny'] ?? this.#opts.voice;
       const response = await fetch(`${SYNTHESIZE_URL}?key=${this.#apiKey}`, {
@@ -115,6 +116,8 @@ class ChunkedStream extends tts.ChunkedStream {
           },
         }),
       });
+
+      console.log(`[timing] Google TTS synthesize response in ${Date.now() - t0}ms`);
 
       if (!response.ok) {
         const body = await response.text().catch(() => '');
@@ -140,6 +143,7 @@ class ChunkedStream extends tts.ChunkedStream {
         lastFrame = frame;
       }
       sendLastFrame(requestId, true);
+      console.log(`[timing] Google TTS frames queued at +${Date.now() - t0}ms`);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') return;
       throw error;

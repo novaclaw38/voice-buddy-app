@@ -541,7 +541,7 @@ export default function ChildPage({ session }) {
     if (liveKitVoice.enabled) {
       const roomName = `buddy-voice-${encodeURIComponent(settings.childId || 'child')}`
       liveKitVoice
-        .speak({ text: transcript, roomName, participantName: settings.buddyName })
+        .speak({ text: transcript, roomName, participantName: settings.buddyName, childName, buddyName, childAge: settings.childAge })
         .then((result) => {
           if (!result?.ok) return
           setBuddyText(result?.text || '')

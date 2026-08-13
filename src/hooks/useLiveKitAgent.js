@@ -21,7 +21,7 @@ export function useLiveKitAgent() {
     setStatus('idle')
   }, [])
 
-  const start = useCallback(async ({ roomName, participantName }) => {
+  const start = useCallback(async ({ roomName, participantName, childName, buddyName, childAge }) => {
     if (!isLiveKitAvatarVoiceEnabled()) {
       setStatus('error')
       return { ok: false, error: 'LiveKit avatar voice is disabled' }
@@ -29,7 +29,7 @@ export function useLiveKitAgent() {
 
     setStatus('connecting')
     try {
-      const session = await startLiveKitAvatarSession({ roomName, participantName })
+      const session = await startLiveKitAvatarSession({ roomName, participantName, childName, buddyName, childAge })
 
       const liveKitRoom = new Room()
       liveKitRoom.on(RoomEvent.TrackSubscribed, (track) => {

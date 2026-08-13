@@ -30,6 +30,7 @@ export class GoogleSTT extends stt.STT {
   }
 
   protected async _recognize(frame: AudioBuffer, abortSignal?: AbortSignal): Promise<stt.SpeechEvent> {
+    const t0 = Date.now();
     const merged = mergeFrames(frame);
     const audioBytes = Buffer.from(
       merged.data.buffer,
@@ -51,6 +52,8 @@ export class GoogleSTT extends stt.STT {
         audio: { content: audioBytes },
       }),
     });
+
+    console.log(`[timing] Google STT recognize response in ${Date.now() - t0}ms`);
 
     if (!response.ok) {
       const body = await response.text().catch(() => '');
