@@ -1,0 +1,6 @@
+allowBuilds:
+  '@livekit/local-inference': true
+  protobufjs: true
+  sharp: true
+minimumReleaseAgeExclude:
+  - '@livekit/agents@1.6.3'

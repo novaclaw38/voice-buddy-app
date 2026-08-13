@@ -21,11 +21,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { RoomServiceClient, AccessToken } = await import('livekit-server-sdk')
+    const { RoomServiceClient, AccessToken, RoomAgentDispatch } = await import('livekit-server-sdk')
     const roomService = new RoomServiceClient(process.env.LIVEKIT_URL, process.env.LIVEKIT_API_KEY, process.env.LIVEKIT_API_SECRET)
 
     try {
-      await roomService.createRoom({ name: roomName, emptyTimeout: 10 * 60, maxParticipants: 2 })
+      await roomService.createRoom({
+        name: roomName,
+        emptyTimeout: 10 * 60,
+        maxParticipants: 2,
+        // Dispatches the Buddy voice agent (agent/) into this room so it
+        // actually joins and talks back — without this, a child's device
+        // would connect to an empty room with nobody listening.
+        agents: [new RoomAgentDispatch({ agentName: 'buddy-voice-agent' })],
+      })
     } catch (_) {
       // Ignore already-exists so boot-time collisions are idempotent.
     }

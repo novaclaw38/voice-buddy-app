@@ -1,3 +1,5 @@
+import { authHeaders } from './chatService.js'
+
 function getMetaEnv() {
   if (typeof import.meta !== 'undefined' && import.meta && import.meta.env) {
     return import.meta.env
@@ -18,7 +20,7 @@ export async function startLiveKitAvatarSession({ roomName, participantName }) {
 
   const response = await fetch('/api/livekit-agent', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await authHeaders(),
     body: JSON.stringify({ roomName, participantName }),
   })
 
