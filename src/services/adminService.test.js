@@ -15,7 +15,7 @@ describe('adminService', () => {
     global.fetch.mockResolvedValue({ ok: true, json: async () => ({ users: [], stats: { tierCounts: { free: 0, trial: 0, pro: 0 }, signupsByDay: [] } }) })
     const result = await fetchOverview()
     expect(result.users).toEqual([])
-    expect(global.fetch).toHaveBeenCalledWith('/api/admin/overview', expect.objectContaining({ headers: expect.any(Object) }))
+    expect(global.fetch).toHaveBeenCalledWith('/api/admin', expect.objectContaining({ headers: expect.any(Object) }))
   })
 
   it('fetchOverview throws the server error message on failure', async () => {
@@ -28,7 +28,7 @@ describe('adminService', () => {
     const result = await cancelSubscription('u1')
     expect(result).toEqual({ ok: true })
     const [url, options] = global.fetch.mock.calls[0]
-    expect(url).toBe('/api/admin/cancel-subscription')
+    expect(url).toBe('/api/admin')
     expect(options.method).toBe('POST')
     expect(JSON.parse(options.body)).toEqual({ userId: 'u1' })
   })

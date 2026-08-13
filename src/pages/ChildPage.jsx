@@ -13,6 +13,7 @@ import { useSpeech } from '../hooks/useSpeech.js'
 import { useChat } from '../hooks/useChat.js'
 import { useTimeOfDay } from '../hooks/useTimeOfDay.js'
 import { useSubscription } from '../hooks/useSubscription.jsx'
+import { useLiveKitAvatarVoice } from '../hooks/useLiveKitAvatarVoice.js'
 import { getSettings, saveSettings, migratePinIfNeeded, getActiveChildId } from '../utils/storage.js'
 import { ensureActiveChildMigrated, updateChild } from '../services/childrenService.js'
 import { getTodayMinutesUsed, addMinutesUsed, resetTodayUsage } from '../utils/screenTime.js'
@@ -78,6 +79,7 @@ export default function ChildPage({ session }) {
   const chat = useChat(settings)
   const { partOfDay } = useTimeOfDay()
   const { isPro } = useSubscription()
+  const liveKitVoice = useLiveKitAvatarVoice()
   const [wordIndex, setWordIndex] = useState(-1)
   const rafRef = useRef(null)
   const [showActivity, setShowActivity] = useState(() => !hasGreetedFully && !isDailyActivityDismissed())
@@ -536,6 +538,23 @@ export default function ChildPage({ session }) {
     setUiStatus('thinking')
     setBuddyText('')
 
+    if (liveKitVoice.enabled) {
+      const roomName = `buddy-voice-${encodeURIComponent(settings.childId || 'child')}`
+      liveKitVoice
+        .speak({ text: transcript, roomName, participantName: settings.buddyName })
+        .then((result) => {
+          if (!result?.ok) return
+          setBuddyText(result?.text || '')
+          setUiStatus('speaking')
+          setUserText('')
+          scheduleBubbleClear()
+        })
+        .catch(() => {
+          setUiStatus('idle')
+        })
+      return
+    }
+
     chat.sendMessage(transcript, chat.mode).then((reply) => {
       if (chat.limitReachedRef.current) {
         setUserText('')
@@ -554,7 +573,7 @@ export default function ChildPage({ session }) {
         }
       }, getModeVoice(chat.mode))
     })
-  }, [chat, speech, settings.autoListen, scheduleBubbleClear, cancelBubbleClear])
+  }, [chat, speech, settings.autoListen, scheduleBubbleClear, cancelBubbleClear, liveKitVoice])
 
   const handleVoicePress = useCallback(() => {
     if (uiStatus === 'listening') {

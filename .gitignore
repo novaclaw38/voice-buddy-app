@@ -6,3 +6,4 @@ node_modules
 dist
 .superpowers
 Payment Methods Logo Pack
+.env*

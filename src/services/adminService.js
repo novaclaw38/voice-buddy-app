@@ -13,11 +13,11 @@ async function request(url, options) {
 }
 
 export async function fetchOverview() {
-  return request('/api/admin/overview')
+  return request('/api/admin')
 }
 
 export async function cancelSubscription(userId) {
-  return request('/api/admin/cancel-subscription', {
+  return request('/api/admin', {
     method: 'POST',
     body: JSON.stringify({ userId }),
   })
