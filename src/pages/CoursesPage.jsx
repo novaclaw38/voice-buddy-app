@@ -9,7 +9,7 @@ import BuddyAvatar from '../components/BuddyAvatar.jsx'
 import SkipLink from '../components/SkipLink.jsx'
 import { useState, useEffect, useMemo } from 'react'
 import { getSettings } from '../utils/storage.js'
-import { pickRandom } from '../utils/prompts.js'
+import { pickRandomDistinct } from '../utils/prompts.js'
 import { IconArrowLeft, IconArrowRight, IconLock, IconCheck } from '../components/icons.jsx'
 import styles from './CoursesPage.module.css'
 
@@ -17,7 +17,14 @@ const COURSES_INTRO = [
   (names) => `Here are your courses! ${names}. Tap one to hear what's inside!`,
   (names) => `Look what we can learn together! ${names}. Which one sounds fun?`,
   (names) => `So many things to discover — ${names}. Pick one and let's dive in!`,
+  (names) => `Check out what's here — ${names}! Which one calls to you?`,
+  (names) => `Ready to learn something new? ${names}. Tap one to peek inside!`,
+  (names) => `Here's what we can explore — ${names}. What catches your eye?`,
 ]
+
+// Module-level (not a component ref) so it survives remounts of this page —
+// otherwise navigating away and back could repeat the same intro line.
+const coursesIntroIndex = { current: -1 }
 
 export default function CoursesPage({ session }) {
   const navigate = useNavigate()
@@ -40,7 +47,7 @@ export default function CoursesPage({ session }) {
   useEffect(() => {
     if (!COURSES.length) return
     const names = COURSES.map((c) => c.title).join(', ')
-    speech.speak(pickRandom(COURSES_INTRO)(names))
+    speech.speak(pickRandomDistinct(COURSES_INTRO, coursesIntroIndex)(names))
     return () => speech.stopSpeaking()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [COURSES])

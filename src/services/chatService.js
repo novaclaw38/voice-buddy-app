@@ -18,7 +18,7 @@ export async function chatCompletion(messages, options = {}) {
       messages,
       mode: options.mode,
       maxTokens: options.maxTokens || 300,
-      temperature: options.temperature || 0.85,
+      temperature: options.temperature || 0.95,
     }),
   })
 

@@ -1,7 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { chatCompletion } from '../services/chatService.js'
 import { addHistory, fetchHistory } from '../services/historyService.js'
-import { PROMPTS, MODE_INTROS, pickRandom } from '../utils/prompts.js'
+import { PROMPTS, MODE_INTROS, pickRandomDistinct } from '../utils/prompts.js'
+import { extractTopics } from '../utils/topics.js'
 import { timeContextLine } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
 import { getActiveChildId } from '../utils/storage.js'
@@ -23,16 +24,32 @@ export function useChat(settings) {
   const limitReachedRef = useRef(false)
 
   const memoryRef = useRef('')
+  // The history and lessons blocks resolve independently (two separate
+  // async fetches) and each rebuilds memoryRef.current from both parts, so
+  // whichever settles last can never silently wipe out the other.
+  const memoryPartsRef = useRef({ history: '', lessons: '' })
+  // One last-picked-index slot per mode, so excluding a repeat in "chat"
+  // doesn't accidentally also exclude an unrelated index in "sing"/"story".
+  const introIndexRef = useRef({ chat: { current: -1 }, sing: { current: -1 }, story: { current: -1 } })
 
   useEffect(() => {
     const childName = settings?.childName || 'there'
 
-    fetchHistory(5).then(entries => {
+    fetchHistory(20).then(entries => {
       if (!entries?.length) return
-      const lines = entries
+      const recent = entries.slice(0, 5)
+      const lines = recent
         .map(e => `- "${(e.user_text || '').slice(0, 100)}" (${e.mode} mode)`)
         .join('\n')
-      memoryRef.current = `\n\nRECENT MEMORIES — things ${childName} said in past chats:\n${lines}\nIf these come up naturally in conversation, reference them warmly to make ${childName} feel remembered.`
+      let block = `\n\nRECENT MEMORIES — things ${childName} said in past chats:\n${lines}\nIf these come up naturally in conversation, reference them warmly to make ${childName} feel remembered.`
+
+      const topics = extractTopics(entries.map(e => e.user_text))
+      if (topics.length) {
+        block += `\n\nTOPICS ${childName} OFTEN BRINGS UP: ${topics.join(', ')}. Weave these in naturally when it fits the conversation — don't force it or list them out.`
+      }
+
+      memoryPartsRef.current.history = block
+      memoryRef.current = memoryPartsRef.current.history + memoryPartsRef.current.lessons
     }).catch(() => {})
 
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -49,8 +66,9 @@ export function useChat(settings) {
         .then(({ data }) => {
           if (!data?.length) return
           const names = data.map(r => `${r.lesson_id} (${r.course_id})`).join(', ')
-          memoryRef.current +=
+          memoryPartsRef.current.lessons =
             `\n\nLESSONS ${childName} HAS COMPLETED: ${names}. Celebrate their learning if the topic comes up!`
+          memoryRef.current = memoryPartsRef.current.history + memoryPartsRef.current.lessons
         })
     }).catch(() => {})
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -77,7 +95,8 @@ export function useChat(settings) {
     const childName = settings?.childName || 'there'
     const buddyName = settings?.buddyName  || 'Buddy'
     const variants = MODE_INTROS[newMode] || MODE_INTROS.chat
-    return pickRandom(variants)(childName, buddyName)
+    const indexState = introIndexRef.current[newMode] || introIndexRef.current.chat
+    return pickRandomDistinct(variants, indexState)(childName, buddyName)
   }, [settings?.childName, settings?.buddyName])
 
   const sendMessage = useCallback(async (userText, currentMode) => {

@@ -27,7 +27,7 @@ import DailyActivity from '../components/DailyActivity.jsx'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
 import SkipLink from '../components/SkipLink.jsx'
 import { getModeVoice } from '../utils/modeVoice.js'
-import { pickRandom } from '../utils/prompts.js'
+import { pickRandomDistinct } from '../utils/prompts.js'
 import styles from './ChildPage.module.css'
 import { IconMail, IconCamera, IconPlay, IconMusic, IconBook, IconPalette, IconGear, IconSparkle } from '../components/icons.jsx'
 
@@ -35,6 +35,11 @@ const WELCOME_BACK = [
   (childName, buddyName) => `Hey ${childName}, I'm back! What do you want to do now?`,
   (childName, buddyName) => `${buddyName}'s here again, ${childName}! Ready to keep having fun?`,
   (childName, buddyName) => `Ooh, ${childName}! Good to see you again — what's next?`,
+  (childName, buddyName) => `${childName}! You're back! I missed you — what should we do?`,
+  (childName, buddyName) => `Welcome back, ${childName}! I've got all sorts of fun ideas — want to hear one?`,
+  (childName, buddyName) => `Hey hey, ${childName}! ${buddyName}'s ready for round two — what sounds fun?`,
+  (childName, buddyName) => `${childName}, perfect timing — I was just thinking about you! What's up?`,
+  (childName, buddyName) => `Back again, ${childName}? Awesome! Let's find something fun to do.`,
 ]
 
 // Buddy shouldn't just sit there waiting to be tapped — after a stretch of
@@ -45,13 +50,22 @@ const IDLE_NUDGES = [
   (childName) => `Hey ${childName}, I know a fun game — want to play 20 Questions with me?`,
   (childName) => `${childName}? I'm getting a little bored just sitting here — let's do something fun!`,
   (childName) => `Did you know I love surprises, ${childName}? Tap the mic and tell me something cool!`,
+  (childName) => `${childName}, I just thought of a silly joke — want to hear it?`,
+  (childName) => `Still there, ${childName}? Let's do something — a song, a story, or just talk!`,
+  (childName) => `${childName}, I bet I can guess your favorite animal — want to try me?`,
+  (childName) => `Whenever you're ready, ${childName}, I've got games, songs, and stories waiting!`,
 ]
 
 // This page can remount many times per browser session (parent settings,
 // courses, lessons all navigate away and back) — only the very first mount
 // gets the full greeting + daily activity; every mount after that gets a
-// short varied welcome-back instead of repeating the same speech.
+// short varied welcome-back instead of repeating the same speech. The two
+// index trackers are module-level (not component refs) for the same
+// reason — they need to survive across those remounts to avoid an
+// immediate repeat right after navigating away and back.
 let hasGreetedFully = false
+const welcomeBackIndex = { current: -1 }
+const idleNudgeIndex = { current: -1 }
 
 export default function ChildPage({ session }) {
   const navigate = useNavigate()
@@ -432,7 +446,7 @@ export default function ChildPage({ session }) {
       : ''
     const greet = isFirstGreeting
       ? `${greetingWord()}, ${childName}! I'm ${buddyName}! Pick something to do, or just tap the mic and talk to me!${activityPart}`
-      : pickRandom(WELCOME_BACK)(childName, buddyName)
+      : pickRandomDistinct(WELCOME_BACK, welcomeBackIndex)(childName, buddyName)
     setBuddyText(greet)
     setUiStatus('speaking')
     speech.speak(greet, () => {
@@ -447,7 +461,7 @@ export default function ChildPage({ session }) {
   useEffect(() => {
     if (uiStatus !== 'idle' || showPin || showPicker || msgPhase || chat.mode !== 'chat') return
     const id = setTimeout(() => {
-      const nudge = pickRandom(IDLE_NUDGES)(childName)
+      const nudge = pickRandomDistinct(IDLE_NUDGES, idleNudgeIndex)(childName)
       setBuddyText(nudge)
       setUiStatus('speaking')
       speech.speak(nudge, () => {
