@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import useFocusTrap from '../hooks/useFocusTrap.js'
 import { useNavigate } from 'react-router-dom'
 import BuddyAvatar from '../components/BuddyAvatar.jsx'
 import SpeechBubble from '../components/SpeechBubble.jsx'
@@ -362,6 +363,7 @@ export default function ChildPage({ session }) {
   // launches into a story unprompted.
   const [storyRequest, setStoryRequest] = useState(null)
   const [storyPhase, setStoryPhase] = useState(null) // null | 'ask'
+  const storyTrapRef = useRef(null)
 
   useEffect(() => {
     fetchLatestUndelivered().then((row) => { if (row) setStoryRequest(row) }).catch(() => {})
@@ -413,6 +415,8 @@ export default function ChildPage({ session }) {
     setStoryPhase(null)
     setBuddyText('')
   }
+
+  useFocusTrap(storyTrapRef, storyPhase === 'ask', declineStoryRequest)
 
   // Boot greeting — Buddy announces the daily activity by voice instead of
   // it sitting in a persistent card; the card itself hides the moment he's
@@ -732,6 +736,7 @@ export default function ChildPage({ session }) {
       <SkipLink />
       <div className={`${styles.page} ${isDarkRealm ? styles.darkRealm : ''} ${styles[`realmTint${partOfDay.charAt(0).toUpperCase() + partOfDay.slice(1)}`]}`}>
       <main id="main">
+      <h1 className={styles.visuallyHidden}>Chat with {buddyName}</h1>
       <WorldBackdrop />
       {/* Ground plane and floating sky decorations — paper planes, kites,
           butterflies, bubbles that drift across the sky above Buddy. */}
@@ -909,8 +914,8 @@ export default function ChildPage({ session }) {
 
       {/* Custom bedtime story request (Pro) — tap fallback for the spoken ask */}
       {storyPhase === 'ask' && (
-        <div className={styles.msgOverlay}>
-          <div className={styles.msgBubble}>
+        <div className={styles.msgOverlay} role="dialog" aria-modal="true" aria-label="Story idea from your parent">
+          <div className={styles.msgBubble} ref={storyTrapRef}>
             <div className={styles.msgIcon}><IconBook size={30} /></div>
             <p className={styles.msgTitle}>Someone left you a story idea! Want to hear it?</p>
             <button className={styles.msgPlayBtn} onClick={playStoryRequestNow}><IconPlay size={16} /> Yes, tell me!</button>
@@ -928,6 +933,8 @@ export default function ChildPage({ session }) {
    Shared across the default, voice-only, and sing-mode screens so the
    ask-then-play flow stays identical everywhere a message can appear. */
 function ParentMessageOverlay({ msgPhase, showEnvelope = true, envelopeClass, onEnvelopeClick, onYes, onNo, onReplay, onDismiss }) {
+  const trapRef = useRef(null)
+  useFocusTrap(trapRef, !!msgPhase, msgPhase === 'ask' ? onNo : onDismiss)
   if (!msgPhase) return null
   return (
     <>
@@ -941,8 +948,8 @@ function ParentMessageOverlay({ msgPhase, showEnvelope = true, envelopeClass, on
           <IconMail size={22} />
         </button>
       )}
-      <div className={styles.msgOverlay}>
-        <div className={styles.msgBubble}>
+      <div className={styles.msgOverlay} role="dialog" aria-modal="true" aria-label="Message from your parent">
+        <div className={styles.msgBubble} ref={trapRef}>
           <div className={styles.msgIcon}><IconMail size={30} /></div>
           {msgPhase === 'ask' ? (
             <>

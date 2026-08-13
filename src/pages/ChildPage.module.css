@@ -1,3 +1,15 @@
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .page {
   height: 100%;
   display: flex;
@@ -26,6 +38,19 @@
 @keyframes twinkle {
   0%   { opacity: 0.7; }
   100% { opacity: 1; }
+}
+
+/* Entrance choreography — the interface settles into place the moment
+   Buddy's world loads, cueing where to look first (top bar, then Buddy,
+   then what he's saying, then the dock) instead of popping in flat. */
+@keyframes settleDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes settleUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Ground plane ─────────────────────────────────────── */
@@ -137,6 +162,7 @@
   z-index: 10;
   position: relative;
   gap: 10px;
+  animation: settleDown 0.4s var(--spring-subtle) both;
 }
 
 .topBarLeft {
@@ -163,6 +189,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  animation: labelPop 0.3s var(--spring) both;
 }
 
 /* Evening/night skies are dark, so --ink text (dark purple) nearly
@@ -175,6 +202,11 @@
 
 .clockBadge {
   flex-shrink: 0;
+}
+
+@keyframes labelPop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
 }
 
 /* Top-centered banner under the top bar — never overlaps Buddy's face. */
@@ -209,6 +241,7 @@
   min-height: 0;
   padding: 6px 0 0;
   z-index: 1;
+  animation: settleUp 0.5s 0.1s var(--spring-subtle) both;
 }
 
 .buddyNameTag {
@@ -223,6 +256,7 @@
   letter-spacing: 0.03em;
   margin-bottom: 22px;
   box-shadow: 0 4px 0 rgba(91,33,182,0.12), 0 8px 16px rgba(80,40,120,0.14);
+  animation: settleUp 0.45s 0.06s var(--spring-subtle) both;
 }
 
 .buddyNameTag::after {
@@ -287,7 +321,13 @@
   animation: pop-in 0.4s var(--spring) both;
 }
 
-.dockBtn:nth-child(2) { animation-delay: 0.05s; }
+/* Stagger reads left-to-right across the whole dock (Songs, Story, Learn,
+   [mic], My Buddy, Parents) as one arriving row, not two disconnected ones. */
+.dockSide:first-child .dockBtn:nth-child(1) { animation-delay: 0.14s; }
+.dockSide:first-child .dockBtn:nth-child(2) { animation-delay: 0.19s; }
+.dockSide:first-child .dockBtn:nth-child(3) { animation-delay: 0.24s; }
+.dockSide:last-child  .dockBtn:nth-child(1) { animation-delay: 0.29s; }
+.dockSide:last-child  .dockBtn:nth-child(2) { animation-delay: 0.34s; }
 
 .dockIcon {
   display: grid;
@@ -298,6 +338,47 @@
   color: #fff;
   box-shadow: 0 5px 0 rgba(91, 33, 182, 0.18), 0 10px 20px rgba(80, 40, 120, 0.18);
   transition: transform 0.12s var(--spring-subtle);
+}
+
+/* Below ~500px the dock's natural width (5 icons + labels + mic + gaps)
+   exceeds every common phone viewport (verified 320-430px) and .page's
+   overflow:hidden clips Songs/Parents off-screen entirely — not just
+   visually tight, actually unreachable. Below this breakpoint the labels
+   go icon-only (accessible name is preserved via visually-hidden text,
+   not removed) and everything tightens up to fit with room to spare. */
+@media (max-width: 499px) {
+  .dock {
+    gap: 6px;
+    padding: 0 4px;
+  }
+
+  .dockSide {
+    gap: 6px;
+  }
+
+  .dockBtn {
+    min-width: 44px;
+    padding: 0;
+    gap: 0;
+  }
+
+  .dockIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .dockLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 .dockBtn:active .dockIcon { transform: scale(0.9); }
@@ -335,7 +416,12 @@
 .cameraIndicator {
   font-size: 1.1rem;
   opacity: 0.9;
-  animation: camBlink 2.5s ease infinite;
+  animation: camArrive 0.35s var(--spring-subtle) both, camBlink 2.5s 0.35s ease infinite;
+}
+
+@keyframes camArrive {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 0.9; }
 }
 
 @keyframes camBlink {
@@ -445,6 +531,12 @@
   padding: 32px;
   text-align: center;
   background: linear-gradient(165deg, #1a1430 0%, #302352 55%, #4a3670 100%);
+  animation: calmSettle 0.6s ease both;
+}
+
+@keyframes calmSettle {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .windDownTitle {
@@ -572,16 +664,22 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #ef4444;
-  box-shadow: 0 4px 0 #b91c1c, 0 0 0 3px rgba(239,68,68,0.35);
+  background: var(--c-alert);
+  box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 3px rgba(239,68,68,0.35);
   line-height: 1;
-  animation: envelopePulse 0.7s ease-in-out infinite alternate;
+  animation: envelopeArrive 0.5s var(--spring) both, envelopePulse 0.7s 0.5s ease-in-out infinite alternate;
   flex-shrink: 0;
 }
 
+@keyframes envelopeArrive {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60%  { transform: scale(1.25) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
 @keyframes envelopePulse {
-  from { transform: scale(1);    box-shadow: 0 4px 0 #b91c1c, 0 0 0 3px rgba(239,68,68,0.35); }
-  to   { transform: scale(1.12); box-shadow: 0 4px 0 #b91c1c, 0 0 0 8px rgba(239,68,68,0.0); }
+  from { transform: scale(1);    box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 3px rgba(239,68,68,0.35); }
+  to   { transform: scale(1.12); box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 8px rgba(239,68,68,0.0); }
 }
 
 /* Floating envelope overlay for sing mode */
@@ -596,9 +694,9 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #ef4444;
-  box-shadow: 0 4px 0 #b91c1c, 0 0 0 3px rgba(239,68,68,0.35);
-  animation: envelopePulse 0.7s ease-in-out infinite alternate;
+  background: var(--c-alert);
+  box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 3px rgba(239,68,68,0.35);
+  animation: envelopeArrive 0.5s var(--spring) both, envelopePulse 0.7s 0.5s ease-in-out infinite alternate;
 }
 
 /* modeLabel is now a button; keep its look, add an affordance. */

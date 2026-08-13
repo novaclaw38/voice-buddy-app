@@ -1,6 +1,14 @@
 import { useCallback, useRef, useState } from 'react'
-import { Room, RoomEvent, Track } from 'livekit-client'
 import { isLiveKitAvatarVoiceEnabled, startLiveKitAvatarSession } from '../services/livekitAgentService.js'
+
+// livekit-client is a full WebRTC SDK — loaded on demand only when a
+// session actually starts, instead of bundled into every ChildPage load
+// (the feature is off by default for most accounts).
+let livekitClientPromise = null
+function loadLiveKitClient() {
+  if (!livekitClientPromise) livekitClientPromise = import('livekit-client')
+  return livekitClientPromise
+}
 
 function attachRemoteAudio(track) {
   const element = track.attach()
@@ -29,7 +37,10 @@ export function useLiveKitAgent() {
 
     setStatus('connecting')
     try {
-      const session = await startLiveKitAvatarSession({ roomName, participantName, childName, buddyName, childAge })
+      const [{ Room, RoomEvent, Track }, session] = await Promise.all([
+        loadLiveKitClient(),
+        startLiveKitAvatarSession({ roomName, participantName, childName, buddyName, childAge }),
+      ])
 
       const liveKitRoom = new Room()
       liveKitRoom.on(RoomEvent.TrackSubscribed, (track) => {

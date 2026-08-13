@@ -10,6 +10,8 @@
   --c-sky: #4dadf7;
   --c-sunny: #ffd23f;
   --c-berry: #c026d3;
+  --c-alert: #ef4444;
+  --c-alert-d: #b91c1c;
 
   /* Legacy aliases (kept so any un-migrated rule still resolves) */
   --buddy-purple: var(--c-grape);
