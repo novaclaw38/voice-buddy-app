@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { useTimeOfDay } from '../hooks/useTimeOfDay.js'
+import { pickSessionBackdrop } from '../utils/childBackdrop.js'
 import styles from './WorldBackdrop.module.css'
 
 // Fixed star field — hand-placed rather than random-per-render so stars
@@ -43,9 +45,15 @@ const SPARKLES = [
 
 export default function WorldBackdrop() {
   const { partOfDay } = useTimeOfDay()
+  // Picked once per browser session, not per mount — this component
+  // remounts every time ChildPage does (settings, courses, lessons all
+  // navigate away and back), and the scene shouldn't shuffle each time.
+  const [backdropUrl] = useState(pickSessionBackdrop)
 
   return (
     <div className={`${styles.world} ${styles[partOfDay]}`} aria-hidden="true">
+      <div className={styles.photoLayer} style={{ backgroundImage: `url(${backdropUrl})` }} />
+
       {partOfDay === 'morning' && (
         <>
           <div className={`${styles.sun} ${styles.sunLow}`}>

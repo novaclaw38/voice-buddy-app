@@ -23,6 +23,20 @@
   background: linear-gradient(180deg, #171233 0%, #241b45 45%, #3a2a5d 100%);
 }
 
+/* Alternating illustrated scene — sits on top of the time-of-day gradient
+   above (visible instantly, no flash-of-unstyled-background while the
+   image loads) and under every decorative element below. The existing
+   .morning/.afternoon/.evening/.night gradient still drives the realm
+   tint applied at the .page level in ChildPage, so mood continuity across
+   time of day is unaffected by which scene got picked this session. */
+.photoLayer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.9;
+}
+
 /* ── Sun ── */
 .sun {
   position: absolute;
