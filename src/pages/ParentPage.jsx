@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import PrintSheet from '../components/PrintSheet.jsx'
 import { getSettings, saveSettings, migratePinIfNeeded, hashPin, getActiveChildId } from '../utils/storage.js'
@@ -431,11 +431,16 @@ export default function ParentPage({ session }) {
     }
   }
 
+  // A native window.confirm() would break out of the app's own focus-trap
+  // dialog system (every other confirm — camera start, etc. — is inline
+  // state like this) with inconsistent screen-reader behavior versus the
+  // rest of the app.
+  const [clearingHistory, setClearingHistory] = useState(false)
+
   const handleClearHistory = async () => {
-    if (window.confirm('Clear all chat history? This cannot be undone.')) {
-      await deleteHistory()
-      setHistory([])
-    }
+    setClearingHistory(false)
+    await deleteHistory()
+    setHistory([])
   }
 
   const handleLogout = async () => {
@@ -486,23 +491,30 @@ export default function ParentPage({ session }) {
       )}
 
       {/* Tabs */}
-      <div className={styles.tabs} role="tablist">
-        {TAB_GROUPS.map((group, gi) => (
-          <div className={styles.tabGroup} key={group.label}>
-            {group.tabs.map((t) => (
-              <button
-                key={t}
-                className={`${styles.tab} ${tab === t ? styles.activeTab : ''}`}
-                onClick={() => setTab(t)}
-                role="tab"
-                aria-selected={tab === t}
-              >
-                {t}
-              </button>
-            ))}
-            {gi < TAB_GROUPS.length - 1 && <span className={styles.tabDivider} aria-hidden="true" />}
-          </div>
-        ))}
+      <div className={styles.tabsScroller}>
+        <div className={styles.tabs} role="tablist">
+          {TAB_GROUPS.map((group, gi) => (
+            <Fragment key={group.label}>
+              <div className={styles.tabGroup}>
+                <span className={styles.tabGroupLabel} aria-hidden="true">{group.label}</span>
+                <div className={styles.tabGroupButtons}>
+                  {group.tabs.map((t) => (
+                    <button
+                      key={t}
+                      className={`${styles.tab} ${tab === t ? styles.activeTab : ''}`}
+                      onClick={() => setTab(t)}
+                      role="tab"
+                      aria-selected={tab === t}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {gi < TAB_GROUPS.length - 1 && <span className={styles.tabDivider} aria-hidden="true" />}
+            </Fragment>
+          ))}
+        </div>
       </div>
 
       {/* Tab content */}
@@ -975,7 +987,7 @@ export default function ParentPage({ session }) {
         {tab === 'Camera' && (
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>
-              Live Camera {!isPro && <IconLock size={11} />}
+              Peace of Mind Camera {!isPro && <IconLock size={11} />}
             </h2>
             {!isPro ? (
               <button className={styles.input} style={{ textAlign: 'left', color: 'var(--ink-dim)' }} onClick={() => setUpgradeTrigger('camera')}>
@@ -1043,12 +1055,23 @@ export default function ParentPage({ session }) {
           <div className={styles.section}>
             <div className={styles.historyHeader}>
               <h2 className={styles.sectionTitle}>Chat History</h2>
-              {history.length > 0 && (
-                <button className={styles.btnDanger} onClick={handleClearHistory}>
+              {history.length > 0 && !clearingHistory && (
+                <button className={styles.btnDanger} onClick={() => setClearingHistory(true)}>
                   Clear All
                 </button>
               )}
             </div>
+            {clearingHistory && (
+              <div className={styles.field} style={{ marginBottom: 16 }}>
+                <p className={styles.hint} style={{ marginBottom: 10 }}>
+                  Clear all chat history? This cannot be undone.
+                </p>
+                <div className={styles.btnRow}>
+                  <button className={styles.btnDanger} onClick={handleClearHistory}>Yes, clear it</button>
+                  <button className={styles.btnTest} onClick={() => setClearingHistory(false)}>Cancel</button>
+                </div>
+              </div>
+            )}
             {historyLoading ? (
               <p className={styles.empty}>Loading history...</p>
             ) : history.length === 0 ? (

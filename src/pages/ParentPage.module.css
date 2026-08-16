@@ -73,14 +73,19 @@
   color: var(--ink);
 }
 
+.tabsScroller {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .tabs {
   display: flex;
+  align-items: flex-start;
   overflow-x: auto;
   gap: 6px;
-  padding: 12px;
+  padding: 10px 12px 12px;
   background: rgba(255,255,255,0.5);
   border-bottom: 1px solid rgba(124,58,237,0.1);
-  flex-shrink: 0;
   scrollbar-width: none;
   /* Right-edge fade signals there are more tabs off-screen */
   mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 34px), transparent 100%);
@@ -89,17 +94,37 @@
 
 .tabs::-webkit-scrollbar { display: none; }
 
+/* Group labels ("Child", "Learning", "Connect", "Billing") were modeled in
+   TAB_GROUPS but never rendered — the 9 tabs read as one flat, ungrouped
+   row with only a faint 1px divider between clusters, which disappears
+   entirely once the row scrolls. Rendering the label above each cluster
+   gives every group a persistent, always-visible orientation cue. */
 .tabGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.tabGroupLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a7fa3;
+  padding-left: 4px;
+}
+
+.tabGroupButtons {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
 }
 
 .tabDivider {
   width: 1px;
   align-self: stretch;
-  margin: 4px 4px;
+  margin: 18px 4px 4px;
   background: rgba(124,58,237,0.15);
   flex-shrink: 0;
 }
@@ -141,6 +166,15 @@
   border-radius: 18px;
   padding: 20px 18px;
   box-shadow: 0 2px 10px rgba(58, 42, 93, 0.05);
+}
+
+/* This is a mobile-first surface (most parents check in from a phone), but
+   nothing stops it opening on a laptop — a fixed 480px card centered in a
+   sea of empty gray space read as unfinished at desktop widths. Widening
+   the card on larger viewports isn't a full desktop redesign, just enough
+   that the surface doesn't look broken when it isn't on a phone. */
+@media (min-width: 900px) {
+  .section { max-width: 640px; padding: 28px 32px; }
 }
 
 .sectionTitle {
