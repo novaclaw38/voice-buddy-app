@@ -37,6 +37,17 @@
   opacity: 0.9;
 }
 
+/* Every generated scene already carries its own baked-in light source
+   (a sun, a glowing horizon, moonlit clouds), so the flat CSS sun/moon
+   disc below would double it up — a second light source floating over
+   the illustrated one. photoLayer is now always present, so these two
+   specific elements are suppressed unconditionally; clouds, stars,
+   fireflies and sparkles stay, since they read as an intentional
+   parallax layer rather than a duplicate object (confirmed visually). */
+.sun, .moon {
+  display: none;
+}
+
 /* ── Sun ── */
 .sun {
   position: absolute;

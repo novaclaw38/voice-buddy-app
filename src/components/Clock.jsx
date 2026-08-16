@@ -67,11 +67,16 @@ export default function Clock({ className, partOfDay, onSpeak }) {
 
         <g filter="url(#clockShadow)">
           {/* Bells — the rim (drawn after) covers each bell's lower half, so
-              only the dome peeks out above the face. */}
-          <circle className={styles.bell} cx="9"  cy="14" r="7" />
-          <circle className={styles.bell} cx="31" cy="14" r="7" />
-          <circle className={styles.bellShine} cx="6.5" cy="11" r="1.9" />
-          <circle className={styles.bellShine} cx="28.5" cy="11" r="1.9" />
+              only the dome peeks out above the face. Sized and tucked closer
+              to the face than a first pass (was r=7 at cy=14, sitting fully
+              above the rim like ears): a design critique flagged the twin
+              domes as easily mistaken for a second mini-Buddy face at a
+              glance, especially over a busy illustrated backdrop. Smaller
+              and lower reads as a bell accent instead of an ear silhouette. */}
+          <circle className={styles.bell} cx="10" cy="16" r="5.5" />
+          <circle className={styles.bell} cx="30" cy="16" r="5.5" />
+          <circle className={styles.bellShine} cx="8" cy="13.5" r="1.5" />
+          <circle className={styles.bellShine} cx="32" cy="13.5" r="1.5" />
 
           <circle className={styles.rim} cx="20" cy="27" r="15" />
           <circle className={styles.faceInner} cx="20" cy="27" r="12.4" />

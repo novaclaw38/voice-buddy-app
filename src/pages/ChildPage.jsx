@@ -751,7 +751,7 @@ export default function ChildPage({ session }) {
       <div className={`${styles.page} ${isDarkRealm ? styles.darkRealm : ''} ${styles[`realmTint${partOfDay.charAt(0).toUpperCase() + partOfDay.slice(1)}`]}`}>
       <main id="main">
       <h1 className={styles.visuallyHidden}>Chat with {buddyName}</h1>
-      <WorldBackdrop />
+      <WorldBackdrop mode={chat.mode} />
       {/* Ground plane and floating sky decorations — paper planes, kites,
           butterflies, bubbles that drift across the sky above Buddy. */}
       <div className={styles.ground} />
@@ -816,11 +816,14 @@ export default function ChildPage({ session }) {
           <div className={styles.avatarArea}>
             {/* Rolling hills — gives Buddy a ground to stand on, right behind
                 his feet. Three translucent layers auto-tint to whichever
-                mode gradient is behind them, creating depth. */}
+                mode gradient is behind them, creating depth. Opacity raised
+                from the original 0.14-0.38 so this still reads as ground
+                against a busy illustrated photo backdrop, not just a flat
+                CSS gradient sky. */}
             <svg className={styles.hills} viewBox="0 0 375 72" preserveAspectRatio="none" aria-hidden="true">
-              <path d="M0 50 Q60 12 140 33 T375 20 V72 H0 Z" fill="rgba(255,255,255,0.22)" />
-              <path d="M0 58 Q100 26 210 41 T375 34 V72 H0 Z" fill="rgba(255,255,255,0.38)" />
-              <path d="M0 64 Q80 42 160 52 T375 46 V72 H0 Z" fill="rgba(255,255,255,0.14)" />
+              <path d="M0 50 Q60 12 140 33 T375 20 V72 H0 Z" fill="rgba(255,255,255,0.45)" />
+              <path d="M0 58 Q100 26 210 41 T375 34 V72 H0 Z" fill="rgba(255,255,255,0.65)" />
+              <path d="M0 64 Q80 42 160 52 T375 46 V72 H0 Z" fill="rgba(255,255,255,0.32)" />
             </svg>
             <p className={styles.buddyNameTag}>{buddyName}</p>
             <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} costume={settings.costume} size={222} audioRef={speech.audioRef} partOfDay={partOfDay} />

@@ -97,17 +97,21 @@
 
 .skyDeco span {
   position: absolute;
-  opacity: 0.45;
+  opacity: 0.32;
   font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
   font-size: 1.1rem;
+  /* Softens the emoji glyphs' hard edges so they read as ambient motion
+     against the illustrated photo backdrop instead of a mismatched
+     foreground art style sitting on top of it. */
+  filter: blur(0.4px);
   animation: floatDrift 14s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 
 @keyframes floatDrift {
-  0%   { transform: translateY(0) rotate(0deg);   opacity: 0.25; }
-  50%  { opacity: 0.55; }
-  100% { transform: translateY(-30px) rotate(20deg); opacity: 0.35; }
+  0%   { transform: translateY(0) rotate(0deg);   opacity: 0.16; }
+  50%  { opacity: 0.4; }
+  100% { transform: translateY(-30px) rotate(20deg); opacity: 0.24; }
 }
 
 .sdB1  { left:  8%; top: 16%; font-size: 1.4rem; animation-duration: 10s; animation-delay: 0s; }

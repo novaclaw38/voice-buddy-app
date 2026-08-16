@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import { useTimeOfDay } from '../hooks/useTimeOfDay.js'
-import { pickSessionBackdrop } from '../utils/childBackdrop.js'
+import { pickBackdropForContext } from '../utils/childBackdrop.js'
 import styles from './WorldBackdrop.module.css'
 
 // Fixed star field — hand-placed rather than random-per-render so stars
@@ -43,12 +43,17 @@ const SPARKLES = [
   { top: '90%', left: '90%', size: 2, delay: '2.2s', duration: '8.8s' },
 ]
 
-export default function WorldBackdrop() {
+export default function WorldBackdrop({ mode = 'chat' }) {
   const { partOfDay } = useTimeOfDay()
-  // Picked once per browser session, not per mount — this component
-  // remounts every time ChildPage does (settings, courses, lessons all
-  // navigate away and back), and the scene shouldn't shuffle each time.
-  const [backdropUrl] = useState(pickSessionBackdrop)
+  // Re-evaluated when mode or partOfDay changes (not held in state) so
+  // switching into story mode, or the realm crossing into evening/night
+  // mid-session, picks a scene that actually fits — general chat-mode
+  // rotation still stays session-stable via sessionStorage inside the
+  // picker itself, so it doesn't shuffle on every ChildPage remount.
+  const backdropUrl = useMemo(
+    () => pickBackdropForContext(mode, partOfDay),
+    [mode, partOfDay]
+  )
 
   return (
     <div className={`${styles.world} ${styles[partOfDay]}`} aria-hidden="true">
