@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "var(--spring)",
+        "createdAt": "2026-08-16T19:44:16.130Z",
+        "reason": "Brand-documented 'squish' press interaction (PRODUCT.md Brand Commitments); a named, reused design token, not accidental bounce easing"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "var(--spring-subtle)",
+        "createdAt": "2026-08-16T19:44:16.250Z",
+        "reason": "Brand-documented 'squish' press interaction (PRODUCT.md Brand Commitments); a named, reused design token, not accidental bounce easing"
+      }
+    ]
+  }
+}
