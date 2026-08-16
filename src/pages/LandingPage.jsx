@@ -313,7 +313,7 @@ export default function LandingPage() {
               just a tap away.
             </p>
             <div className={styles.featureChips}>
-              <span><IconCamera size={14} /> Live camera</span>
+              <span><IconCamera size={14} /> Peace of mind camera</span>
               <span><IconLock size={14} /> Signed-in parents only</span>
               <span><IconBolt size={14} /> Real-time</span>
             </div>
@@ -439,7 +439,7 @@ export default function LandingPage() {
             <ul className={styles.planFeatures}>
               <li className={styles.yes}><IconCheck size={14} /> Chat with Buddy (10/day)</li>
               <li className={styles.yes}><IconCheck size={14} /> Sing-along mode</li>
-              <li className={styles.no}><IconX size={14} /> Live camera</li>
+              <li className={styles.no}><IconX size={14} /> Peace of mind camera</li>
               <li className={styles.no}><IconX size={14} /> Parent voice messages</li>
               <li className={styles.no}><IconX size={14} /> Courses &amp; lessons</li>
               <li className={styles.no}><IconX size={14} /> Progress tracking</li>
