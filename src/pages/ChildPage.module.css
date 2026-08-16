@@ -248,6 +248,16 @@
   animation: settleUp 0.5s 0.1s var(--spring-subtle) both;
 }
 
+/* .activityFloat is position:absolute at top:70px, and .avatarArea centers
+   its content vertically — on a short viewport that center lands in the
+   same band as the activity banner, so the "Buddy" name tag rendered right
+   behind it. Only applied while the banner is actually shown (first mount),
+   pushing the avatar down enough to clear it instead of permanently eating
+   space on every visit. */
+.avatarAreaShifted {
+  padding-top: 96px;
+}
+
 .buddyNameTag {
   position: relative;
   font-family: var(--font-head);

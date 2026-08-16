@@ -813,7 +813,7 @@ export default function ChildPage({ session }) {
           </div>
 
           {/* Avatar */}
-          <div className={styles.avatarArea}>
+          <div className={`${styles.avatarArea} ${showActivity && chat.mode === 'chat' ? styles.avatarAreaShifted : ''}`}>
             {/* Rolling hills — gives Buddy a ground to stand on, right behind
                 his feet. Three translucent layers auto-tint to whichever
                 mode gradient is behind them, creating depth. Opacity raised
