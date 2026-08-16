@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { SUBJECTS, orderSubjects, lessonsForAge } from '../utils/subjects.js'
 import { useSubscription } from '../hooks/useSubscription.jsx'
 import { useProgress } from '../hooks/useProgress.js'
@@ -28,13 +28,15 @@ const coursesIntroIndex = { current: -1 }
 
 export default function CoursesPage({ session }) {
   const navigate = useNavigate()
+  const location = useLocation()
+  const [lessonNotFound, setLessonNotFound] = useState(() => !!location.state?.lessonNotFound)
   const { isPro } = useSubscription()
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [expanded, setExpanded] = useState(null)
   const [settings] = useState(() => getSettings())
   const durationLabel = (settings.childAge || 7) <= 6 ? '~15 min' : '~30 min'
   const { completions } = useProgress()
-  const { courses: COURSES, loading: catalogLoading, error: catalogError } = useCourseCatalog()
+  const { courses: COURSES, loading: catalogLoading, error: catalogError, retry: retryCatalog } = useCourseCatalog()
   const speech = useSpeech(settings)
 
   const orderedSubjects = useMemo(
@@ -51,6 +53,21 @@ export default function CoursesPage({ session }) {
     return () => speech.stopSpeaking()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [COURSES])
+
+  useEffect(() => {
+    if (!catalogError) return
+    speech.speak("Oops, my books got a little mixed up! Let's try that again.")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalogError])
+
+  // Cleared from history state immediately so it doesn't reappear on a
+  // later back/forward navigation to this same entry.
+  useEffect(() => {
+    if (!lessonNotFound) return
+    navigate('.', { replace: true, state: {} })
+    speech.speak("Hmm, that lesson wandered off! Here's everything else you can try.")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleExpand = (course) => {
     const opening = expanded !== course.id
@@ -89,9 +106,17 @@ export default function CoursesPage({ session }) {
       </header>
 
       {catalogError && (
-        <p className={styles.sub} role="alert">
-          {catalogError.message || 'Could not load courses. Please try again.'}
-        </p>
+        <div className={styles.catalogError} role="alert">
+          <p className={styles.sub}>Oops, my books got a little mixed up! Let's try that again.</p>
+          <button className={styles.retryBtn} onClick={retryCatalog}>Try again</button>
+        </div>
+      )}
+
+      {lessonNotFound && (
+        <div className={styles.catalogError} role="alert">
+          <p className={styles.sub}>Hmm, that lesson wandered off! Here's everything else you can try.</p>
+          <button className={styles.retryBtn} onClick={() => setLessonNotFound(false)}>Got it</button>
+        </div>
       )}
 
       {orderedSubjects.map((subject) => (
@@ -117,7 +142,7 @@ export default function CoursesPage({ session }) {
                   {!isPro && <span className={styles.lockBadge}><IconLock size={13} /> Pro</span>}
                 </div>
                 <div className={styles.courseBody}>
-                  <h2 className={styles.courseName}>{course.title}</h2>
+                  <h3 className={styles.courseName}>{course.title}</h3>
                   <p className={styles.courseDesc}>{course.description}</p>
                   <button
                     className={styles.expandBtn}

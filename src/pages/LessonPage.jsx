@@ -88,9 +88,12 @@ export default function LessonPage({ session }) {
   const step = steps?.[stepIndex]
   const narration = step ? pickNarration(step, childAge) : ''
 
-  // Fix 2: navigate is a side-effect — must not be called during render
+  // Fix 2: navigate is a side-effect — must not be called during render.
+  // A silent bounce back to Courses would leave the child wondering what
+  // happened; pass a flag so Courses can show a brief explanation instead
+  // of just... being somewhere else.
   useEffect(() => {
-    if (lessonError) navigate('/courses')
+    if (lessonError) navigate('/courses', { state: { lessonNotFound: true } })
   }, [lessonError, navigate])
 
   // Fix 1: hoisted above the if (!lesson) guard; guard inside the effect body
