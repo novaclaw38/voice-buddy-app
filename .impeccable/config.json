@@ -14,6 +14,18 @@
         "value": "var(--spring-subtle)",
         "createdAt": "2026-08-16T19:44:16.250Z",
         "reason": "Brand-documented 'squish' press interaction (PRODUCT.md Brand Commitments); a named, reused design token, not accidental bounce easing"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "msgbounce",
+        "createdAt": "2026-08-16T20:18:24.682Z",
+        "reason": "False positive: detector matched the animation NAME containing 'Bounce', not the easing curve — actual timing-function is plain 'ease' (smooth translateY float), not elastic/spring"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "tapbounce",
+        "createdAt": "2026-08-16T20:18:24.789Z",
+        "reason": "False positive: detector matched the animation NAME containing 'Bounce', not the easing curve — actual timing-function is 'ease-in-out' (smooth opacity/scale pulse), not elastic/spring"
       }
     ]
   }
