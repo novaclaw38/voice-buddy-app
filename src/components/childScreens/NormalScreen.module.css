@@ -15,7 +15,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden;
+  /* html/body keep overflow:hidden (prevents pull-to-refresh/bounce), so
+     this is the fallback scroll container: on a short viewport (landscape
+     phones, or the first-mount activityAreaShifted padding pushing past a
+     borderline-short portrait one) the dock would otherwise be clipped
+     with no way to reach it at all. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
   position: relative;
   padding-bottom: env(safe-area-inset-bottom);
   transition: background 0.8s ease;
