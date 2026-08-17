@@ -15,7 +15,7 @@ import { useSubscription } from '../hooks/useSubscription.jsx'
 import { useLiveKitAvatarVoice } from '../hooks/useLiveKitAvatarVoice.js'
 import { getSettings, saveSettings, migratePinIfNeeded, getActiveChildId } from '../utils/storage.js'
 import { ensureActiveChildMigrated, updateChild } from '../services/childrenService.js'
-import { getTodayMinutesUsed, addMinutesUsed, resetTodayUsage } from '../utils/screenTime.js'
+import { getTodayMinutesUsed, addMinutesUsed, resetTodayUsage, evaluateScreenTime } from '../utils/screenTime.js'
 import { greetingWord } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
 import { fetchMessageById, markPlayed, fetchLatestUnplayed } from '../services/messageService.js'
@@ -132,12 +132,12 @@ export default function ChildPage({ session }) {
       if (document.hidden) return
       const total = addMinutesUsed(getActiveChildId(), TICK_MINUTES)
       setMinutesUsed(total)
-      const left = dailyLimit - total
-      if (left <= 5 && !warnedRef.current) {
+      const { shouldWarn, shouldWindDown } = evaluateScreenTime(total, dailyLimit)
+      if (shouldWarn && !warnedRef.current) {
         warnedRef.current = true
         speech.speak("Just a heads up — five more minutes, then it's time for a little break!")
       }
-      if (left <= 0) setShowWindDown(true)
+      if (shouldWindDown) setShowWindDown(true)
     }, TICK_MINUTES * 60 * 1000)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps

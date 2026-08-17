@@ -34,3 +34,20 @@ export function resetTodayUsage(childId) {
     localStorage.removeItem(storageKey(childId))
   } catch { /* no-op */ }
 }
+
+// ── Policy ──────────────────────────────────────────────────────────────
+// The screen-time rule itself: warn with 5 minutes left, wind down at 0.
+// Pure and side-effect-free on purpose — ChildPage's ticking effect owns
+// how often to check (tick cadence is a polling detail, not part of the
+// rule) and whether a warning has already been spoken this session (that's
+// view-state about a side effect, not a fact about the policy).
+export const WARNING_THRESHOLD_MINUTES = 5
+
+export function evaluateScreenTime(minutesUsed, dailyLimitMinutes) {
+  const minutesLeft = dailyLimitMinutes - minutesUsed
+  return {
+    minutesLeft,
+    shouldWarn: minutesLeft <= WARNING_THRESHOLD_MINUTES,
+    shouldWindDown: minutesLeft <= 0,
+  }
+}
