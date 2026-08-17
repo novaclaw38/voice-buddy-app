@@ -1,0 +1,219 @@
+/* Common form/card primitives shared across most parentTabs components.
+   Split out alongside the tab-per-component refactor (2026-08-17,
+   Candidate C) rather than duplicated per tab — unlike ChildPage's
+   screens (Candidate B), where the shared surface was ~80 lines, here
+   nearly every tab draws from the same design-system layer (section
+   cards, form fields, buttons, history-style entry lists). Each tab's
+   own .module.css covers only what's genuinely specific to it. */
+
+.section {
+  max-width: 480px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #e9e5f2;
+  border-radius: 18px;
+  padding: 20px 18px;
+  box-shadow: 0 2px 10px rgba(58, 42, 93, 0.05);
+}
+
+/* This is a mobile-first surface (most parents check in from a phone), but
+   nothing stops it opening on a laptop — a fixed 480px card centered in a
+   sea of empty gray space read as unfinished at desktop widths. Widening
+   the card on larger viewports isn't a full desktop redesign, just enough
+   that the surface doesn't look broken when it isn't on a phone. */
+@media (min-width: 900px) {
+  .section { max-width: 640px; padding: 28px 32px; }
+}
+
+.sectionTitle {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--c-grape);
+  margin-bottom: 16px;
+}
+
+.sectionHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #575072;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input {
+  width: 100%;
+  padding: 13px 15px;
+  background: #faf9fd;
+  border: 2px solid #e6dff4;
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--c-grape);
+}
+
+.input::placeholder { color: #b6abce; }
+
+.hint {
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  margin-top: 4px;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--c-grape);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--c-grape);
+}
+
+.toggleLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.btnRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btnSave {
+  padding: 12px 22px;
+  background: linear-gradient(135deg, var(--c-grape), var(--c-berry));
+  border-radius: var(--r-md);
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 5px 0 var(--c-grape-d);
+}
+
+.btnSave:active { transform: translateY(3px) scale(0.98); box-shadow: 0 2px 0 var(--c-grape-d); }
+
+.btnTest {
+  padding: 12px 22px;
+  background: #fff;
+  border-radius: var(--r-md);
+  color: var(--c-grape);
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 5px 0 rgba(91,33,182,0.12);
+}
+
+.btnTest:disabled { opacity: 0.5; }
+.btnTest:active:not(:disabled) { transform: translateY(3px) scale(0.98); box-shadow: 0 2px 0 rgba(91,33,182,0.12); }
+
+.testError {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #c0285a;
+  background: #ffe4ef;
+  border-radius: var(--r-sm);
+  padding: 10px 13px;
+  word-break: break-word;
+}
+
+.btnDanger {
+  padding: 9px 16px;
+  background: #ffe4ef;
+  border-radius: var(--r-sm);
+  color: #c0285a;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.btnDanger:active { transform: scale(0.97); }
+
+.btnSmall {
+  padding: 6px 14px;
+  background: #f2ecfb;
+  border-radius: var(--r-pill);
+  color: var(--c-grape);
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--ink-dim);
+  padding: 32px 0;
+  font-size: 1rem;
+}
+
+/* History-style entry list — used by HistoryTab (chat history) and
+   MessagesTab (sent messages / story requests), and the mode-badge color
+   variants below are also reached dynamically from PrintTab
+   (styles[printData.mode]). .game/.activity/.routine have no current UI
+   that writes those mode values, but history rows are read from Supabase
+   and could still hold them from before those modes existed — kept for
+   that reason, not dead code. */
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.historyEntry {
+  background: #fff;
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  box-shadow: 0 6px 16px rgba(124,58,237,0.08);
+}
+
+.entryMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.modeBadge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.story   { background: #efe7fb; color: #6d28d9; }
+.game    { background: #ffe3f1; color: #be185d; }
+.activity{ background: #ffedd9; color: #c2410c; }
+.routine { background: #dcfbe9; color: #15803d; }
+.chat    { background: #e0efff; color: #1d4ed8; }
+
+.entryDate {
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+}

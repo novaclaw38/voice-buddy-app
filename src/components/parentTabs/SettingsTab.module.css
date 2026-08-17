@@ -1,0 +1,29 @@
+.savedFlash {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #15803d;
+  background: #dcfbe9;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  margin-bottom: 16px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.savedFlashVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.linkBtn {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--c-grape);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 4px 0;
+}
+
+.linkBtn:disabled { opacity: 0.6; }

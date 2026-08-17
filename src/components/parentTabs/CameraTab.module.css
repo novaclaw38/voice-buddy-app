@@ -1,0 +1,50 @@
+/* Camera — keep the video frame dark */
+.cameraBox {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #100b1f;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-card);
+}
+
+.cameraVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror front-facing camera */
+}
+
+.cameraPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 4rem;
+  color: rgba(255,255,255,0.25);
+  padding: 20px;
+  text-align: center;
+}
+
+.camMsg {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  animation: camWait 1.4s ease infinite alternate;
+}
+
+@keyframes camWait {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+.camErr {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffb4c8;
+  line-height: 1.4;
+}
