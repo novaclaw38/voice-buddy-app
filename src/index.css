@@ -52,6 +52,16 @@
   --font-head: 'Fredoka', 'Nunito', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, sans-serif;
   --font-main: var(--font-body);
+
+  /* Parent surface (calm admin tones, reused across ParentPage.module.css
+     and components/parentTabs/*.module.css — status text/badge colors and
+     the shared neutral border, so a re-theme only touches one place). */
+  --parent-border: #e9e5f2;
+  --parent-danger-bg: #ffe4ef;
+  --parent-danger-text: #c0285a;
+  --parent-plum-text: #6d28d9;
+  --parent-rose-text: #be185d;
+  --parent-green-text: #15803d;
 }
 
 /* ---- Reset ---- */

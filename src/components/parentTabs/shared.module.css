@@ -10,7 +10,7 @@
   max-width: 480px;
   margin: 0 auto;
   background: #fff;
-  border: 1px solid #e9e5f2;
+  border: 1px solid var(--parent-border);
   border-radius: 18px;
   padding: 20px 18px;
   box-shadow: 0 2px 10px rgba(58, 42, 93, 0.05);
@@ -137,18 +137,22 @@
   margin-top: 8px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #c0285a;
-  background: #ffe4ef;
+  color: var(--parent-danger-text);
+  background: var(--parent-danger-bg);
   border-radius: var(--r-sm);
   padding: 10px 13px;
   word-break: break-word;
 }
 
 .btnDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: 9px 16px;
-  background: #ffe4ef;
+  background: var(--parent-danger-bg);
   border-radius: var(--r-sm);
-  color: #c0285a;
+  color: var(--parent-danger-text);
   font-weight: 700;
   font-size: 0.85rem;
 }
@@ -207,10 +211,10 @@
   letter-spacing: 0.05em;
 }
 
-.story   { background: #efe7fb; color: #6d28d9; }
-.game    { background: #ffe3f1; color: #be185d; }
+.story   { background: #efe7fb; color: var(--parent-plum-text); }
+.game    { background: #ffe3f1; color: var(--parent-rose-text); }
 .activity{ background: #ffedd9; color: #c2410c; }
-.routine { background: #dcfbe9; color: #15803d; }
+.routine { background: #dcfbe9; color: var(--parent-green-text); }
 .chat    { background: #e0efff; color: #1d4ed8; }
 
 .entryDate {

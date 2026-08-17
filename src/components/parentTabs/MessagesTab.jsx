@@ -122,6 +122,22 @@ export default function MessagesTab({ isPro, onUpgrade }) {
               onPointerDown={startRecording}
               onPointerUp={stopRecording}
               onPointerLeave={stopRecording}
+              onKeyDown={(e) => {
+                // Enter/Space produce a `click`, not pointer events, and
+                // repeat while held — only react to the first keydown so a
+                // keyboard user can hold-to-record the same as a mouse/touch
+                // user, and release on keyup instead of on click.
+                if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
+                  e.preventDefault()
+                  startRecording()
+                }
+              }}
+              onKeyUp={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  stopRecording()
+                }
+              }}
               disabled={recStatus === 'sending'}
               aria-label={recStatus === 'recording' ? 'Recording, release to send' : 'Hold to record a voice message'}
             >

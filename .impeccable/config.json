@@ -26,6 +26,18 @@
         "value": "tapbounce",
         "createdAt": "2026-08-16T20:18:24.789Z",
         "reason": "False positive: detector matched the animation NAME containing 'Bounce', not the easing curve — actual timing-function is 'ease-in-out' (smooth opacity/scale pulse), not elastic/spring"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "bounce-in",
+        "createdAt": "2026-08-17T17:52:03.251Z",
+        "reason": "PRODUCT.md brand commitment: candy palette 'squish' identity, --spring token used deliberately for playful child-facing bounce animations, predates this session"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "createdAt": "2026-08-17T17:52:03.357Z",
+        "reason": "PRODUCT.md brand commitment: candy palette 'squish' identity, --spring token used deliberately for playful child-facing bounce animations, predates this session"
       }
     ]
   }

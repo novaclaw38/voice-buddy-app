@@ -1,7 +1,7 @@
 .savedFlash {
   font-size: 0.8rem;
   font-weight: 800;
-  color: #15803d;
+  color: var(--parent-green-text);
   background: #dcfbe9;
   padding: 4px 10px;
   border-radius: var(--r-pill);

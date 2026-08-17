@@ -26,6 +26,7 @@ const TAB_GROUPS = [
   { label: 'Connect',  tabs: ['Messages', 'Camera', 'History', 'Print'] },
   { label: 'Billing',  tabs: ['Subscription', 'Account'] },
 ]
+const ALL_TABS = TAB_GROUPS.flatMap((g) => g.tabs)
 
 // ParentPage is the shell: it owns only what's genuinely shared across 2+
 // tabs — settings (Settings writes it, Learning/Print read childName),
@@ -115,19 +116,32 @@ export default function ParentPage({ session }) {
 
       {/* Tabs */}
       <div className={styles.tabsScroller}>
-        <div className={styles.tabs} role="tablist">
+        <div
+          className={styles.tabs}
+          role="tablist"
+          onKeyDown={(e) => {
+            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+            const i = ALL_TABS.indexOf(tab)
+            const next = e.key === 'ArrowRight' ? (i + 1) % ALL_TABS.length : (i - 1 + ALL_TABS.length) % ALL_TABS.length
+            setTab(ALL_TABS[next])
+            e.currentTarget.querySelector(`#tab-${ALL_TABS[next]}`)?.focus()
+          }}
+        >
           {TAB_GROUPS.map((group, gi) => (
             <Fragment key={group.label}>
               <div className={styles.tabGroup}>
                 <span className={styles.tabGroupLabel} aria-hidden="true">{group.label}</span>
-                <div className={styles.tabGroupButtons}>
+                <div className={styles.tabGroupButtons} role="group" aria-label={group.label}>
                   {group.tabs.map((t) => (
                     <button
                       key={t}
+                      id={`tab-${t}`}
                       className={`${styles.tab} ${tab === t ? styles.activeTab : ''}`}
                       onClick={() => setTab(t)}
                       role="tab"
                       aria-selected={tab === t}
+                      aria-controls={`tabpanel-${t}`}
+                      tabIndex={tab === t ? 0 : -1}
                     >
                       {t}
                     </button>
@@ -141,7 +155,7 @@ export default function ParentPage({ session }) {
       </div>
 
       {/* Tab content — each tab mounts only while active */}
-      <div className={styles.content}>
+      <div className={styles.content} role="tabpanel" id={`tabpanel-${tab}`} aria-labelledby={`tab-${tab}`} tabIndex={-1}>
         {tab === 'Children' && (
           <ChildrenManager
             session={session}
