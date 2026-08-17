@@ -8,6 +8,7 @@ import NormalScreen from '../components/childScreens/NormalScreen.jsx'
 import VoiceOnlyScreen from '../components/childScreens/VoiceOnlyScreen.jsx'
 import GoalReachedScreen from '../components/childScreens/GoalReachedScreen.jsx'
 import { useSpeech } from '../hooks/useSpeech.js'
+import { usePendingAsk } from '../hooks/usePendingAsk.js'
 import { useChat } from '../hooks/useChat.js'
 import { useTimeOfDay } from '../hooks/useTimeOfDay.js'
 import { useSubscription } from '../hooks/useSubscription.jsx'
@@ -107,9 +108,11 @@ export default function ChildPage({ session }) {
   const [showActivity, setShowActivity] = useState(() => !hasGreetedFully && !isDailyActivityDismissed())
   const dailyActivity = getDailyActivity()
   const [parentMessage, setParentMessage] = useState(null)
-  // null = nothing pending; 'ask' = Buddy is asking whether to hear it;
-  // 'playing' = child said yes and the recording is playing/played.
-  const [msgPhase, setMsgPhase] = useState(null)
+  // 'playing' = child said yes and the recording is playing/played; the
+  // 'ask' half of the phase lives in msgAsk (usePendingAsk) below, combined
+  // into one msgPhase value for ParentMessageOverlay further down.
+  const [playingMessage, setPlayingMessage] = useState(false)
+  const msgAsk = usePendingAsk({ speech, setBuddyText, setUiStatus })
   const parentAudioRef = useRef(null)
 
   // ── Screen-time limit (Pro) ──────────────────────────────────────────
@@ -226,7 +229,7 @@ export default function ChildPage({ session }) {
         }, async (payload) => {
           // Fetch full row (audio_data too large for realtime payload)
           const msg = await fetchMessageById(payload.new.id).catch(() => null)
-          if (msg) { setParentMessage(msg); setMsgPhase('ask') }
+          if (msg) setParentMessage(msg)
         })
         .subscribe()
     })
@@ -242,36 +245,34 @@ export default function ChildPage({ session }) {
       if (!row) return
       return fetchMessageById(row.id)
     }).then((msg) => {
-      if (msg) { setParentMessage(msg); setMsgPhase('ask') }
+      if (msg) setParentMessage(msg)
     }).catch(() => {})
   }, [])
 
   // Buddy announces the message and asks whether to hear it, then listens
-  // for a yes/no — the recording never auto-plays without asking first.
-  // Guarded against the wind-down/free-limit screens (added alongside the
-  // Candidate B split): neither renders any overlay for this, so without
-  // the guard Buddy would speak and listen for a message no screen could
-  // show — audio with no visual, on a "time for a break" screen.
+  // for a yes/no — the recording never auto-plays without asking first
+  // (usePendingAsk owns the speak/listen/branch mechanics). Guarded against
+  // the wind-down/free-limit screens (added alongside the Candidate B
+  // split): neither renders any overlay for this, so without the guard
+  // Buddy would speak and listen for a message no screen could show — audio
+  // with no visual, on a "time for a break" screen.
+  //
+  // promptedMessageIdRef (not msgAsk.phase) drives the "already asked"
+  // check: gating on phase directly would re-trigger the instant a decline
+  // resets phase to null while parentMessage is still set — the same loop
+  // Candidate D's review caught and fixed on the story-request flow below.
+  // The ref means each message is auto-offered exactly once; the envelope
+  // button (onShowMessage) re-asks about the same message deliberately, by
+  // calling msgAsk.ask directly instead of going through this effect.
+  const MSG_ASK_PROMPT = "You have a message from your parent! Do you want to hear it?"
+  const promptedMessageIdRef = useRef(null)
   useEffect(() => {
-    if (msgPhase !== 'ask' || !parentMessage || showWindDown || showFreeLimit) return
-    speech.stopListening()
-    const prompt = "You have a message from your parent! Do you want to hear it?"
-    setBuddyText(prompt)
-    setUiStatus('speaking')
-    speech.speak(prompt, () => {
-      if (!speech.supported.stt) { setUiStatus('idle'); return } // wait for the tap-buttons instead
-      setUiStatus('listening')
-      speech.startListening((transcript) => {
-        setUiStatus('idle')
-        if (/\b(yes|yeah|yep|sure|please|ok|okay)\b/i.test(transcript)) {
-          playParentMessageNow()
-        } else {
-          setMsgPhase(null)
-          setBuddyText('')
-        }
-      })
-    })
-  }, [msgPhase, showWindDown, showFreeLimit]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!parentMessage || playingMessage || msgAsk.phase === 'ask' || showWindDown || showFreeLimit) return
+    if (promptedMessageIdRef.current === parentMessage.id) return
+    promptedMessageIdRef.current = parentMessage.id
+    msgAsk.ask(MSG_ASK_PROMPT, playParentMessageNow)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parentMessage, playingMessage, msgAsk.phase, showWindDown, showFreeLimit])
 
   const playParentMessageNow = () => {
     if (!parentMessage) return
@@ -282,13 +283,7 @@ export default function ChildPage({ session }) {
     audio.onended = () => { parentAudioRef.current = null }
     audio.onerror = () => { parentAudioRef.current = null }
     audio.play().catch(() => {})
-    setMsgPhase('playing')
-  }
-
-  const declineParentMessage = () => {
-    speech.stopListening()
-    setMsgPhase(null)
-    setBuddyText('')
+    setPlayingMessage(true)
   }
 
   const dismissParentMessage = () => {
@@ -296,7 +291,7 @@ export default function ChildPage({ session }) {
     parentAudioRef.current = null
     if (parentMessage) markPlayed(parentMessage.id).catch(() => {})
     setParentMessage(null)
-    setMsgPhase(null)
+    setPlayingMessage(false)
   }
 
   const replayParentMessage = () => {
@@ -333,45 +328,32 @@ export default function ChildPage({ session }) {
   // next session, ask-first like parent voice messages — it never just
   // launches into a story unprompted.
   const [storyRequest, setStoryRequest] = useState(null)
-  const [storyPhase, setStoryPhase] = useState(null) // null | 'ask'
+  const storyAsk = usePendingAsk({ speech, setBuddyText, setUiStatus })
 
   useEffect(() => {
     fetchLatestUndelivered().then((row) => { if (row) setStoryRequest(row) }).catch(() => {})
   }, [])
 
-  // Wait until nothing else (parent message, onboarding, PIN, wind-down/
-  // free-limit — same reasoning as the parent-message guard above) is
-  // competing for Buddy's voice before offering the story.
+  // Wait until nothing else (parent message ask or playback, onboarding,
+  // PIN, wind-down/free-limit — same reasoning as the parent-message guard
+  // above) is competing for Buddy's voice before offering the story.
+  //
+  // Unlike the message flow's promptedMessageIdRef, gating directly on
+  // storyAsk.phase here is safe: storyAsk's onNo (below) clears
+  // storyRequest itself on decline, so this effect's own `!storyRequest`
+  // check stops it from re-firing — no separate ref needed. (A pre-refactor
+  // version of this effect declined without clearing storyRequest, which
+  // did loop; that was a real bug this review surfaced and fixed.)
   useEffect(() => {
-    if (!storyRequest || storyPhase === 'ask' || msgPhase || showPicker || showPin || showWindDown || showFreeLimit) return
-    setStoryPhase('ask')
-  }, [storyRequest, msgPhase, showPicker, showPin, showWindDown, showFreeLimit, storyPhase])
-
-  useEffect(() => {
-    if (storyPhase !== 'ask' || !storyRequest) return
-    speech.stopListening()
-    const prompt = 'Guess what? Someone left you a story idea! Want to hear it?'
-    setBuddyText(prompt)
-    setUiStatus('speaking')
-    speech.speak(prompt, () => {
-      if (!speech.supported.stt) { setUiStatus('idle'); return } // wait for tap-buttons instead
-      setUiStatus('listening')
-      speech.startListening((transcript) => {
-        setUiStatus('idle')
-        if (/\b(yes|yeah|yep|sure|please|ok|okay)\b/i.test(transcript)) {
-          playStoryRequestNow()
-        } else {
-          declineStoryRequest()
-        }
-      })
-    })
-  }, [storyPhase]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!storyRequest || storyAsk.phase === 'ask' || msgAsk.phase === 'ask' || playingMessage || showPicker || showPin || showWindDown || showFreeLimit) return
+    storyAsk.ask('Guess what? Someone left you a story idea! Want to hear it?', playStoryRequestNow, () => setStoryRequest(null))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storyRequest, msgAsk.phase, playingMessage, showPicker, showPin, showWindDown, showFreeLimit, storyAsk.phase])
 
   const playStoryRequestNow = async () => {
     if (!storyRequest) return
     speech.stopSpeaking()
     speech.stopListening()
-    setStoryPhase(null)
     setUiStatus('thinking')
     const reply = await chat.sendMessage(`Tell me a story about: ${storyRequest.prompt_text}`, 'chat')
     setBuddyText(reply)
@@ -379,12 +361,6 @@ export default function ChildPage({ session }) {
     speech.speak(reply, () => { setUiStatus('idle'); scheduleBubbleClear() })
     markStoryDelivered(storyRequest.id).catch(() => {})
     setStoryRequest(null)
-  }
-
-  const declineStoryRequest = () => {
-    speech.stopListening()
-    setStoryPhase(null)
-    setBuddyText('')
   }
 
   // Boot greeting — Buddy announces the daily activity by voice instead of
@@ -414,7 +390,7 @@ export default function ChildPage({ session }) {
   // Idle nudge — Buddy doesn't just wait silently forever for a tap; after
   // a stretch of quiet he proactively invites the child to do something.
   useEffect(() => {
-    if (uiStatus !== 'idle' || showPin || showPicker || msgPhase || chat.mode !== 'chat') return
+    if (uiStatus !== 'idle' || showPin || showPicker || msgAsk.phase === 'ask' || playingMessage || chat.mode !== 'chat') return
     const id = setTimeout(() => {
       const nudge = pickRandomDistinct(IDLE_NUDGES, idleNudgeIndex)(childName)
       setBuddyText(nudge)
@@ -425,7 +401,7 @@ export default function ChildPage({ session }) {
       })
     }, IDLE_NUDGE_MS)
     return () => clearTimeout(id)
-  }, [uiStatus, showPin, showPicker, msgPhase, chat.mode, childName, speech, scheduleBubbleClear])
+  }, [uiStatus, showPin, showPicker, msgAsk.phase, playingMessage, chat.mode, childName, speech, scheduleBubbleClear])
 
   const handleStartSing = useCallback(() => {
     cancelBubbleClear()
@@ -608,13 +584,13 @@ export default function ChildPage({ session }) {
         userText={userText}
         cameraOn={cameraOn}
         parentMessage={parentMessage}
-        onShowMessage={() => setMsgPhase('ask')}
+        onShowMessage={() => msgAsk.ask(MSG_ASK_PROMPT, playParentMessageNow)}
         showActivity={showActivity}
         dailyActivity={dailyActivity}
         onDismissActivity={handleDismissActivity}
-        storyPhase={storyPhase}
-        onPlayStory={playStoryRequestNow}
-        onDeclineStory={declineStoryRequest}
+        storyPhase={storyAsk.phase}
+        onPlayStory={storyAsk.accept}
+        onDeclineStory={storyAsk.decline}
         onExitMode={handleExitMode}
         onStartSing={handleStartSing}
         onStartStory={handleStartStory}
@@ -629,11 +605,12 @@ export default function ChildPage({ session }) {
   // screen) — NormalScreen has its own inline envelope button in its top
   // bar (showEnvelope=false below), VoiceOnlyScreen and sing mode get the
   // shared floating envelope, and the wind-down/free-limit screens simply
-  // never see msgPhase !== null thanks to the guard above.
+  // never see msgOverlayPhase !== null thanks to the guard above.
+  const msgOverlayPhase = msgAsk.phase === 'ask' ? 'ask' : (playingMessage ? 'playing' : null)
   const envelopeConfig = chat.mode === 'sing'
     ? { envelopeClass: styles.envelopeFloat }
     : voiceOnly
-      ? { envelopeClass: styles.envelopeBtn, onEnvelopeClick: () => setMsgPhase('ask') }
+      ? { envelopeClass: styles.envelopeBtn, onEnvelopeClick: () => msgAsk.ask(MSG_ASK_PROMPT, playParentMessageNow) }
       : { showEnvelope: false }
 
   return (
@@ -641,10 +618,10 @@ export default function ChildPage({ session }) {
       {screen}
 
       <ParentMessageOverlay
-        msgPhase={msgPhase}
+        msgPhase={msgOverlayPhase}
         {...envelopeConfig}
-        onYes={playParentMessageNow}
-        onNo={declineParentMessage}
+        onYes={msgAsk.accept}
+        onNo={msgAsk.decline}
         onReplay={replayParentMessage}
         onDismiss={dismissParentMessage}
       />
