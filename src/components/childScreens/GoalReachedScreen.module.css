@@ -1,0 +1,53 @@
+.windDownPage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 32px;
+  text-align: center;
+  background: linear-gradient(165deg, #1a1430 0%, #302352 55%, #4a3670 100%);
+  animation: calmSettle 0.6s ease both;
+}
+
+@keyframes calmSettle {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.windDownTitle {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 8px;
+}
+
+.windDownSub {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.95rem;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.windDownUnlock {
+  margin-top: 14px;
+  padding: 12px 22px;
+  min-height: 44px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--r-pill);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.windDownUnlock:active { transform: scale(0.96); }
+
+.pinDismiss {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: transparent;
+}

@@ -1,15 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import useFocusTrap from '../hooks/useFocusTrap.js'
 import { useNavigate } from 'react-router-dom'
-import BuddyAvatar from '../components/BuddyAvatar.jsx'
-import SpeechBubble from '../components/SpeechBubble.jsx'
-import VoiceButton from '../components/VoiceButton.jsx'
-import BuddyMenu from '../components/BuddyMenu.jsx'
+import useFocusTrap from '../hooks/useFocusTrap.js'
 import ParentPin from '../components/ParentPin.jsx'
 import AvatarPicker from '../components/AvatarPicker.jsx'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
-import WorldBackdrop from '../components/WorldBackdrop.jsx'
-import Clock from '../components/Clock.jsx'
+import NormalScreen from '../components/childScreens/NormalScreen.jsx'
+import VoiceOnlyScreen from '../components/childScreens/VoiceOnlyScreen.jsx'
+import GoalReachedScreen from '../components/childScreens/GoalReachedScreen.jsx'
 import { useSpeech } from '../hooks/useSpeech.js'
 import { useChat } from '../hooks/useChat.js'
 import { useTimeOfDay } from '../hooks/useTimeOfDay.js'
@@ -24,13 +21,11 @@ import { fetchMessageById, markPlayed, fetchLatestUnplayed } from '../services/m
 import { fetchLatestUndelivered, markStoryDelivered } from '../services/storyRequestService.js'
 import { startAsChild } from '../services/cameraSignal.js'
 import SingAlong from '../components/SingAlong.jsx'
-import DailyActivity from '../components/DailyActivity.jsx'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
-import SkipLink from '../components/SkipLink.jsx'
 import { getModeVoice } from '../utils/modeVoice.js'
 import { pickRandomDistinct } from '../utils/prompts.js'
 import styles from './ChildPage.module.css'
-import { IconMail, IconCamera, IconPlay, IconMusic, IconBook, IconPalette, IconGear, IconSparkle } from '../components/icons.jsx'
+import { IconMail, IconPlay } from '../components/icons.jsx'
 
 const WELCOME_BACK = [
   (childName, buddyName) => `Hey ${childName}, I'm back! What do you want to do now?`,
@@ -68,6 +63,19 @@ let hasGreetedFully = false
 const welcomeBackIndex = { current: -1 }
 const idleNudgeIndex = { current: -1 }
 
+// ChildPage is the shell: it owns everything that must survive a screen
+// switch — camera check-in signaling, the parent-message and story-request
+// realtime listeners, settings/onboarding, screen-time ticking, boot
+// greeting, idle nudge — and renders exactly one of five screens
+// (NormalScreen, VoiceOnlyScreen, GoalReachedScreen x2 variants, or
+// SingAlong) based on current state. None of those cross-cutting effects
+// live inside a screen component, because a screen can unmount (e.g. the
+// child hits the wind-down screen) while the shell — and the camera/
+// message connections it owns — needs to keep running.
+//
+// See the 2026-08-17 architecture review (Candidate B) for the full
+// before/after: this used to be one 988-line component with five early
+// returns, all sharing hooks declared unconditionally above them.
 export default function ChildPage({ session }) {
   const navigate = useNavigate()
   const [settings, setSettings] = useState(() => getSettings())
@@ -96,8 +104,6 @@ export default function ChildPage({ session }) {
   const { partOfDay } = useTimeOfDay()
   const { isPro } = useSubscription()
   const liveKitVoice = useLiveKitAvatarVoice()
-  const [wordIndex, setWordIndex] = useState(-1)
-  const rafRef = useRef(null)
   const [showActivity, setShowActivity] = useState(() => !hasGreetedFully && !isDailyActivityDismissed())
   const dailyActivity = getDailyActivity()
   const [parentMessage, setParentMessage] = useState(null)
@@ -113,9 +119,7 @@ export default function ChildPage({ session }) {
   const dailyLimit = isPro ? (settings.dailyLimitMinutes || 0) : 0
   const [minutesUsed, setMinutesUsed] = useState(() => getTodayMinutesUsed(getActiveChildId()))
   const [showWindDown, setShowWindDown] = useState(false)
-  const [showWindDownPin, setShowWindDownPin] = useState(false)
   const [showFreeLimit, setShowFreeLimit] = useState(false)
-  const [showFreeLimitPin, setShowFreeLimitPin] = useState(false)
   const warnedRef = useRef(false)
 
   useEffect(() => {
@@ -141,7 +145,6 @@ export default function ChildPage({ session }) {
     setMinutesUsed(0)
     warnedRef.current = false
     setShowWindDown(false)
-    setShowWindDownPin(false)
   }
   // Timer ref for clearing bubble text after speech ends
   const bubbleClearRef = useRef(null)
@@ -185,7 +188,9 @@ export default function ChildPage({ session }) {
   // Camera streaming — listen for parent check-in requests. Protocol lives
   // in services/cameraSignal.js; this page only maps status to the
   // indicator dot ('error' collapses to off, same as 'idle' — a young
-  // child shouldn't see a camera-error message).
+  // child shouldn't see a camera-error message). Lives in the shell, not
+  // NormalScreen, so a parent can still check the camera while the child
+  // is on the wind-down/voice-only/sing screen.
   const [cameraOn, setCameraOn] = useState(false)
 
   useEffect(() => {
@@ -243,8 +248,12 @@ export default function ChildPage({ session }) {
 
   // Buddy announces the message and asks whether to hear it, then listens
   // for a yes/no — the recording never auto-plays without asking first.
+  // Guarded against the wind-down/free-limit screens (added alongside the
+  // Candidate B split): neither renders any overlay for this, so without
+  // the guard Buddy would speak and listen for a message no screen could
+  // show — audio with no visual, on a "time for a break" screen.
   useEffect(() => {
-    if (msgPhase !== 'ask' || !parentMessage) return
+    if (msgPhase !== 'ask' || !parentMessage || showWindDown || showFreeLimit) return
     speech.stopListening()
     const prompt = "You have a message from your parent! Do you want to hear it?"
     setBuddyText(prompt)
@@ -262,7 +271,7 @@ export default function ChildPage({ session }) {
         }
       })
     })
-  }, [msgPhase]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [msgPhase, showWindDown, showFreeLimit]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const playParentMessageNow = () => {
     if (!parentMessage) return
@@ -325,18 +334,18 @@ export default function ChildPage({ session }) {
   // launches into a story unprompted.
   const [storyRequest, setStoryRequest] = useState(null)
   const [storyPhase, setStoryPhase] = useState(null) // null | 'ask'
-  const storyTrapRef = useRef(null)
 
   useEffect(() => {
     fetchLatestUndelivered().then((row) => { if (row) setStoryRequest(row) }).catch(() => {})
   }, [])
 
-  // Wait until nothing else (parent message, onboarding, PIN) is competing
-  // for Buddy's voice before offering the story.
+  // Wait until nothing else (parent message, onboarding, PIN, wind-down/
+  // free-limit — same reasoning as the parent-message guard above) is
+  // competing for Buddy's voice before offering the story.
   useEffect(() => {
-    if (!storyRequest || storyPhase === 'ask' || msgPhase || showPicker || showPin) return
+    if (!storyRequest || storyPhase === 'ask' || msgPhase || showPicker || showPin || showWindDown || showFreeLimit) return
     setStoryPhase('ask')
-  }, [storyRequest, msgPhase, showPicker, showPin, storyPhase])
+  }, [storyRequest, msgPhase, showPicker, showPin, showWindDown, showFreeLimit, storyPhase])
 
   useEffect(() => {
     if (storyPhase !== 'ask' || !storyRequest) return
@@ -378,8 +387,6 @@ export default function ChildPage({ session }) {
     setBuddyText('')
   }
 
-  useFocusTrap(storyTrapRef, storyPhase === 'ask', declineStoryRequest)
-
   // Boot greeting — Buddy announces the daily activity by voice instead of
   // it sitting in a persistent card; the card itself hides the moment he's
   // done speaking it. Only the first mount this session gets the full
@@ -419,45 +426,6 @@ export default function ChildPage({ session }) {
     }, IDLE_NUDGE_MS)
     return () => clearTimeout(id)
   }, [uiStatus, showPin, showPicker, msgPhase, chat.mode, childName, speech, scheduleBubbleClear])
-
-  // Sing mode plays real recordings inside <SingAlong>; no separate
-  // background track here (the old Pixabay loop hot-link-404'd anyway).
-
-  // Word-by-word karaoke tracker (bouncing dot + colour highlight) — active
-  // for every reply Buddy speaks, not just special modes.
-  useEffect(() => {
-    if (uiStatus !== 'speaking' || !buddyText) {
-      setWordIndex(-1)
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-      return
-    }
-    const words = buddyText.trim().split(/\s+/).filter(Boolean)
-    if (!words.length) return
-    // Char-proportion: words with more characters get proportionally more time
-    const totalChars = words.reduce((s, w) => s + w.length, 0)
-    const tick = () => {
-      const audio = speech.audioRef.current
-      if (audio && audio.duration > 0) {
-        const charPos = Math.min(audio.currentTime / audio.duration, 1) * totalChars
-        let cumChars = 0
-        let idx = words.length - 1
-        for (let i = 0; i < words.length; i++) {
-          cumChars += words[i].length
-          if (charPos <= cumChars) { idx = i; break }
-        }
-        setWordIndex(idx)
-      } else if (speech.boundaryWordRef.current >= 0) {
-        setWordIndex(Math.min(speech.boundaryWordRef.current, words.length - 1))
-      }
-      rafRef.current = requestAnimationFrame(tick)
-    }
-    rafRef.current = requestAnimationFrame(tick)
-    return () => {
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-      setWordIndex(-1)
-    }
-  }, [uiStatus, buddyText]) // eslint-disable-line react-hooks/exhaustive-deps
-
 
   const handleStartSing = useCallback(() => {
     cancelBubbleClear()
@@ -558,273 +526,128 @@ export default function ChildPage({ session }) {
     navigate('/parent')
   }
 
-  // Screen-time limit reached — a calm goodnight screen, not a hard wall.
-  // A grown-up can unlock the rest of today with the same parent PIN used
-  // everywhere else in the app.
-  if (showWindDown) {
-    return (
-      <div className={styles.windDownPage}>
-        <BuddyAvatar status="idle" avatarColor={settings.avatarColor} type={avatarType} costume={settings.costume} size={150} live={false} />
-        <h1 className={styles.windDownTitle}>Great playing today, {childName}!</h1>
-        <p className={styles.windDownSub}>Time for a little break. {buddyName} will be right here when you're back!</p>
-        <button className={styles.windDownUnlock} onClick={() => setShowWindDownPin(true)}>
-          Ask a grown-up for more time
-        </button>
-        {showWindDownPin && (
-          <>
-            <ParentPin correctPinHash={settings.parentPinHash} onCreate={handlePinCreate} onSuccess={handleWindDownUnlock} />
-            <button className={styles.pinDismiss} onClick={() => setShowWindDownPin(false)} aria-label="Cancel" />
-          </>
-        )}
-      </div>
-    )
-  }
-
-  // Free-tier daily chat limit reached — same calm, non-blocking pattern as
-  // the screen-time wind-down above, but the only real "unlock" here is
-  // upgrading, so a grown-up's PIN routes to the Parent Dashboard with the
-  // upgrade prompt already open instead of just granting more time.
-  if (showFreeLimit) {
-    return (
-      <>
-        <SkipLink />
-        <main className={styles.windDownPage} id="main">
-        <BuddyAvatar status="idle" avatarColor={settings.avatarColor} type={avatarType} costume={settings.costume} size={150} live={false} />
-        <h1 className={styles.windDownTitle}>Great chatting today, {childName}!</h1>
-        <p className={styles.windDownSub}>{buddyName} needs a little rest from today's free chats. Ask a grown-up to unlock unlimited chatting!</p>
-        <button className={styles.windDownUnlock} onClick={() => setShowFreeLimitPin(true)}>
-          Ask a grown-up
-        </button>
-        {showFreeLimitPin && (
-          <>
-            <ParentPin
-              correctPinHash={settings.parentPinHash}
-              onCreate={handlePinCreate}
-              onSuccess={() => {
-                setShowFreeLimit(false)
-                setShowFreeLimitPin(false)
-                navigate('/parent', { state: { openUpgrade: 'freeLimit' } })
-              }}
-            />
-            <button className={styles.pinDismiss} onClick={() => setShowFreeLimitPin(false)} aria-label="Cancel" />
-          </>
-        )}
-      </main>
-      </>
-    )
-  }
-
   const voiceOnly = settings.voiceOnly || false
 
-  if (voiceOnly) {
-    return (
-      <>
-        <SkipLink />
-        <main className={styles.voicePage} id="main">
-        <div className={styles.voiceMenuWrap}>
-          <BuddyMenu
-            variant="dark"
-            onSongs={handleStartSing}
-            onLearn={() => navigate('/courses')}
-            onCustomize={() => setShowPicker(true)}
-            onSettings={() => setShowPin(true)}
-          />
-        </div>
-
-        <div className={`${styles.voiceOrb} ${styles[`orb_${uiStatus}`]}`} />
-        <p className={styles.voiceBuddyText}>{buddyText}</p>
-        {userText ? <p className={styles.voiceUserText}>You: {userText}</p> : null}
-
-        <VoiceButton status={uiStatus} onPress={handleVoicePress} buddyName={buddyName} />
-
-        {showPin && (
-          <>
-            <ParentPin correctPinHash={settings.parentPinHash} onCreate={handlePinCreate} onSuccess={handlePinSuccess} />
-            <button className={styles.pinDismiss} onClick={() => setShowPin(false)} aria-label="Cancel" />
-          </>
-        )}
-
-        <ParentMessageOverlay
-          msgPhase={msgPhase}
-          envelopeClass={styles.envelopeBtn}
-          onEnvelopeClick={() => setMsgPhase('ask')}
-          onYes={playParentMessageNow}
-          onNo={declineParentMessage}
-          onReplay={replayParentMessage}
-          onDismiss={dismissParentMessage}
-        />
-      </main>
-      </>
+  // ── Screen selection ──────────────────────────────────────────────
+  // Precedence matches the original early-return order: a limit screen
+  // always wins over voice-only/sing/normal.
+  let screen
+  if (showWindDown) {
+    screen = (
+      <GoalReachedScreen
+        variant="windDown"
+        childName={childName}
+        buddyName={buddyName}
+        avatarColor={settings.avatarColor}
+        avatarType={avatarType}
+        costume={settings.costume}
+        parentPinHash={settings.parentPinHash}
+        onCreatePin={handlePinCreate}
+        onUnlock={handleWindDownUnlock}
+      />
+    )
+  } else if (showFreeLimit) {
+    screen = (
+      <GoalReachedScreen
+        variant="freeLimit"
+        childName={childName}
+        buddyName={buddyName}
+        avatarColor={settings.avatarColor}
+        avatarType={avatarType}
+        costume={settings.costume}
+        parentPinHash={settings.parentPinHash}
+        onCreatePin={handlePinCreate}
+        onUnlock={() => {
+          setShowFreeLimit(false)
+          navigate('/parent', { state: { openUpgrade: 'freeLimit' } })
+        }}
+      />
+    )
+  } else if (voiceOnly) {
+    screen = (
+      <VoiceOnlyScreen
+        uiStatus={uiStatus}
+        buddyText={buddyText}
+        userText={userText}
+        buddyName={buddyName}
+        onVoicePress={handleVoicePress}
+        onStartSing={handleStartSing}
+        onCustomize={() => setShowPicker(true)}
+        onShowPin={() => setShowPin(true)}
+      />
+    )
+  } else if (chat.mode === 'sing') {
+    screen = (
+      <SingAlong
+        avatarColor={settings.avatarColor}
+        avatarType={avatarType}
+        costume={settings.costume}
+        onExit={() => {
+          cancelBubbleClear()
+          const intro = chat.switchMode('chat')
+          setBuddyText(intro)
+          setUserText('')
+          setUiStatus('speaking')
+          speech.speak(intro, () => {
+            setUiStatus('idle')
+            scheduleBubbleClear()
+          })
+        }}
+      />
+    )
+  } else {
+    screen = (
+      <NormalScreen
+        settings={settings}
+        buddyName={buddyName}
+        chatMode={chat.mode}
+        partOfDay={partOfDay}
+        speech={speech}
+        uiStatus={uiStatus}
+        buddyText={buddyText}
+        userText={userText}
+        cameraOn={cameraOn}
+        parentMessage={parentMessage}
+        onShowMessage={() => setMsgPhase('ask')}
+        showActivity={showActivity}
+        dailyActivity={dailyActivity}
+        onDismissActivity={handleDismissActivity}
+        storyPhase={storyPhase}
+        onPlayStory={playStoryRequestNow}
+        onDeclineStory={declineStoryRequest}
+        onExitMode={handleExitMode}
+        onStartSing={handleStartSing}
+        onStartStory={handleStartStory}
+        onVoicePress={handleVoicePress}
+        onShowPicker={() => setShowPicker(true)}
+        onShowPin={() => setShowPin(true)}
+      />
     )
   }
 
-  // Sing mode renders its own full-screen overlay
-  if (chat.mode === 'sing') {
-    return (
-      <>
-        <SingAlong
-          avatarColor={settings.avatarColor}
-          avatarType={avatarType}
-          costume={settings.costume}
-          onExit={() => {
-            cancelBubbleClear()
-            const intro = chat.switchMode('chat')
-            setBuddyText(intro)
-            setUserText('')
-            setUiStatus('speaking')
-            speech.speak(intro, () => {
-              setUiStatus('idle')
-              scheduleBubbleClear()
-            })
-          }}
-        />
-        <ParentMessageOverlay
-          msgPhase={msgPhase}
-          envelopeClass={styles.envelopeFloat}
-          onEnvelopeClick={() => setMsgPhase('ask')}
-          onYes={playParentMessageNow}
-          onNo={declineParentMessage}
-          onReplay={replayParentMessage}
-          onDismiss={dismissParentMessage}
-        />
-      </>
-    )
-  }
-
-  const isDarkRealm = partOfDay === 'evening' || partOfDay === 'night'
+  // Parent-message ask/playing overlay is rendered once here (not per
+  // screen) — NormalScreen has its own inline envelope button in its top
+  // bar (showEnvelope=false below), VoiceOnlyScreen and sing mode get the
+  // shared floating envelope, and the wind-down/free-limit screens simply
+  // never see msgPhase !== null thanks to the guard above.
+  const envelopeConfig = chat.mode === 'sing'
+    ? { envelopeClass: styles.envelopeFloat }
+    : voiceOnly
+      ? { envelopeClass: styles.envelopeBtn, onEnvelopeClick: () => setMsgPhase('ask') }
+      : { showEnvelope: false }
 
   return (
     <>
-      <SkipLink />
-      <div className={`${styles.page} ${isDarkRealm ? styles.darkRealm : ''} ${styles[`realmTint${partOfDay.charAt(0).toUpperCase() + partOfDay.slice(1)}`]}`}>
-      <main id="main">
-      <h1 className={styles.visuallyHidden}>Chat with {buddyName}</h1>
-      <WorldBackdrop mode={chat.mode} />
-      {/* Ground plane and floating sky decorations — paper planes, kites,
-          butterflies, bubbles that drift across the sky above Buddy. */}
-      <div className={styles.ground} />
-      <div className={styles.skyDeco}>
-        <span className={styles.sdB1}>✈️</span>
-        <span className={styles.sdP1}>🎈</span>
-        <span className={styles.sdP2}>🦋</span>
-        <span className={styles.sdB2}>✈️</span>
-        <span className={styles.sdS1}>⭐</span>
-        <span className={styles.sdP3}>🎈</span>
-        <span className={styles.sdB3}>🦋</span>
-        <span className={styles.sdP4}>✈️</span>
-        <span className={styles.sdS2}>⭐</span>
-        <span className={styles.sdP5}>🎈</span>
-      </div>
+      {screen}
 
-      {/* Daily activity — Buddy announces it by voice on boot; this card
-          just echoes it briefly, then fades once he's done speaking. */}
-      <div className={`${styles.activityFloat} ${showActivity && chat.mode === 'chat' ? styles.activityVisible : ''}`}>
-        <DailyActivity activity={dailyActivity} onDismiss={handleDismissActivity} />
-      </div>
-
-      {/* Layout: stacks vertically on phones (mode tiles at bottom), becomes
-          a main-content + left-sidebar pair on tablet/desktop (>=768px) so
-          the mode tiles don't look stranded at the bottom of a wide screen. */}
-      <div className={styles.layout}>
-        <div className={styles.mainColumn}>
-          {/* Top bar */}
-          <div className={styles.topBar}>
-            <div className={styles.topBarLeft}>
-              {chat.mode !== 'chat' && (
-                <button
-                  className={styles.modeLabel}
-                  onClick={handleExitMode}
-                  aria-label={`Leave ${chat.mode} mode`}
-                >
-                  {chat.mode} mode ✕
-                </button>
-              )}
-              <Clock
-                className={styles.clockBadge}
-                partOfDay={partOfDay}
-                onSpeak={(time) => speech.speak(`It's ${time}!`)}
-              />
-            </div>
-            <div className={styles.topBarRight}>
-              {parentMessage && (
-                <button
-                  className={styles.envelopeBtn}
-                  onClick={() => setMsgPhase('ask')}
-                  aria-label="Message from your parent, tap to hear it"
-                  title="Message from your parent!"
-                >
-                  <IconMail size={22} />
-                </button>
-              )}
-              {cameraOn && <span className={styles.cameraIndicator} title="Camera on" aria-label="Camera on"><IconCamera size={18} /></span>}
-            </div>
-          </div>
-
-          {/* Avatar */}
-          <div className={`${styles.avatarArea} ${showActivity && chat.mode === 'chat' ? styles.avatarAreaShifted : ''}`}>
-            {/* Rolling hills — gives Buddy a ground to stand on, right behind
-                his feet. Three translucent layers auto-tint to whichever
-                mode gradient is behind them, creating depth. Opacity raised
-                from the original 0.14-0.38 so this still reads as ground
-                against a busy illustrated photo backdrop, not just a flat
-                CSS gradient sky. */}
-            <svg className={styles.hills} viewBox="0 0 375 72" preserveAspectRatio="none" aria-hidden="true">
-              <path d="M0 50 Q60 12 140 33 T375 20 V72 H0 Z" fill="rgba(255,255,255,0.45)" />
-              <path d="M0 58 Q100 26 210 41 T375 34 V72 H0 Z" fill="rgba(255,255,255,0.65)" />
-              <path d="M0 64 Q80 42 160 52 T375 46 V72 H0 Z" fill="rgba(255,255,255,0.32)" />
-            </svg>
-            <p className={styles.buddyNameTag}>{buddyName}</p>
-            <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} costume={settings.costume} size={222} audioRef={speech.audioRef} partOfDay={partOfDay} />
-          </div>
-
-          {/* Speech bubble */}
-          <div className={styles.bubbleArea}>
-            <SpeechBubble
-              buddyText={buddyText}
-              userText={userText}
-              status={uiStatus}
-              wordIndex={wordIndex}
-            />
-          </div>
-
-          {/* Voice button + dock — replaces the old hamburger menu with big
-              tactile destinations a child can actually find and press. */}
-          <div className={styles.voiceArea}>
-            {!speech.supported.stt && (
-              <p className={styles.noMic}>
-                Voice not supported in this browser. Try Chrome!
-              </p>
-            )}
-            <nav className={styles.dock} aria-label="Navigation">
-            <div className={styles.dockSide}>
-                <button className={styles.dockBtn} onClick={handleStartSing}>
-                  <span className={`${styles.dockIcon} ${styles.dockPink}`}><IconMusic size={26} /></span>
-                  <span className={styles.dockLabel}>Songs</span>
-                </button>
-                <button className={styles.dockBtn} onClick={handleStartStory}>
-                  <span className={`${styles.dockIcon} ${styles.dockBerry}`}><IconSparkle size={26} /></span>
-                  <span className={styles.dockLabel}>Story</span>
-                </button>
-                <button className={styles.dockBtn} onClick={() => navigate('/courses')}>
-                  <span className={`${styles.dockIcon} ${styles.dockSky}`}><IconBook size={26} /></span>
-                  <span className={styles.dockLabel}>Learn</span>
-                </button>
-              </div>
-              <VoiceButton status={uiStatus} onPress={handleVoicePress} buddyName={buddyName} />
-              <div className={styles.dockSide}>
-                <button className={styles.dockBtn} onClick={() => setShowPicker(true)}>
-                  <span className={`${styles.dockIcon} ${styles.dockTangerine}`}><IconPalette size={26} /></span>
-                  <span className={styles.dockLabel}>My Buddy</span>
-                </button>
-                <button className={`${styles.dockBtn} ${styles.dockParent}`} onClick={() => setShowPin(true)}>
-                  <span className={`${styles.dockIcon} ${styles.dockGrape}`}><IconGear size={26} /></span>
-                  <span className={styles.dockLabel}>Parents</span>
-                </button>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </div>
+      <ParentMessageOverlay
+        msgPhase={msgPhase}
+        {...envelopeConfig}
+        onYes={playParentMessageNow}
+        onNo={declineParentMessage}
+        onReplay={replayParentMessage}
+        onDismiss={dismissParentMessage}
+      />
 
       {upgradeTrigger && (
         <UpgradePrompt
@@ -834,25 +657,27 @@ export default function ChildPage({ session }) {
         />
       )}
 
-      {/* PIN gate */}
-      {showPin && (
-        <ParentPin
-          correctPinHash={settings.parentPinHash}
-          onCreate={handlePinCreate}
-          onSuccess={handlePinSuccess}
-        />
+      {/* Parent-PIN gate — shared by NormalScreen and VoiceOnlyScreen,
+          which both navigate to /parent on success. GoalReachedScreen
+          manages its own separate PIN gate locally (different unlock
+          behavior), so it's excluded here via the showWindDown/
+          showFreeLimit check. */}
+      {showPin && !showWindDown && !showFreeLimit && (
+        <>
+          <ParentPin
+            correctPinHash={settings.parentPinHash}
+            onCreate={handlePinCreate}
+            onSuccess={handlePinSuccess}
+          />
+          <button
+            className={styles.pinDismiss}
+            onClick={() => setShowPin(false)}
+            aria-label="Cancel"
+          />
+        </>
       )}
 
-      {/* Tap anywhere on overlay to dismiss PIN */}
-      {showPin && (
-        <button
-          className={styles.pinDismiss}
-          onClick={() => setShowPin(false)}
-          aria-label="Cancel"
-        />
-      )}
-
-      {/* Avatar + name picker */}
+      {/* Avatar + name picker — shared by NormalScreen and VoiceOnlyScreen. */}
       {showPicker && (
         <AvatarPicker
           currentType={avatarType}
@@ -865,31 +690,6 @@ export default function ChildPage({ session }) {
           onClose={handlePickerClose}
         />
       )}
-
-      {/* Parent voice message: envelope already lives in the top bar above,
-          so this only renders the ask/playing bubble. */}
-      <ParentMessageOverlay
-        msgPhase={msgPhase}
-        showEnvelope={false}
-        onYes={playParentMessageNow}
-        onNo={declineParentMessage}
-        onReplay={replayParentMessage}
-        onDismiss={dismissParentMessage}
-      />
-
-      {/* Custom bedtime story request (Pro) — tap fallback for the spoken ask */}
-      {storyPhase === 'ask' && (
-        <div className={styles.msgOverlay} role="dialog" aria-modal="true" aria-label="Story idea from your parent">
-          <div className={styles.msgBubble} ref={storyTrapRef}>
-            <div className={styles.msgIcon}><IconBook size={30} /></div>
-            <p className={styles.msgTitle}>Someone left you a story idea! Want to hear it?</p>
-            <button className={styles.msgPlayBtn} onClick={playStoryRequestNow}><IconPlay size={16} /> Yes, tell me!</button>
-            <button className={styles.msgDismissBtn} onClick={declineStoryRequest}>Not now</button>
-          </div>
-        </div>
-      )}
-    </main>
-    </div>
     </>
   )
 }
