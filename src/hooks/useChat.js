@@ -9,6 +9,32 @@ import { getActiveChildId } from '../utils/storage.js'
 
 const MAX_HISTORY = 16
 
+// Pure formatting, factored out of the mount effect below purely so it's
+// unit-testable without mocking the two Supabase call chains that feed it —
+// not because either caller needs it independently. Each returns '' (never
+// null/undefined) so a caller can treat "no memory yet" and "nothing to add"
+// the same way.
+export function formatHistoryMemory(entries, childName) {
+  if (!entries?.length) return ''
+  const recent = entries.slice(0, 5)
+  const lines = recent
+    .map(e => `- "${(e.user_text || '').slice(0, 100)}" (${e.mode} mode)`)
+    .join('\n')
+  let block = `\n\nRECENT MEMORIES — things ${childName} said in past chats:\n${lines}\nIf these come up naturally in conversation, reference them warmly to make ${childName} feel remembered.`
+
+  const topics = extractTopics(entries.map(e => e.user_text))
+  if (topics.length) {
+    block += `\n\nTOPICS ${childName} OFTEN BRINGS UP: ${topics.join(', ')}. Weave these in naturally when it fits the conversation — don't force it or list them out.`
+  }
+  return block
+}
+
+export function formatLessonsMemory(lessonRows, childName) {
+  if (!lessonRows?.length) return ''
+  const names = lessonRows.map(r => `${r.lesson_id} (${r.course_id})`).join(', ')
+  return `\n\nLESSONS ${childName} HAS COMPLETED: ${names}. Celebrate their learning if the topic comes up!`
+}
+
 export function useChat(settings) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -36,18 +62,8 @@ export function useChat(settings) {
     const childName = settings?.childName || 'there'
 
     fetchHistory(20).then(entries => {
-      if (!entries?.length) return
-      const recent = entries.slice(0, 5)
-      const lines = recent
-        .map(e => `- "${(e.user_text || '').slice(0, 100)}" (${e.mode} mode)`)
-        .join('\n')
-      let block = `\n\nRECENT MEMORIES — things ${childName} said in past chats:\n${lines}\nIf these come up naturally in conversation, reference them warmly to make ${childName} feel remembered.`
-
-      const topics = extractTopics(entries.map(e => e.user_text))
-      if (topics.length) {
-        block += `\n\nTOPICS ${childName} OFTEN BRINGS UP: ${topics.join(', ')}. Weave these in naturally when it fits the conversation — don't force it or list them out.`
-      }
-
+      const block = formatHistoryMemory(entries, childName)
+      if (!block) return
       memoryPartsRef.current.history = block
       memoryRef.current = memoryPartsRef.current.history + memoryPartsRef.current.lessons
     }).catch(() => {})
@@ -64,10 +80,9 @@ export function useChat(settings) {
         .order('completed_at', { ascending: false })
         .limit(5)
         .then(({ data }) => {
-          if (!data?.length) return
-          const names = data.map(r => `${r.lesson_id} (${r.course_id})`).join(', ')
-          memoryPartsRef.current.lessons =
-            `\n\nLESSONS ${childName} HAS COMPLETED: ${names}. Celebrate their learning if the topic comes up!`
+          const block = formatLessonsMemory(data, childName)
+          if (!block) return
+          memoryPartsRef.current.lessons = block
           memoryRef.current = memoryPartsRef.current.history + memoryPartsRef.current.lessons
         })
     }).catch(() => {})
