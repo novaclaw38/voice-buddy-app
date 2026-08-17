@@ -8,6 +8,7 @@ const baseSpeech = {
   supported: { stt: true, tts: true },
   audioRef: { current: null },
   boundaryWordRef: { current: -1 },
+  wordIndex: -1,
 }
 
 const baseProps = {

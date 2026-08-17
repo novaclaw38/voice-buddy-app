@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useFocusTrap from '../../hooks/useFocusTrap.js'
 import BuddyAvatar from '../BuddyAvatar.jsx'
@@ -12,9 +12,10 @@ import { IconMail, IconCamera, IconPlay, IconMusic, IconBook, IconPalette, IconG
 import styles from './NormalScreen.module.css'
 
 // The default chat/story-mode screen — Buddy's world, the dock, the speech
-// bubble. Owns karaoke word-highlight tracking (moved down from the shell;
-// no other screen renders a word-highlighted speech bubble) and the story
-// overlay's focus trap (moved down alongside the only JSX that uses it).
+// bubble. Karaoke word-highlight tracking lives in useSpeech (speech.wordIndex)
+// since that hook already knows which TTS backend is live; this screen just
+// renders it. Owns the story overlay's focus trap (moved down alongside the
+// only JSX that uses it).
 export default function NormalScreen({
   settings,
   buddyName,
@@ -41,50 +42,11 @@ export default function NormalScreen({
   onShowPin,
 }) {
   const navigate = useNavigate()
-  const [wordIndex, setWordIndex] = useState(-1)
-  const rafRef = useRef(null)
   const storyTrapRef = useRef(null)
 
   useFocusTrap(storyTrapRef, storyPhase === 'ask', onDeclineStory)
 
-  // Word-by-word karaoke tracker (bouncing dot + colour highlight) — active
-  // for every reply Buddy speaks. Only this screen renders a
-  // word-highlighted SpeechBubble (VoiceOnlyScreen shows plain text,
-  // GoalReachedScreen/SingAlong don't show Buddy's speech at all), so this
-  // no longer runs unconditionally on every ChildPage render.
-  useEffect(() => {
-    if (uiStatus !== 'speaking' || !buddyText) {
-      setWordIndex(-1)
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-      return
-    }
-    const words = buddyText.trim().split(/\s+/).filter(Boolean)
-    if (!words.length) return
-    // Char-proportion: words with more characters get proportionally more time
-    const totalChars = words.reduce((s, w) => s + w.length, 0)
-    const tick = () => {
-      const audio = speech.audioRef.current
-      if (audio && audio.duration > 0) {
-        const charPos = Math.min(audio.currentTime / audio.duration, 1) * totalChars
-        let cumChars = 0
-        let idx = words.length - 1
-        for (let i = 0; i < words.length; i++) {
-          cumChars += words[i].length
-          if (charPos <= cumChars) { idx = i; break }
-        }
-        setWordIndex(idx)
-      } else if (speech.boundaryWordRef.current >= 0) {
-        setWordIndex(Math.min(speech.boundaryWordRef.current, words.length - 1))
-      }
-      rafRef.current = requestAnimationFrame(tick)
-    }
-    rafRef.current = requestAnimationFrame(tick)
-    return () => {
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-      setWordIndex(-1)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uiStatus, buddyText])
+  const wordIndex = speech.wordIndex
 
   const avatarType = settings.avatarType || 'bear'
   const isDarkRealm = partOfDay === 'evening' || partOfDay === 'night'

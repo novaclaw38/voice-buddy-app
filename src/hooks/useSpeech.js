@@ -15,6 +15,8 @@ export function useSpeech(settings) {
   const synthRef  = useRef(window.speechSynthesis)
   const audioRef  = useRef(null)         // Google TTS <Audio>
   const boundaryWordRef = useRef(-1)     // word index from Web Speech onboundary
+  const [wordIndex, setWordIndex] = useState(-1)
+  const wordRafRef = useRef(null)
   const onResultRef = useRef(null)
   const listeningRef = useRef(false)
   // speak() is async (network round-trip to /api/tts) but stopSpeaking()
@@ -38,6 +40,41 @@ export function useSpeech(settings) {
     return () => synthRef.current?.removeEventListener('voiceschanged', load)
   }, [])
 
+  // ── Karaoke word tracking ───────────────────────────────────────────────
+  // Drives the word-by-word highlight while speaking. Lives here (not in the
+  // caller) because this hook is the only place that already knows which
+  // backend is actually live: audioRef is populated only by the Google TTS
+  // success path below, boundaryWordRef only by fallbackSpeak's onboundary
+  // event — a caller would otherwise have to duplicate that same probe.
+  const stopWordTracking = useCallback(() => {
+    if (wordRafRef.current) { cancelAnimationFrame(wordRafRef.current); wordRafRef.current = null }
+    setWordIndex(-1)
+  }, [])
+
+  const startWordTracking = useCallback((text) => {
+    const words = text.trim().split(/\s+/).filter(Boolean)
+    if (!words.length) return
+    // Char-proportion: words with more characters get proportionally more time.
+    const totalChars = words.reduce((s, w) => s + w.length, 0)
+    const tick = () => {
+      const audio = audioRef.current
+      if (audio && audio.duration > 0) {
+        const charPos = Math.min(audio.currentTime / audio.duration, 1) * totalChars
+        let cumChars = 0
+        let idx = words.length - 1
+        for (let i = 0; i < words.length; i++) {
+          cumChars += words[i].length
+          if (charPos <= cumChars) { idx = i; break }
+        }
+        setWordIndex(idx)
+      } else if (boundaryWordRef.current >= 0) {
+        setWordIndex(Math.min(boundaryWordRef.current, words.length - 1))
+      }
+      wordRafRef.current = requestAnimationFrame(tick)
+    }
+    wordRafRef.current = requestAnimationFrame(tick)
+  }, [])
+
   // ── Fallback: browser Web Speech API ──────────────────────────────────────
   // This only ever runs if Google TTS itself fails, so it can't offer the
   // same named voices — just pick a reasonable default English voice.
@@ -55,7 +92,13 @@ export function useSpeech(settings) {
   // semitone-ish scale as the Google TTS pitch below) and rateMul (a speed
   // multiplier applied to the base rate).
   const fallbackSpeak = useCallback((text, onDone, voiceOpts = {}) => {
-    if (!synthRef.current || !text) { onDone?.(); return }
+    // Pre-existing gap this refactor also fixes: status never transitioned to
+    // idle here, only masked before because onDone's caller-side handler
+    // usually set its own "idle" state independently. Now that word-tracking
+    // is driven by this hook's own status/lifecycle rather than an external
+    // signal, leaving status stuck at 'speaking' would leave the RAF loop
+    // running forever whenever neither TTS backend is usable.
+    if (!synthRef.current || !text) { stopWordTracking(); setStatus('idle'); onDone?.(); return }
     synthRef.current.cancel()
     const utter = new SpeechSynthesisUtterance(text)
     const baseRate  = settings?.speechRate  ?? 0.9
@@ -68,10 +111,10 @@ export function useSpeech(settings) {
       if (e.name !== 'word') return
       boundaryWordRef.current = text.slice(0, e.charIndex).trim().split(/\s+/).filter(Boolean).length
     }
-    utter.onend  = () => { boundaryWordRef.current = -1; setStatus('idle'); onDone?.() }
-    utter.onerror = () => { boundaryWordRef.current = -1; setStatus('idle'); onDone?.() }
+    utter.onend  = () => { boundaryWordRef.current = -1; stopWordTracking(); setStatus('idle'); onDone?.() }
+    utter.onerror = () => { boundaryWordRef.current = -1; stopWordTracking(); setStatus('idle'); onDone?.() }
     setTimeout(() => synthRef.current?.speak(utter), 0)
-  }, [getFallbackVoice, settings?.speechRate, settings?.speechPitch])
+  }, [getFallbackVoice, settings?.speechRate, settings?.speechPitch, stopWordTracking])
 
   // ── Stop helpers ──────────────────────────────────────────────────────────
   const stopListening = useCallback(() => {
@@ -87,11 +130,12 @@ export function useSpeech(settings) {
     }
     boundaryWordRef.current = -1
     synthRef.current?.cancel()
+    stopWordTracking()
     setStatus('idle')
     // Invalidate any speak() call still awaiting its /api/tts response so it
     // can't play its audio after the fact once this one resolves.
     speakTokenRef.current++
-  }, [])
+  }, [stopWordTracking])
 
   // ── Google TTS speak ──────────────────────────────────────────────────────
   // voiceOpts: optional { pitchOffset, rateMul } — see fallbackSpeak above.
@@ -100,6 +144,7 @@ export function useSpeech(settings) {
     stopListening()
     stopSpeaking()
     setStatus('speaking')
+    startWordTracking(text)
 
     const callId = ++speakTokenRef.current
     const isStale = () => speakTokenRef.current !== callId
@@ -139,6 +184,7 @@ export function useSpeech(settings) {
         const finish = () => {
           URL.revokeObjectURL(url)
           audioRef.current = null
+          stopWordTracking()
           setStatus('idle')
           onDone?.()
         }
@@ -158,7 +204,7 @@ export function useSpeech(settings) {
         console.warn('Google TTS failed, falling back to browser speech:', err.message)
         if (!isStale()) fallbackSpeak(text, onDone, voiceOpts)
       })
-  }, [stopListening, stopSpeaking, fallbackSpeak,
+  }, [stopListening, stopSpeaking, fallbackSpeak, startWordTracking, stopWordTracking,
       settings?.speechRate, settings?.voiceName])
 
   // ── Speech recognition ────────────────────────────────────────────────────
@@ -215,7 +261,8 @@ export function useSpeech(settings) {
   return {
     status, transcript, voices, supported,
     startListening, stopListening, speak, stopSpeaking,
-    audioRef,          // Google TTS audio element — currentTime/duration for word sync
+    audioRef,          // Google TTS audio element — passed to BuddyAvatar for mouth-sync
     boundaryWordRef,   // Web Speech fallback — word index from onboundary event
+    wordIndex,         // karaoke word-highlight position; -1 when not speaking
   }
 }
