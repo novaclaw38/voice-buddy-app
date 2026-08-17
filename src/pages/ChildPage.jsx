@@ -22,6 +22,7 @@ import { greetingWord } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
 import { fetchMessageById, markPlayed, fetchLatestUnplayed } from '../services/messageService.js'
 import { fetchLatestUndelivered, markStoryDelivered } from '../services/storyRequestService.js'
+import { startAsChild } from '../services/cameraSignal.js'
 import SingAlong from '../components/SingAlong.jsx'
 import DailyActivity from '../components/DailyActivity.jsx'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
@@ -181,78 +182,25 @@ export default function ChildPage({ session }) {
     setShowPicker(false)
   }
 
-  // Camera streaming — listen for parent requests
-  const cameraStreamRef = useRef(null)
-  const cameraPcRef    = useRef(null)
-  const cameraChRef    = useRef(null)
+  // Camera streaming — listen for parent check-in requests. Protocol lives
+  // in services/cameraSignal.js; this page only maps status to the
+  // indicator dot ('error' collapses to off, same as 'idle' — a young
+  // child shouldn't see a camera-error message).
   const [cameraOn, setCameraOn] = useState(false)
 
   useEffect(() => {
     let mounted = true
+    let handle = null
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user || !mounted) return
-      const userId = session.user.id
-      const channel = supabase.channel('camera-' + userId, { config: { private: true } })
-      cameraChRef.current = channel
-
-      channel.on('broadcast', { event: 'signal' }, async ({ payload }) => {
-        if (payload.type === 'request') {
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            cameraStreamRef.current = stream
-            if (mounted) setCameraOn(true)
-
-            const pc = new RTCPeerConnection({
-              iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-              ],
-            })
-            cameraPcRef.current = pc
-            stream.getTracks().forEach((t) => pc.addTrack(t, stream))
-
-            pc.onicecandidate = (e) => {
-              if (e.candidate) {
-                channel.send({ type: 'broadcast', event: 'signal',
-                  payload: { type: 'ice-child', candidate: e.candidate.toJSON() } })
-              }
-            }
-
-            const offer = await pc.createOffer()
-            await pc.setLocalDescription(offer)
-            channel.send({ type: 'broadcast', event: 'signal',
-              payload: { type: 'offer', sdp: { type: offer.type, sdp: offer.sdp } } })
-          } catch (err) {
-            console.warn('Camera start error:', err)
-          }
-        }
-
-        if (payload.type === 'answer' && cameraPcRef.current?.signalingState === 'have-local-offer') {
-          await cameraPcRef.current.setRemoteDescription(
-            new RTCSessionDescription(payload.sdp)
-          )
-        }
-
-        if (payload.type === 'ice-parent' && cameraPcRef.current) {
-          try { await cameraPcRef.current.addIceCandidate(new RTCIceCandidate(payload.candidate)) }
-          catch (_) {}
-        }
-
-        if (payload.type === 'stop') {
-          cameraStreamRef.current?.getTracks().forEach((t) => t.stop())
-          cameraPcRef.current?.close()
-          cameraStreamRef.current = null
-          cameraPcRef.current    = null
-          if (mounted) setCameraOn(false)
-        }
-      }).subscribe()
+      handle = startAsChild(session.user.id, {
+        onStatusChange: (status) => { if (mounted) setCameraOn(status === 'streaming') },
+      })
     })
 
     return () => {
       mounted = false
-      cameraStreamRef.current?.getTracks().forEach((t) => t.stop())
-      cameraPcRef.current?.close()
-      cameraChRef.current?.unsubscribe()
+      handle?.stop()
     }
   }, [])
 

@@ -6,6 +6,7 @@ import { testConnection } from '../services/chatService.js'
 import { fetchHistory, deleteHistory } from '../services/historyService.js'
 import { sendVoiceMessage, fetchMessages, fetchMessageById, markPlayed } from '../services/messageService.js'
 import { sendStoryRequest, fetchSentStoryRequests } from '../services/storyRequestService.js'
+import { startAsParent } from '../services/cameraSignal.js'
 import { supabase } from '../lib/supabase.js'
 import { useSpeech } from '../hooks/useSpeech.js'
 import { useProgress, masteryTier } from '../hooks/useProgress.js'
@@ -40,11 +41,11 @@ const TAB_GROUPS = [
   { label: 'Billing',  tabs: ['Subscription', 'Account'] },
 ]
 
-const ICE_SERVERS = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-  ],
+// Maps cameraSignal's reason codes to the copy this page owns — the
+// module reports facts, not user-facing strings (same split as
+// courseService/CoursesPage).
+const CAMERA_ERROR_COPY = {
+  'connection-lost': 'Connection lost. Make sure the app is open on the kids device.',
 }
 
 export default function ParentPage({ session }) {
@@ -84,9 +85,8 @@ export default function ParentPage({ session }) {
   const [sentStories, setSentStories] = useState([])
   const mediaRecorderRef = useRef(null)
   const chunksRef = useRef([])
-  const camVideoRef   = useRef(null)
-  const camPcRef      = useRef(null)
-  const camChannelRef = useRef(null)
+  const camVideoRef  = useRef(null)
+  const camHandleRef = useRef(null)
   const [camStatus, setCamStatus] = useState('idle') // idle | requesting | streaming | error
   const [camError,  setCamError]  = useState(null)
   const [subInfo, setSubInfo] = useState(null)
@@ -297,11 +297,8 @@ export default function ParentPage({ session }) {
   }
 
   const stopCamera = () => {
-    camChannelRef.current?.send({ type: 'broadcast', event: 'signal', payload: { type: 'stop' } })
-    camPcRef.current?.close()
-    camChannelRef.current?.unsubscribe()
-    camPcRef.current      = null
-    camChannelRef.current = null
+    camHandleRef.current?.stop()
+    camHandleRef.current = null
     if (camVideoRef.current) camVideoRef.current.srcObject = null
     setCamStatus('idle')
     setCamError(null)
@@ -311,58 +308,20 @@ export default function ParentPage({ session }) {
     if (!isPro) { setUpgradeTrigger('camera'); return }
     if (camStatus !== 'idle' && camStatus !== 'error') return
     setCamConfirming(false)
-    setCamStatus('requesting')
     setCamError(null)
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setCamStatus('idle'); return }
 
-    const pc = new RTCPeerConnection(ICE_SERVERS)
-    camPcRef.current = pc
-
-    pc.ontrack = (e) => {
-      if (camVideoRef.current) {
-        camVideoRef.current.srcObject = e.streams[0]
-        camVideoRef.current.play().catch(() => {})
-      }
-      setCamStatus('streaming')
-    }
-
-    pc.oniceconnectionstatechange = () => {
-      const s = pc.iceConnectionState
-      if (s === 'failed' || s === 'disconnected' || s === 'closed') {
-        setCamStatus('error')
-        setCamError('Connection lost. Make sure the app is open on the kids device.')
-      }
-    }
-
-    pc.onicecandidate = (e) => {
-      if (e.candidate) {
-        camChannelRef.current?.send({ type: 'broadcast', event: 'signal',
-          payload: { type: 'ice-parent', candidate: e.candidate.toJSON() } })
-      }
-    }
-
-    const channel = supabase.channel('camera-' + user.id, { config: { private: true } })
-    camChannelRef.current = channel
-
-    channel.on('broadcast', { event: 'signal' }, async ({ payload }) => {
-      if (payload.type === 'offer') {
-        await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp))
-        const answer = await pc.createAnswer()
-        await pc.setLocalDescription(answer)
-        channel.send({ type: 'broadcast', event: 'signal',
-          payload: { type: 'answer', sdp: { type: answer.type, sdp: answer.sdp } } })
-      }
-      if (payload.type === 'ice-child') {
-        try { await pc.addIceCandidate(new RTCIceCandidate(payload.candidate)) }
-        catch (_) {}
-      }
-    }).subscribe(() => {
-      // Small delay to let child's subscription settle, then request stream
-      setTimeout(() => {
-        channel.send({ type: 'broadcast', event: 'signal', payload: { type: 'request' } })
-      }, 600)
+    camHandleRef.current = startAsParent(user.id, {
+      onStatusChange: setCamStatus,
+      onRemoteStream: (stream) => {
+        if (camVideoRef.current) {
+          camVideoRef.current.srcObject = stream
+          camVideoRef.current.play().catch(() => {})
+        }
+      },
+      onError: (reason) => setCamError(CAMERA_ERROR_COPY[reason] || 'Something went wrong with the camera connection.'),
     })
   }
 
