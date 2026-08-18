@@ -1,0 +1,19 @@
+/* Base chrome shared by every step-card type (Explain/Quiz/Activity/Label/
+   Explore/MasteryCheck/OpenResponse/Practice/StoryBuild/Teach) — previously
+   duplicated verbatim in all 9 card .module.css files, so a chrome tweak
+   needed applying in 9 places or the types would visibly drift apart. Each
+   card composes `.card` and layers on only what's genuinely its own
+   (padding, text-align, flex layout). */
+
+.card {
+  background: rgba(255,255,255,0.92);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  animation: fadeIn 0.35s var(--spring);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}

@@ -9,6 +9,20 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.loadingState {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 24px;
+}
+
 .page::before {
   content: '';
   position: absolute;
@@ -53,11 +67,15 @@
 
 .lessonTitle {
   font-family: var(--font-head);
-  font-size: 1rem;
+  font-size: var(--fs-md);
   font-weight: 700;
   color: var(--ink);
   text-align: center;
   flex: 1;
+  /* A flex item's default min-width is its content's intrinsic width, which
+     overrides text-overflow: ellipsis until this is set — long titles would
+     push .back/.headerRight out instead of truncating. */
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -236,6 +254,15 @@
     font-size: 11pt;
     text-align: right;
     min-width: 140pt;
+  }
+
+  /* A real fill-in blank for the printed worksheet when no name is set,
+     drawn as a rule rather than typed underscore characters (which render
+     inconsistently across fonts/print scaling). */
+  .printNameBlank {
+    display: inline-block;
+    width: 100pt;
+    border-bottom: 1pt solid #333;
   }
 
   .printSection {

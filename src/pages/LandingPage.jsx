@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import BuddyAvatar from '../components/BuddyAvatar.jsx'
 import SkipLink from '../components/SkipLink.jsx'
 import styles from './LandingPage.module.css'
@@ -42,11 +42,15 @@ function Particles({ count = 36 }) {
 // actual animated character their child will play with (including the
 // double-tap celebration discovery).
 function BuddyHero() {
+  // BuddyAvatar reacts to a real pointerdown on its own container (the same
+  // "poke" mechanic live in the app), so the separate hint button forwards
+  // a synthetic pointerdown to it instead of duplicating that logic here.
+  const avatarRef = useRef(null)
   return (
     <div className={styles.buddyWrap}>
       <div className={styles.buddyGlow} />
       <div className={styles.buddyRing} />
-      <div className={styles.buddyFloat}>
+      <div className={styles.buddyFloat} ref={avatarRef}>
         <BuddyAvatar
           status="happy"
           avatarColor="#7c3aed"
@@ -61,7 +65,10 @@ function BuddyHero() {
       </div>
       <button
         className={styles.tapHint}
-        onClick={(e) => { e.stopPropagation(); }}
+        onClick={(e) => {
+          e.stopPropagation()
+          avatarRef.current?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
+        }}
         aria-label="Tap Buddy to see him react! He loves attention."
       >
         👆 Tap Buddy!
@@ -195,7 +202,6 @@ function Ticker() {
 }
 
 export default function LandingPage() {
-  const navigate = useNavigate()
   const [navHidden, setNavHidden] = useState(false)
   const [pastHero, setPastHero] = useState(false)
   const lastY = useRef(0)
@@ -249,8 +255,8 @@ export default function LandingPage() {
             <span className={styles.logoText}>Buddy</span>
           </div>
           <div className={styles.navActions}>
-            <button className={styles.navLogin} onClick={() => navigate('/login')}>Log In</button>
-            <button className={styles.navCta} onClick={() => navigate('/login')}>Start Free Trial</button>
+            <Link className={styles.navLogin} to="/login">Log In</Link>
+            <Link className={styles.navCta} to="/login" state={{ mode: 'signup', plan: 'pro' }}>Start Free Trial</Link>
           </div>
         </div>
       </nav>
@@ -264,27 +270,24 @@ export default function LandingPage() {
             <h1 className={styles.heroTitle}>
               Meet <span className={styles.gradientText}>Buddy</span>
               <br />
-              your child's AI best friend
+              your child&rsquo;s AI best friend
             </h1>
             <p className={styles.heroSub}>
-              An always-on companion that tells stories, teaches courses, sings songs,
+              An always-on companion that chats, teaches courses, sings songs,
               and gives parents peace of mind, all in one magical app.
             </p>
             <div className={styles.heroCtas}>
-              <button
+              <Link
                 className={styles.ctaPrimary}
-                onClick={() => navigate('/login')}
+                to="/login"
+                state={{ mode: 'signup', plan: 'pro' }}
               >
                 <span className={styles.ctaRipple} />
                 Start Free Trial
-              </button>
-              <a
-                href="#"
-                className={styles.heroLoginLink}
-                onClick={(e) => { e.preventDefault(); navigate('/login') }}
-              >
+              </Link>
+              <Link to="/login" className={styles.heroLoginLink}>
                 Already have an account? Log in
-              </a>
+              </Link>
             </div>
           </div>
           <div className={styles.heroBuddy}>
@@ -308,8 +311,8 @@ export default function LandingPage() {
             <div className={styles.featureTag}>Peace of Mind</div>
             <h2 className={styles.featureTitle}>See your child, anytime</h2>
             <p className={styles.featureDesc}>
-              Open the parent dashboard and stream a live view of your child's screen
-              in real time. Whether you're at work or in another room, you're always
+              Open the parent dashboard and stream a live view of your child&rsquo;s screen
+              in real time. Whether you&rsquo;re at work or in another room, you&rsquo;re always
               just a tap away.
             </p>
             <div className={styles.featureChips}>
@@ -327,7 +330,7 @@ export default function LandingPage() {
             <h2 className={styles.featureTitle}>Leave voice messages for your child</h2>
             <p className={styles.featureDesc}>
               Record a voice note from the parent dashboard. Buddy delivers it instantly,
-              even if you're not home. Your child hears your voice whenever they need it most.
+              even if you&rsquo;re not home. Your child hears your voice whenever they need it most.
             </p>
             <div className={styles.featureChips}>
               <span><IconMic size={14} /> Voice notes</span>
@@ -359,10 +362,10 @@ export default function LandingPage() {
             <ChatDemo />
           </div>
           <div className={styles.featureChips}>
-            <span><IconBook size={14} /> Stories</span>
-            <span><IconSparkle size={14} /> Games</span>
+            <span><IconBook size={14} /> Chat</span>
+            <span><IconSparkle size={14} /> Playful</span>
             <span><IconMusic size={14} /> Sing-along</span>
-            <span><IconShield size={14} /> Quiz</span>
+            <span><IconShield size={14} /> Child-safe</span>
           </div>
         </RevealSection>
 
@@ -425,7 +428,7 @@ export default function LandingPage() {
       <section className={styles.pricing}>
         <RevealSection>
           <div className={styles.pricingLabel}>Simple Pricing</div>
-          <h2 className={styles.pricingTitle}>Start free. Upgrade when you're ready.</h2>
+          <h2 className={styles.pricingTitle}>Start free. Upgrade when you&rsquo;re ready.</h2>
         </RevealSection>
 
         <RevealSection className={styles.pricingCards}>
@@ -444,9 +447,9 @@ export default function LandingPage() {
               <li className={styles.no}><IconX size={14} /> Courses &amp; lessons</li>
               <li className={styles.no}><IconX size={14} /> Progress tracking</li>
             </ul>
-            <button className={styles.planBtn} onClick={() => navigate('/login')}>
+            <Link className={styles.planBtn} to="/login" state={{ mode: 'signup', plan: 'free' }}>
               Continue Free
-            </button>
+            </Link>
           </div>
 
           {/* Pro */}
@@ -464,20 +467,20 @@ export default function LandingPage() {
             </p>
             <ul className={styles.planFeatures}>
               <li className={styles.yes}><IconCheck size={14} /> Unlimited daily messages</li>
-              <li className={styles.yes}><IconCheck size={14} /> Interactive story time</li>
-              <li className={styles.yes}><IconCheck size={14} /> All 10 courses — literacy, numeracy, science &amp; more</li>
+              <li className={styles.yes}><IconCheck size={14} /> All 6 courses — gardening, robotics, science &amp; more</li>
               <li className={styles.yes}><IconCheck size={14} /> Progress &amp; mastery tracking</li>
               <li className={styles.yes}><IconCheck size={14} /> Peace of mind camera</li>
               <li className={styles.yes}><IconCheck size={14} /> Parent voice messages</li>
               <li className={styles.yes}><IconCheck size={14} /> Avatar &amp; costume customisation</li>
               <li className={styles.yes}><IconCheck size={14} /> Priority support</li>
             </ul>
-            <button
+            <Link
               className={`${styles.planBtn} ${styles.planBtnPro}`}
-              onClick={() => navigate('/login')}
+              to="/login"
+              state={{ mode: 'signup', plan: 'pro' }}
             >
               Start Free Trial
-            </button>
+            </Link>
           </div>
         </RevealSection>
       </section>
@@ -497,7 +500,7 @@ export default function LandingPage() {
               <span>Buddy</span>
             </div>
             <p className={styles.footerTagline}>
-              Your child's AI best friend. Made with ❤️ in South Africa.
+              Your child&rsquo;s AI best friend. Made with ❤️ in South Africa.
             </p>
             <div className={styles.paymentLogos} aria-label="Accepted payment methods via PayFast">
               <img src="/payment-logos/visa.svg" alt="Visa" width="63" height="21" loading="lazy" />
@@ -509,8 +512,8 @@ export default function LandingPage() {
 
           <div className={styles.footerCol}>
             <span className={styles.footerColTitle}>Product</span>
-            <button onClick={() => navigate('/login')}>Start Free Trial</button>
-            <button onClick={() => navigate('/login')}>Log In</button>
+            <Link to="/login" state={{ mode: 'signup', plan: 'pro' }}>Start Free Trial</Link>
+            <Link to="/login">Log In</Link>
           </div>
 
           <div className={styles.footerCol}>
@@ -531,9 +534,9 @@ export default function LandingPage() {
       {/* Mobile-only sticky CTA — on a long phone-scroll, the signup button
           shouldn't require scrolling back to the top. */}
       <div className={`${styles.stickyCta} ${pastHero ? styles.stickyCtaVisible : ''}`}>
-        <button className={styles.stickyCtaBtn} onClick={() => navigate('/login')}>
+        <Link className={styles.stickyCtaBtn} to="/login" state={{ mode: 'signup', plan: 'pro' }}>
           Start Free Trial
-        </button>
+        </Link>
       </div>
       </main>
     </div>

@@ -26,7 +26,7 @@ import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from
 import { getModeVoice } from '../utils/modeVoice.js'
 import { pickRandomDistinct } from '../utils/prompts.js'
 import styles from './ChildPage.module.css'
-import { IconMail, IconPlay } from '../components/icons.jsx'
+import { IconMail, IconPlay, IconX, IconCheck } from '../components/icons.jsx'
 
 const WELCOME_BACK = [
   (childName, buddyName) => `Hey ${childName}, I'm back! What do you want to do now?`,
@@ -53,6 +53,16 @@ const IDLE_NUDGES = [
   (childName) => `Whenever you're ready, ${childName}, I've got games, songs, and stories waiting!`,
 ]
 
+// Said when speech recognition ends with nothing usable (silence, timeout,
+// or a recognition error) — without this, a child who wasn't heard just
+// watches the mic go quiet with no sign anything happened at all.
+const LISTEN_FAIL_PROMPTS = [
+  () => `Hmm, I didn't quite catch that! Wanna try again?`,
+  () => `Oops, I missed what you said — can you say it one more time?`,
+  () => `My ears must've been napping! Try that again?`,
+  () => `I didn't hear you that time — go ahead, I'm listening!`,
+]
+
 // This page can remount many times per browser session (parent settings,
 // courses, lessons all navigate away and back) — only the very first mount
 // gets the full greeting + daily activity; every mount after that gets a
@@ -63,6 +73,7 @@ const IDLE_NUDGES = [
 let hasGreetedFully = false
 const welcomeBackIndex = { current: -1 }
 const idleNudgeIndex = { current: -1 }
+const listenFailIndex = { current: -1 }
 
 // ChildPage is the shell: it owns everything that must survive a screen
 // switch — camera check-in signaling, the parent-message and story-request
@@ -476,26 +487,51 @@ export default function ChildPage({ session }) {
       setBuddyText(reply)
       setUiStatus('speaking')
       speech.speak(reply, () => {
-        setUiStatus('idle')
+        // A brief happy beat before idle — otherwise every exchange, good or
+        // routine, ends on the exact same neutral face with no sense that
+        // anything landed. Reverts itself only if nothing else (like the
+        // auto-listen below) has already moved the status on.
+        setUiStatus('happy')
+        setTimeout(() => setUiStatus((s) => (s === 'happy' ? 'idle' : s)), 1100)
         scheduleBubbleClear()
         if (settings.autoListen) {
-          setTimeout(() => handleVoicePress(), 500)
+          setTimeout(() => handleVoicePress(true), 500)
         }
       }, getModeVoice(chat.mode))
     })
   }, [chat, speech, settings.autoListen, scheduleBubbleClear, cancelBubbleClear, liveKitVoice])
 
-  const handleVoicePress = useCallback(() => {
-    if (uiStatus === 'listening') {
-      speech.stopListening()
+  // Fires when a listening session ends with nothing usable to act on
+  // (silence, timeout, recognition error) — without this, a child who
+  // wasn't heard just watches the mic go quiet with no idea what happened.
+  const handleListenFail = useCallback(() => {
+    cancelBubbleClear()
+    setUiStatus('confused')
+    const msg = pickRandomDistinct(LISTEN_FAIL_PROMPTS, listenFailIndex)()
+    setBuddyText(msg)
+    speech.speak(msg, () => {
       setUiStatus('idle')
+      scheduleBubbleClear()
+    })
+  }, [speech, cancelBubbleClear, scheduleBubbleClear])
+
+  // isAuto distinguishes Buddy starting the mic himself (after his own
+  // reply, when autoListen is on) from the child tapping it — same
+  // "listening" status either way, but the bubble text differs so a child
+  // isn't left wondering why the mic turned on without them touching it.
+  const handleVoicePress = useCallback((isAuto = false) => {
+    if (uiStatus === 'listening') {
+      // Deliver whatever was heard so far instead of discarding it — a tap
+      // here means "I'm done talking," not "never mind."
+      speech.stopListening({ deliver: true })
       return
     }
     if (uiStatus !== 'idle') return
     cancelBubbleClear()
     setUiStatus('listening')
-    speech.startListening(handleUserSpeech)
-  }, [uiStatus, speech, handleUserSpeech, cancelBubbleClear])
+    if (isAuto) setBuddyText("I'm listening!")
+    speech.startListening(handleUserSpeech, handleListenFail)
+  }, [uiStatus, speech, handleUserSpeech, handleListenFail, cancelBubbleClear])
 
   const handlePinSuccess = () => {
     setShowPin(false)
@@ -684,7 +720,7 @@ function ParentMessageOverlay({ msgPhase, showEnvelope = true, envelopeClass, on
         <button
           className={envelopeClass}
           onClick={onEnvelopeClick}
-          aria-label="Message from your parent, tap to hear it"
+          aria-label="Message from your parent! Tap to hear it"
           title="Message from your parent!"
         >
           <IconMail size={22} />
@@ -697,13 +733,13 @@ function ParentMessageOverlay({ msgPhase, showEnvelope = true, envelopeClass, on
             <>
               <p className={styles.msgTitle}>Message from your parent! Want to hear it?</p>
               <button className={styles.msgPlayBtn} onClick={onYes}><IconPlay size={16} /> Yes, play it!</button>
-              <button className={styles.msgDismissBtn} onClick={onNo}>Not now</button>
+              <button className={styles.msgDismissBtn} onClick={onNo}><IconX size={14} /> Not now</button>
             </>
           ) : (
             <>
               <p className={styles.msgTitle}>Message from your parent!</p>
               <button className={styles.msgPlayBtn} onClick={onReplay}><IconPlay size={16} /> Play again</button>
-              <button className={styles.msgDismissBtn} onClick={onDismiss}>Got it!</button>
+              <button className={styles.msgDismissBtn} onClick={onDismiss}><IconCheck size={14} /> Got it!</button>
             </>
           )}
         </div>

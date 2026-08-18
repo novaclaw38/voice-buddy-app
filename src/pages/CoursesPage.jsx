@@ -34,7 +34,13 @@ export default function CoursesPage({ session }) {
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [expanded, setExpanded] = useState(null)
   const [settings] = useState(() => getSettings())
-  const durationLabel = (settings.childAge || 7) <= 6 ? '~15 min' : '~30 min'
+  // Per-lesson duration isn't real data — the catalog deliberately strips
+  // step content (api/courses.js), so there's no per-lesson step count to
+  // estimate from here. Rather than repeat a fabricated identical number on
+  // every lesson row, show one course-level total, clearly averaged from
+  // the real lesson count.
+  const minutesPerLesson = (settings.childAge || 7) <= 6 ? 15 : 30
+  const courseDurationLabel = (course) => `~${course.lessons.length * minutesPerLesson} min total`
   const { completions } = useProgress()
   const { courses: COURSES, loading: catalogLoading, error: catalogError, retry: retryCatalog } = useCourseCatalog()
   const speech = useSpeech(settings)
@@ -86,7 +92,15 @@ export default function CoursesPage({ session }) {
     navigate(`/lesson?course=${courseId}&lesson=${lessonId}`)
   }
 
-  if (catalogLoading) return <div className={styles.page}><SkipLink /><div className={styles.bg} /></div>
+  if (catalogLoading) {
+    return (
+      <div className={styles.page}>
+        <SkipLink />
+        <div className={styles.bg} />
+        <main id="main" className={styles.loadingState}>Finding your courses…</main>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.page}>
@@ -147,12 +161,14 @@ export default function CoursesPage({ session }) {
                   <button
                     className={styles.expandBtn}
                     onClick={() => handleExpand(course)}
+                    aria-expanded={expanded === course.id}
+                    aria-controls={`lessons-${course.id}`}
                   >
-                    {expanded === course.id ? 'Hide lessons ▲' : `${course.lessons.length} lessons ▼`}
+                    {expanded === course.id ? 'Hide lessons ▲' : `${course.lessons.length} lessons — ${courseDurationLabel(course)} ▼`}
                   </button>
 
                   {expanded === course.id && (
-                    <ul className={styles.lessons}>
+                    <ul id={`lessons-${course.id}`} className={styles.lessons}>
                       {lessonsForAge(course, settings.childAge || 7).map((lesson, i) => (
                         <li key={lesson.id}>
                           <button
@@ -168,7 +184,6 @@ export default function CoursesPage({ session }) {
                             {completions.has(`${course.id}:${lesson.id}`) && (
                               <span className={styles.lessonCheck}><IconCheck size={14} /></span>
                             )}
-                            <span className={styles.lessonDuration}>{durationLabel}</span>
                             <span className={styles.lessonArrow}>{isPro ? <IconArrowRight size={16} /> : <IconLock size={16} />}</span>
                           </button>
                         </li>

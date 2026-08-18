@@ -81,7 +81,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--ink-dim);
-  transition: all 0.15s var(--spring-subtle);
+  transition: background 0.15s var(--spring-subtle), color 0.15s var(--spring-subtle), box-shadow 0.15s var(--spring-subtle);
 }
 
 .activeTab {
@@ -124,14 +124,17 @@
   box-sizing: border-box;
 }
 
-.input:focus { border-color: var(--c-grape); background: #fff; }
+.input:focus { border-color: var(--c-grape); background: #fff; box-shadow: 0 0 0 3px rgba(124,58,237,0.18); }
 .input::placeholder { color: #b6abce; }
 
 .error {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #c0285a;
-  background: #ffe4ef;
+  /* Same hue as parentTabs' danger tokens (index.css), not --c-alert
+     (a different red) — reusing the existing pair instead of adding
+     a duplicate. */
+  color: var(--parent-danger-text);
+  background: var(--parent-danger-bg);
   border-radius: var(--r-sm);
   padding: 10px 14px;
 }
@@ -139,8 +142,8 @@
 .successMsg {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #128a5a;
-  background: #d8f7e9;
+  color: var(--c-success-text);
+  background: var(--c-success-bg);
   border-radius: var(--r-sm);
   padding: 10px 14px;
 }

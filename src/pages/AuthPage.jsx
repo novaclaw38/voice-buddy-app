@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import SkipLink from '../components/SkipLink.jsx'
 import styles from './AuthPage.module.css'
@@ -7,7 +7,12 @@ import { IconArrowLeft, IconEye, IconEyeOff } from '../components/icons.jsx'
 
 export default function AuthPage() {
   const navigate = useNavigate()
-  const [mode, setMode] = useState('login') // 'login' | 'signup' | 'forgot'
+  const location = useLocation()
+  // A "Start Free Trial" / "Continue Free" click on the landing page passes
+  // its intended mode (and, for signup, which plan) via route state — so
+  // the visitor lands straight in Sign Up instead of on the Log In tab.
+  const [mode, setMode] = useState(location.state?.mode === 'signup' ? 'signup' : 'login') // 'login' | 'signup' | 'forgot'
+  const plan = location.state?.mode === 'signup' ? location.state?.plan : null
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -130,16 +135,23 @@ export default function AuthPage() {
         </div>
 
         <h1 className={styles.title}>Buddy</h1>
-        <p className={styles.subtitle}>Your child's AI buddy</p>
+        <p className={styles.subtitle}>Your child&rsquo;s AI buddy</p>
+        {mode === 'signup' && plan && (
+          <p className={styles.subtitle}>
+            Signing up for {plan === 'free' ? 'the Free plan' : 'Buddy Pro'}
+          </p>
+        )}
 
         {mode !== 'forgot' && (
           <div className={styles.modeTabs}>
             <button
               className={`${styles.modeTab} ${mode === 'login' ? styles.activeTab : ''}`}
+              aria-pressed={mode === 'login'}
               onClick={() => { setMode('login'); setError(''); setSuccess('') }}
             >Log In</button>
             <button
               className={`${styles.modeTab} ${mode === 'signup' ? styles.activeTab : ''}`}
+              aria-pressed={mode === 'signup'}
               onClick={() => { setMode('signup'); setError(''); setSuccess('') }}
             >Sign Up</button>
           </div>
@@ -157,6 +169,7 @@ export default function AuthPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+              spellCheck={false}
             />
           </div>
 
@@ -204,7 +217,7 @@ export default function AuthPage() {
 
           <button className={styles.submit} type="submit" disabled={loading}>
             {loading
-              ? 'Please wait...'
+              ? 'Please wait…'
               : mode === 'signup' ? 'Create Account'
               : mode === 'forgot' ? 'Send reset link'
               : 'Log In'}
@@ -246,7 +259,7 @@ export default function AuthPage() {
 
             <p className={styles.hint}>
               {mode === 'login'
-                ? "Don't have an account? "
+                ? 'Don’t have an account? '
                 : 'Already have an account? '}
               <button
                 className={styles.switchBtn}

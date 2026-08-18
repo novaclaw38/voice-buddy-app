@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { axe } from 'jest-axe'
 
 vi.mock('../lib/supabase.js', () => ({
   supabase: {
@@ -16,6 +17,13 @@ import LandingPage from './LandingPage.jsx'
 const renderLanding = () =>
   render(<MemoryRouter><LandingPage /></MemoryRouter>)
 
+describe('LandingPage accessibility', () => {
+  it('has no detectable a11y violations', async () => {
+    const { container } = renderLanding()
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
 describe('LandingPage pricing honesty', () => {
   it('does not advertise features that are not implemented', () => {
     renderLanding()
@@ -23,13 +31,11 @@ describe('LandingPage pricing honesty', () => {
     expect(screen.queryByText(/wake word/i)).not.toBeInTheDocument()
   })
 
-  it('sells story time under Pro, never on the free tier', () => {
+  it('advertises the real 6-course catalog under Pro, never a fake "10 courses" claim', () => {
     renderLanding()
-    const storyItem = screen.getByText(/interactive story time/i)
-    expect(storyItem).toBeInTheDocument()
-    // The free plan card must not contain it.
-    const freeCard = screen.getByText('Free').closest('div')
-    expect(freeCard.textContent).not.toMatch(/story/i)
+    expect(screen.queryByText(/10 courses/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/interactive story time/i)).not.toBeInTheDocument()
+    expect(screen.getByText(/all 6 courses/i)).toBeInTheDocument()
   })
 
   it('states the trial terms without implying a card is on file', () => {

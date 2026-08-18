@@ -160,7 +160,14 @@ export default function LessonPage({ session }) {
   // !isPro), so `lesson` would stay null forever and this branch would never
   // be reached if it came second — a direct link to /lesson must still show
   // the upgrade prompt, not silently render nothing.
-  if (subLoading) return null
+  if (subLoading) {
+    return (
+      <div className={styles.page}>
+        <SkipLink />
+        <main id="main" className={styles.loadingState}>Getting your lesson ready…</main>
+      </div>
+    )
+  }
   if (!isPro) {
     return (
       <UpgradePrompt
@@ -172,7 +179,12 @@ export default function LessonPage({ session }) {
   }
 
   if (!lesson) {
-    return null
+    return (
+      <div className={styles.page}>
+        <SkipLink />
+        <main id="main" className={styles.loadingState}>Getting your lesson ready…</main>
+      </div>
+    )
   }
 
   const handleNext = () => {
@@ -328,7 +340,9 @@ export default function LessonPage({ session }) {
           <div className={styles.printHeader}>
             <span className={styles.printLogo}>🐻 Voice Buddy</span>
             <h1 className={styles.printTitle}>{lesson.emoji} {lesson.printSheet?.title || lesson.title}</h1>
-            <div className={styles.printName}>Name: {settings.childName || '______________________'}</div>
+            <div className={styles.printName}>
+              Name: {settings.childName || <span className={styles.printNameBlank} aria-hidden="true" />}
+            </div>
           </div>
           <section className={styles.printSection}>
             <h2>What I Will Learn</h2>

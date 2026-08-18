@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { axe } from 'jest-axe'
 
 // Mutable so each test can flip entitlement before rendering.
 const mockSub = { isPro: false, loading: false, tier: 'free', daysLeft: null, refresh: vi.fn() }
@@ -75,5 +76,12 @@ describe('LessonPage entitlement gate', () => {
     renderLesson()
     expect(await screen.findByText(/Blending Sounds/i)).toBeInTheDocument()
     expect(screen.queryByText(/Unlock All Courses/i)).not.toBeInTheDocument()
+  })
+
+  it('has no detectable a11y violations once the lesson loads', async () => {
+    mockSub.isPro = true
+    const { container } = renderLesson()
+    await screen.findByText(/Blending Sounds/i)
+    expect(await axe(container)).toHaveNoViolations()
   })
 })

@@ -143,10 +143,24 @@
 }
 
 .trial {
-  color: var(--c-pink-d);
+  /* --c-pink-d (#e0408a) was 3.98:1 on white at this size/weight — below
+     the 4.5:1 AA floor (pa11y-ci, 2026-08-17). Darkened locally rather
+     than changing the shared token, which passes at its other, larger
+     usages. */
+  color: #c22f70;
   font-size: 13px;
   margin: 0 0 24px;
   font-weight: 800;
+}
+
+.upgradeError {
+  color: var(--parent-danger-text);
+  background: var(--parent-danger-bg);
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 14px;
+  margin: 0 0 14px;
 }
 
 .cta {

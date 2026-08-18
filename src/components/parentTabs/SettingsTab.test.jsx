@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { axe } from 'jest-axe'
 
 const mockSpeak = vi.fn((text, onDone) => onDone?.())
 vi.mock('../../hooks/useSpeech.js', () => ({
@@ -60,6 +61,11 @@ const baseProps = {
 
 describe('SettingsTab', () => {
   beforeEach(() => vi.clearAllMocks())
+
+  it('has no detectable a11y violations', async () => {
+    const { container } = render(<SettingsTab {...baseProps} />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
 
   it('calls onUpdateSetting when the child name changes', () => {
     const onUpdateSetting = vi.fn()

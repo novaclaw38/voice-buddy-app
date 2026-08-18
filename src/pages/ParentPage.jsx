@@ -130,8 +130,13 @@ export default function ParentPage({ session }) {
           {TAB_GROUPS.map((group, gi) => (
             <Fragment key={group.label}>
               <div className={styles.tabGroup}>
-                <span className={styles.tabGroupLabel} aria-hidden="true">{group.label}</span>
-                <div className={styles.tabGroupButtons} role="group" aria-label={group.label}>
+                {/* role="group" here would break tablist's required
+                    tab-only ownership chain (axe: aria-required-children/
+                    -parent) — the group name is exposed per-tab via
+                    aria-describedby instead, and this stays a plain,
+                    presentation-only wrapper. */}
+                <span className={styles.tabGroupLabel} id={`tabgroup-${group.label}`}>{group.label}</span>
+                <div className={styles.tabGroupButtons}>
                   {group.tabs.map((t) => (
                     <button
                       key={t}
@@ -141,6 +146,7 @@ export default function ParentPage({ session }) {
                       role="tab"
                       aria-selected={tab === t}
                       aria-controls={`tabpanel-${t}`}
+                      aria-describedby={`tabgroup-${group.label}`}
                       tabIndex={tab === t ? 0 : -1}
                     >
                       {t}

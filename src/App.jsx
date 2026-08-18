@@ -24,9 +24,15 @@ const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
 const ADMIN_EMAIL = 'rebawntech@gmail.com'
 
 const Loader = () => (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#030712' }}>
-    <div style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'sans-serif' }}>Loading…</div>
-  </div>
+  <main
+    id="main"
+    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#030712' }}
+  >
+    {/* rgba(255,255,255,0.3) on #030712 was 2.54:1 — below the 4.5:1 AA
+        floor every user hits on every cold load while the session
+        resolves (AccessLint audit_live, 2026-08-17). */}
+    <h1 style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'sans-serif', fontSize: '1rem', fontWeight: 400 }}>Loading…</h1>
+  </main>
 )
 
 export default function App() {

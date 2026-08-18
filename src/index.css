@@ -12,6 +12,8 @@
   --c-berry: #c026d3;
   --c-alert: #ef4444;
   --c-alert-d: #b91c1c;
+  --c-success-text: #128a5a;
+  --c-success-bg: #d8f7e9;
 
   /* Legacy aliases (kept so any un-migrated rule still resolves) */
   --buddy-purple: var(--c-grape);
@@ -53,6 +55,19 @@
   --font-body: 'Nunito', system-ui, sans-serif;
   --font-main: var(--font-body);
 
+  /* Type scale — this app had ~15 uncoordinated ad-hoc sizes across
+     LandingPage alone before this. Steps chosen to match the sizes
+     already in wide use, not an abstract ratio. */
+  --fs-2xs: 0.6875rem;  /* 11px — badges, tags */
+  --fs-xs: 0.75rem;     /* 12px — captions, meta */
+  --fs-sm: 0.8125rem;   /* 13px — pills, small labels */
+  --fs-base: 0.875rem;  /* 14px — body/button text */
+  --fs-md: 1rem;        /* 16px — larger body, descriptions */
+  --fs-lg: 1.125rem;    /* 18px — small headings */
+  --fs-xl: 1.375rem;    /* 22px — section labels, logo */
+  --fs-2xl: 1.75rem;    /* 28px */
+  --fs-display: clamp(2.25rem, 6vw, 4rem); /* 36–64px — hero */
+
   /* Parent surface (calm admin tones, reused across ParentPage.module.css
      and components/parentTabs/*.module.css — status text/badge colors and
      the shared neutral border, so a re-theme only touches one place). */
@@ -62,6 +77,11 @@
   --parent-plum-text: #6d28d9;
   --parent-rose-text: #be185d;
   --parent-green-text: #15803d;
+
+  /* Light-purple surface tints, previously duplicated as 6+ near-identical
+     one-off hex values across CoursesPage and lesson step cards. */
+  --surface-tint: #f4f0fc;
+  --surface-tint-strong: #e9e0fb;
 }
 
 /* ---- Reset ---- */
@@ -75,6 +95,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: var(--font-main);
+  line-height: 1.5;
   background: var(--bg-gradient);
   color: var(--text-main);
   -webkit-tap-highlight-color: transparent;

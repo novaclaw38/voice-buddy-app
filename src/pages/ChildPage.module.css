@@ -5,11 +5,14 @@
    across NormalScreen, VoiceOnlyScreen, and sing mode), the shared PIN
    dismiss backdrop, and sing mode's floating envelope variant. */
 
+/* A fully transparent full-viewport button had zero visual affordance —
+   nothing signaled it was there or tappable. A faint scrim makes the tap
+   target discoverable without competing with ParentPin's own visible card. */
 .pinDismiss {
   position: fixed;
   inset: 0;
   z-index: 99;
-  background: transparent;
+  background: rgba(58,42,93,0.08);
 }
 
 /* Parent voice message overlay */
@@ -23,6 +26,7 @@
   background: rgba(58,42,93,0.6);
   backdrop-filter: blur(6px);
   animation: msgFadeIn 0.25s ease;
+  overscroll-behavior: contain;
 }
 
 @keyframes msgFadeIn {
@@ -95,18 +99,24 @@
 
 .msgDismissBtn:active { background: #e7defa; }
 
-/* Flashing envelope — parent message indicator, voice-only mode's top-right */
+/* Flashing envelope — parent message indicator, voice-only mode's top-right.
+   Was --c-alert (the app's shared error/warning token) with an infinite
+   pulse — a parent voice note is a warm "peace of mind" feature per
+   PRODUCT.md, not an alarm, so it read as "something's wrong" instead of
+   "something nice arrived." Candy pink + a few finite pulses that settle,
+   not an unending alarm loop. Sized to match .envelopeFloat (52px) rather
+   than sitting right at the 44px tap-target floor. */
 .envelopeBtn {
   font-size: 1.4rem;
-  width: 46px;
-  height: 46px;
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--c-alert);
-  box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 3px rgba(239,68,68,0.35);
+  background: var(--c-pink);
+  box-shadow: 0 4px 0 var(--c-pink-d), 0 0 0 3px rgba(255,107,169,0.35);
   line-height: 1;
-  animation: envelopeArrive 0.5s var(--spring) both, envelopePulse 0.7s 0.5s ease-in-out infinite alternate;
+  animation: envelopeArrive 0.5s var(--spring) both, envelopePulse 0.7s 0.5s ease-in-out 3 alternate;
   flex-shrink: 0;
 }
 
@@ -117,8 +127,8 @@
 }
 
 @keyframes envelopePulse {
-  from { transform: scale(1);    box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 3px rgba(239,68,68,0.35); }
-  to   { transform: scale(1.12); box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 8px rgba(239,68,68,0.0); }
+  from { transform: scale(1);    box-shadow: 0 4px 0 var(--c-pink-d), 0 0 0 3px rgba(255,107,169,0.35); }
+  to   { transform: scale(1.12); box-shadow: 0 4px 0 var(--c-pink-d), 0 0 0 8px rgba(255,107,169,0.0); }
 }
 
 /* Floating envelope overlay for sing mode */
@@ -133,7 +143,7 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--c-alert);
-  box-shadow: 0 4px 0 var(--c-alert-d), 0 0 0 3px rgba(239,68,68,0.35);
-  animation: envelopeArrive 0.5s var(--spring) both, envelopePulse 0.7s 0.5s ease-in-out infinite alternate;
+  background: var(--c-pink);
+  box-shadow: 0 4px 0 var(--c-pink-d), 0 0 0 3px rgba(255,107,169,0.35);
+  animation: envelopeArrive 0.5s var(--spring) both, envelopePulse 0.7s 0.5s ease-in-out 3 alternate;
 }

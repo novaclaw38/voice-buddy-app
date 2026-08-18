@@ -16,6 +16,21 @@
   pointer-events: none;
 }
 
+.loadingState {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: var(--ink-dim);
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 24px;
+}
+
 .header {
   position: relative;
   z-index: 1;
@@ -198,7 +213,7 @@
 }
 
 .expandBtn {
-  background: #f4f0fc;
+  background: var(--surface-tint);
   color: var(--c-grape);
   font-weight: 700;
   font-size: 14px;
@@ -207,7 +222,7 @@
   cursor: pointer;
   width: 100%;
 }
-.expandBtn:active { transform: scale(0.98); background: #e9e0fb; }
+.expandBtn:active { transform: scale(0.98); background: var(--surface-tint-strong); }
 
 .lessons {
   list-style: none;
@@ -224,14 +239,14 @@
   align-items: center;
   gap: 10px;
   padding: 14px 14px;
-  background: #f7f4fd;
+  background: var(--surface-tint);
   border-radius: var(--r-sm);
   cursor: pointer;
   text-align: left;
   color: var(--ink);
   transition: background 0.15s, transform 0.12s;
 }
-.lessonBtn:active { background: #efe7fb; transform: scale(0.98); }
+.lessonBtn:active { background: var(--surface-tint-strong); transform: scale(0.98); }
 
 .lessonNum {
   width: 24px;
@@ -286,17 +301,6 @@
   color: var(--ink);
 }
 
-.lessonDuration {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--ink-dim);
-  background: rgba(124,58,237,0.08);
-  border-radius: 20px;
-  padding: 2px 8px;
-  margin-left: auto;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
 
 .lessonCheck {
   display: grid;

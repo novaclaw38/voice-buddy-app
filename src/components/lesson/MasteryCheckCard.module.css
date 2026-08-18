@@ -1,15 +1,6 @@
 .card {
-  background: rgba(255,255,255,0.92);
-  border-radius: var(--r-lg);
+  composes: card from './shared.module.css';
   padding: 24px 20px;
-  width: 100%;
-  box-shadow: var(--shadow-card);
-  animation: fadeIn 0.35s var(--spring);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.92) translateY(12px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
 .progress {

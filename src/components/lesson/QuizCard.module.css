@@ -1,15 +1,6 @@
 .card {
-  background: rgba(255,255,255,0.92);
-  border-radius: var(--r-lg);
+  composes: card from './shared.module.css';
   padding: 24px 20px;
-  width: 100%;
-  box-shadow: var(--shadow-card);
-  animation: fadeIn 0.35s var(--spring);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.92) translateY(12px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
 .question {
@@ -30,7 +21,7 @@
 
 .option {
   padding: 12px 16px;
-  background: #f3ecfc;
+  background: var(--surface-tint);
   border-radius: var(--r-md);
   font-family: var(--font-head);
   font-size: 1rem;
@@ -58,7 +49,7 @@
 
 .option:not(.correct):not(.wrong):not(.correctReveal):active {
   transform: scale(0.97);
-  background: #ede0fc;
+  background: var(--surface-tint-strong);
 }
 
 .correct {

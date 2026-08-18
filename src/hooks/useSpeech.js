@@ -18,6 +18,7 @@ export function useSpeech(settings) {
   const [wordIndex, setWordIndex] = useState(-1)
   const wordRafRef = useRef(null)
   const onResultRef = useRef(null)
+  const onFailRef = useRef(null)
   const listeningRef = useRef(false)
   // speak() is async (network round-trip to /api/tts) but stopSpeaking()
   // only clears whatever audio already exists — if a second speak() call
@@ -117,7 +118,21 @@ export function useSpeech(settings) {
   }, [getFallbackVoice, settings?.speechRate, settings?.speechPitch, stopWordTracking])
 
   // ── Stop helpers ──────────────────────────────────────────────────────────
-  const stopListening = useCallback(() => {
+  // Two different callers want two different things from "stop listening":
+  // preemptive cleanup (speak(), a new startListening() session, an
+  // interrupting parent-message/story playback) wants to silently discard
+  // whatever's been heard so far — that's the default. A child tapping the
+  // mic again mid-listen to say "I'm done" wants the opposite: whatever was
+  // transcribed should still reach onResult, same as if recognition had
+  // ended on its own. { deliver: true } leaves listeningRef/recRef alone so
+  // rec.onend's own guard (`if (!listeningRef.current) return`) lets it run
+  // its normal deliver-the-transcript path instead of the early-return this
+  // used to force by clearing listeningRef before rec.stop() could fire it.
+  const stopListening = useCallback(({ deliver = false } = {}) => {
+    if (deliver) {
+      recRef.current?.stop()
+      return
+    }
     listeningRef.current = false
     if (recRef.current) { recRef.current.stop(); recRef.current = null }
   }, [])
@@ -208,8 +223,14 @@ export function useSpeech(settings) {
       settings?.speechRate, settings?.voiceName])
 
   // ── Speech recognition ────────────────────────────────────────────────────
-  const startListening = useCallback((onResult) => {
-    if (!SpeechRec) return
+  // onFail fires whenever a listening session ends WITHOUT a usable
+  // transcript — no speech heard, recognition error, or (defensively) no STT
+  // support at all — so the caller can give the child feedback (e.g. a
+  // "confused" face) instead of silently sitting on a stale "listening" UI
+  // that nothing else was ever going to clear.
+  const startListening = useCallback((onResult, onFail) => {
+    onFailRef.current = onFail
+    if (!SpeechRec) { onFailRef.current?.(); return }
     stopSpeaking()
     stopListening()
 
@@ -244,6 +265,8 @@ export function useSpeech(settings) {
       setStatus('idle')
       if (latestTranscript.trim() && onResultRef.current) {
         onResultRef.current(latestTranscript.trim())
+      } else {
+        onFailRef.current?.()
       }
     }
 
@@ -253,6 +276,7 @@ export function useSpeech(settings) {
       listeningRef.current = false
       recRef.current = null
       setStatus('idle')
+      onFailRef.current?.()
     }
 
     rec.start()

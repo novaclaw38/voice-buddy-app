@@ -37,7 +37,7 @@
 }
 .logoText {
   font-family: var(--font-head);
-  font-size: 22px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   color: var(--c-grape);
 }
@@ -53,7 +53,7 @@
   min-height: 44px;
   border-radius: var(--r-pill);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--fs-base);
   box-shadow: 0 4px 0 rgba(91,33,182,0.12);
 }
 .navLogin:active { transform: translateY(2px) scale(0.97); box-shadow: 0 2px 0 rgba(91,33,182,0.12); }
@@ -69,7 +69,7 @@
   min-height: 44px;
   border-radius: var(--r-pill);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 700;
   box-shadow: 0 5px 0 var(--c-pink-d);
 }
@@ -123,7 +123,7 @@
 
 .heroTitle {
   font-family: var(--font-head);
-  font-size: clamp(36px, 6vw, 64px);
+  font-size: var(--fs-display);
   font-weight: 700;
   line-height: 1.1;
   margin: 0 0 24px;
@@ -197,7 +197,7 @@
 .heroLoginLink {
   color: var(--ink-dim);
   text-decoration: none;
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 600;
   transition: color 0.15s ease;
 }
@@ -224,8 +224,10 @@
   bottom: -34px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: var(--font-head);
-  font-size: 13px;
+  /* Fredoka (display face) loses legibility below ~16px — Nunito at this
+     13px size instead. */
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--c-pink-d);
   background: #fff;
@@ -247,9 +249,11 @@
   max-width: 190px;
   background: #fff;
   color: var(--ink);
-  font-family: var(--font-head);
+  /* Fredoka loses legibility below ~16px, and this is a full sentence,
+     not a heading. */
+  font-family: var(--font-body);
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   line-height: 1.35;
   padding: 12px 16px;
   border-radius: var(--r-md);
@@ -349,7 +353,7 @@
 .tickerItem {
   white-space: nowrap;
   color: var(--ink-dim);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   padding: 0 24px;
   letter-spacing: 0.04em;
@@ -447,7 +451,7 @@
 .featureTag {
   display: inline-block;
   color: var(--c-pink-d);
-  font-size: 12px;
+  font-size: var(--fs-xs);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -465,7 +469,7 @@
 }
 
 .featureDesc {
-  font-size: 16px;
+  font-size: var(--fs-md);
   color: var(--ink-dim);
   line-height: 1.7;
   margin: 0 0 24px;
@@ -483,7 +487,7 @@
   background: #fff;
   padding: 8px 16px;
   border-radius: var(--r-pill);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--ink);
   box-shadow: 0 3px 0 rgba(91,33,182,0.08);
@@ -565,7 +569,7 @@
   background: rgba(10, 20, 16, 0.55);
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   font-weight: 700;
   letter-spacing: 0.1em;
   animation: blink 1.2s ease-in-out infinite;
@@ -573,7 +577,7 @@
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 .childTag {
   color: rgba(255,255,255,0.85);
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   background: rgba(0,0,0,0.4);
   padding: 4px 8px;
   border-radius: 6px;
@@ -604,7 +608,7 @@
 .voiceInfo { flex: 1; }
 .voiceName {
   display: block;
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 800;
   color: var(--ink);
   margin-bottom: 8px;
@@ -618,7 +622,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 14px;
+  font-size: var(--fs-base);
   box-shadow: 0 5px 0 var(--c-grape-d);
 }
 
@@ -654,7 +658,7 @@
   background: #fff;
   padding: 12px 18px;
   border-radius: var(--r-md);
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 600;
   color: var(--ink);
   line-height: 1.5;
@@ -723,7 +727,7 @@
 
 .pricingLabel {
   color: var(--c-pink-d);
-  font-size: 12px;
+  font-size: var(--fs-xs);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -816,7 +820,7 @@
   right: 16px;
   background: linear-gradient(135deg, var(--c-tangerine), var(--c-pink));
   color: var(--ink);
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   font-weight: 800;
   padding: 5px 13px;
   border-radius: var(--r-pill);
@@ -825,7 +829,7 @@
 }
 
 .planName {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -847,12 +851,12 @@
   line-height: 1;
 }
 .planPer {
-  font-size: 16px;
+  font-size: var(--fs-md);
   color: var(--ink-dim);
 }
 
 .planDesc {
-  font-size: 14px;
+  font-size: var(--fs-base);
   color: var(--ink-dim);
   margin: 0 0 24px;
   line-height: 1.5;
@@ -871,7 +875,7 @@
   flex-direction: column;
   gap: 10px;
 }
-.planFeatures li { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.planFeatures li { font-size: var(--fs-base); font-weight: 600; line-height: 1.4; }
 .yes { color: var(--ink); }
 .no  { color: var(--ink-dim); text-decoration: line-through; }
 
@@ -923,14 +927,14 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-head);
-  font-size: 18px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--ink);
 }
 
 .footerTagline {
   color: var(--ink-dim);
-  font-size: 14px;
+  font-size: var(--fs-base);
   line-height: 1.5;
   margin: 0;
 }
@@ -945,7 +949,7 @@
 
 .footerColTitle {
   color: var(--ink-dim);
-  font-size: 11px;
+  font-size: var(--fs-2xs);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -957,7 +961,7 @@
   background: none;
   border: none;
   color: var(--ink-dim);
-  font-size: 14px;
+  font-size: var(--fs-base);
   text-decoration: none;
   cursor: pointer;
   min-height: 36px;
@@ -998,7 +1002,7 @@
      the 4.5:1 AA floor. --ink-dim was already darkened project-wide for
      exactly this reason (see index.css). */
   color: var(--ink-dim);
-  font-size: 12px;
+  font-size: var(--fs-xs);
   margin: 0;
 }
 
@@ -1045,7 +1049,7 @@
   color: white;
   font-family: var(--font-head);
   font-weight: 800;
-  font-size: 16px;
+  font-size: var(--fs-md);
   border-radius: var(--r-pill);
   cursor: pointer;
   box-shadow: 0 5px 0 var(--c-grape-d);

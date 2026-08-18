@@ -61,7 +61,7 @@
   border: 2px solid #e6dff4;
   border-radius: var(--r-md);
   color: var(--ink);
-  font-size: 1rem;
+  font-size: var(--fs-md);
   font-family: var(--font-body);
   transition: border-color 0.15s;
   outline: none;
@@ -97,7 +97,7 @@
 }
 
 .toggleLabel {
-  font-size: 1rem;
+  font-size: var(--fs-md);
   font-weight: 600;
   color: var(--ink);
 }
@@ -172,7 +172,7 @@
   text-align: center;
   color: var(--ink-dim);
   padding: 32px 0;
-  font-size: 1rem;
+  font-size: var(--fs-md);
 }
 
 /* History-style entry list — used by HistoryTab (chat history) and

@@ -223,10 +223,11 @@ export default function SettingsTab({ settings, onUpdateSetting, isPro, onUpgrad
       </div>
 
       <div className={shared.field}>
-        <label className={shared.label}>Daily Time Limit {!isPro && <IconLock size={11} />}</label>
+        <label className={shared.label} htmlFor="dailyLimitMinutes">Daily Time Limit {!isPro && <IconLock size={11} />}</label>
         {isPro ? (
           <>
             <select
+              id="dailyLimitMinutes"
               className={shared.input}
               value={settings.dailyLimitMinutes || ''}
               onChange={(e) => updateSetting('dailyLimitMinutes', e.target.value ? Number(e.target.value) : null)}

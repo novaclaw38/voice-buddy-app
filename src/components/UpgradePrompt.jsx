@@ -12,7 +12,7 @@ const TRIGGERS = {
   messages:   { title: 'Unlock Parent Voice Messages',   sub: 'Sending Buddy voice notes to your child is part of Buddy Pro' },
   costume:    { title: 'Unlock Costumes',                sub: "Dressing up your child's Buddy is part of Buddy Pro" },
   child:      { title: 'Unlock a Second Child Profile',  sub: 'Adding more than one child is part of Buddy Pro' },
-  courses:    { title: 'Unlock All Courses',             sub: 'Literacy, numeracy, science and more are part of Buddy Pro' },
+  courses:    { title: 'Unlock All Courses',             sub: 'Gardening, robotics, science and more are part of Buddy Pro' },
   timeLimit:  { title: 'Unlock Daily Time Limits',       sub: 'Setting a screen-time limit is part of Buddy Pro' },
   story:      { title: 'Unlock Bedtime Story Ideas',     sub: 'Sending Buddy a story idea is part of Buddy Pro' },
   storyMode:  { title: 'Unlock Story Time',              sub: 'Interactive stories with Buddy are part of Buddy Pro' },
@@ -23,6 +23,7 @@ const TRIGGERS = {
 
 export default function UpgradePrompt({ onClose, session, trigger }) {
   const [loading, setLoading] = useState(false)
+  const [upgradeError, setUpgradeError] = useState('')
   const trapRef = useRef(null)
   useFocusTrap(trapRef, true, onClose)
   const copy = TRIGGERS[trigger] || { title: 'Unlock Buddy Pro', sub: 'This feature is part of Buddy Pro' }
@@ -30,6 +31,7 @@ export default function UpgradePrompt({ onClose, session, trigger }) {
   const handleUpgrade = async () => {
     if (!session) return
     setLoading(true)
+    setUpgradeError('')
     try {
       const res = await fetch('/api/payfast-create', {
         method: 'POST',
@@ -46,6 +48,7 @@ export default function UpgradePrompt({ onClose, session, trigger }) {
       window.location.href = paymentUrl
     } catch (err) {
       console.error('Upgrade error:', err)
+      setUpgradeError('Something went wrong starting checkout. Please try again.')
       setLoading(false)
     }
   }
@@ -63,7 +66,7 @@ export default function UpgradePrompt({ onClose, session, trigger }) {
         <ul className={styles.perks}>
           {[
             'Unlimited daily messages',
-            'All 10 courses — literacy, numeracy, science & more',
+            'All 6 courses — gardening, robotics, science & more',
             'Progress & mastery tracking',
             'Peace of mind camera',
             'Parent voice messages',
@@ -78,6 +81,8 @@ export default function UpgradePrompt({ onClose, session, trigger }) {
           <span className={styles.period}>/month</span>
         </div>
         <p className={styles.trial}>First 10 days completely free</p>
+
+        {upgradeError && <p className={styles.upgradeError} role="alert">{upgradeError}</p>}
 
         <button
           className={styles.cta}

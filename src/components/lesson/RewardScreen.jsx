@@ -4,13 +4,21 @@ import { masteryTier } from '../../hooks/useProgress.js'
 import styles from './RewardScreen.module.css'
 import { IconStar, IconPrinter, IconTrophy, IconArrowLeft } from '../icons.jsx'
 
-const STAR_COUNT = 12
-
-const TIER_LABEL = { gold: '🥇 Gold — nailed it first try!', silver: '🥈 Silver — great work!', bronze: '🥉 Bronze — you got there!' }
+// Celebration scales with how the child actually did — a scrape-by pass
+// and a perfect run shouldn't trigger the identical fireworks. `null`
+// (legacy completions with no scored steps) gets the full gold treatment
+// since there's no signal to scale down from.
+const TIER_CONFIG = {
+  gold:   { stars: 12, heading: 'Amazing! You nailed it!', label: '🥇 Gold — nailed it first try!' },
+  silver: { stars: 8,  heading: 'Great job!',              label: '🥈 Silver — great work!' },
+  bronze: { stars: 5,  heading: 'You did it!',             label: '🥉 Bronze — you got there!' },
+  none:   { stars: 12, heading: 'You did it!',             label: null },
+}
 
 export default function RewardScreen({ lesson, course, childName, avatarType, avatarColor, costume, masteryScore, onBack }) {
   const [printTarget, setPrintTarget] = useState(null)
   const tier = masteryTier(masteryScore)
+  const { stars: starCount, heading, label: tierLabel } = TIER_CONFIG[tier || 'none']
 
   const handlePrint = (target) => {
     setPrintTarget(target)
@@ -29,7 +37,7 @@ export default function RewardScreen({ lesson, course, childName, avatarType, av
       <div className={styles.screen}>
         {/* Star burst */}
         <div className={styles.starsWrap} aria-hidden="true">
-          {Array.from({ length: STAR_COUNT }).map((_, i) => (
+          {Array.from({ length: starCount }).map((_, i) => (
             <span key={i} className={styles.star} style={{ '--i': i }}><IconStar size={26} /></span>
           ))}
         </div>
@@ -39,11 +47,11 @@ export default function RewardScreen({ lesson, course, childName, avatarType, av
           <div className={styles.buddyWrap}>
             <BuddyAvatar type={avatarType || 'bear'} costume={costume} status="happy" avatarColor={avatarColor} size={130} />
           </div>
-          <h1 className={styles.heading}>You did it!</h1>
+          <h1 className={styles.heading}>{heading}</h1>
           <p className={styles.sub}>
             You finished <strong>{lesson.title}</strong>!
           </p>
-          {tier && <p className={styles.tierBadge}>{TIER_LABEL[tier]}</p>}
+          {tierLabel && <p className={styles.tierBadge}>{tierLabel}</p>}
 
           <div className={styles.actions}>
             <button className={styles.sheetBtn} onClick={() => handlePrint('sheet')}>

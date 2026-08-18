@@ -45,9 +45,12 @@
 
 .windDownUnlock:active { transform: scale(0.96); }
 
+/* A fully transparent full-viewport button had zero visual affordance —
+   nothing signaled it was there or tappable. A faint scrim makes the tap
+   target discoverable without competing with ParentPin's own visible card. */
 .pinDismiss {
   position: fixed;
   inset: 0;
   z-index: 99;
-  background: transparent;
+  background: rgba(58,42,93,0.08);
 }
