@@ -120,9 +120,14 @@ export default function ParentPage({ session }) {
           className={styles.tabs}
           role="tablist"
           onKeyDown={(e) => {
-            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
             const i = ALL_TABS.indexOf(tab)
-            const next = e.key === 'ArrowRight' ? (i + 1) % ALL_TABS.length : (i - 1 + ALL_TABS.length) % ALL_TABS.length
+            let next
+            if (e.key === 'ArrowRight') next = (i + 1) % ALL_TABS.length
+            else if (e.key === 'ArrowLeft') next = (i - 1 + ALL_TABS.length) % ALL_TABS.length
+            else if (e.key === 'Home') next = 0
+            else if (e.key === 'End') next = ALL_TABS.length - 1
+            else return
+            e.preventDefault()
             setTab(ALL_TABS[next])
             e.currentTarget.querySelector(`#tab-${ALL_TABS[next]}`)?.focus()
           }}
@@ -145,7 +150,7 @@ export default function ParentPage({ session }) {
                       onClick={() => setTab(t)}
                       role="tab"
                       aria-selected={tab === t}
-                      aria-controls={`tabpanel-${t}`}
+                      aria-controls={tab === t ? `tabpanel-${t}` : undefined}
                       aria-describedby={`tabgroup-${group.label}`}
                       tabIndex={tab === t ? 0 : -1}
                     >

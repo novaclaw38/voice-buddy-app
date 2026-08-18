@@ -4,6 +4,10 @@
   text-align: center;
 }
 
+.srOnly {
+  composes: srOnly from './shared.module.css';
+}
+
 .visual {
   font-size: 3.5rem;
   display: block;

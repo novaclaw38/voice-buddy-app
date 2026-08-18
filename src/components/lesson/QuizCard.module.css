@@ -3,6 +3,14 @@
   padding: 24px 20px;
 }
 
+.srOnly {
+  composes: srOnly from './shared.module.css';
+}
+
+.mark {
+  margin-left: 6px;
+}
+
 .question {
   font-family: var(--font-head);
   font-size: 1.05rem;

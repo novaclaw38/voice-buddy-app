@@ -651,7 +651,7 @@ export default function ChildPage({ session }) {
 
   return (
     <>
-      {screen}
+      <main id="main">{screen}</main>
 
       <ParentMessageOverlay
         msgPhase={msgOverlayPhase}

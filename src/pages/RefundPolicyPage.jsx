@@ -1,15 +1,17 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './LegalPage.module.css'
 import { IconArrowLeft } from '../components/icons.jsx'
+import SkipLink from '../components/SkipLink.jsx'
 
 export default function RefundPolicyPage() {
   const navigate = useNavigate()
   return (
     <div className={styles.page}>
+      <SkipLink />
       <button className={styles.home} onClick={() => navigate('/')}>
         <IconArrowLeft size={16} /> Home
       </button>
-      <div className={styles.card}>
+      <main id="main" className={styles.card}>
         <h1 className={styles.title}>Refund &amp; Cancellation Policy</h1>
         <p className={styles.updated}>Last updated: 30 July 2026</p>
 
@@ -61,7 +63,7 @@ export default function RefundPolicyPage() {
           Nothing in this policy limits any refund or cancellation rights you have under
           South African consumer protection law that cannot be excluded by agreement.
         </p>
-      </div>
+      </main>
     </div>
   )
 }

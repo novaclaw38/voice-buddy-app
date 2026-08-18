@@ -27,9 +27,12 @@ export default function QuizCard({ step, onComplete }) {
     return styles.option
   }
 
+  const liveStatus = selected === null ? '' : selected === step.correct ? 'Correct!' : 'Not quite — try again.'
+
   return (
     <div className={styles.card}>
       <p className={styles.question}>{step.question}</p>
+      <p className={styles.srOnly} role="status" aria-live="polite">{liveStatus}</p>
       <div className={`${styles.options} ${styles.confettiWrap}`}>
         {showConfetti && (
           <div className={styles.confetti} aria-hidden="true">
@@ -40,6 +43,9 @@ export default function QuizCard({ step, onComplete }) {
           const spaceIdx = opt.indexOf(' ')
           const emoji = spaceIdx > -1 ? opt.slice(0, spaceIdx) : ''
           const text  = spaceIdx > -1 ? opt.slice(spaceIdx + 1) : opt
+          // Non-color cue alongside the correct/wrong background — color
+          // alone (SC 1.4.1) shouldn't be the only signal.
+          const mark = selected === null ? '' : i === step.correct ? '✓' : i === selected ? '✗' : ''
           return (
             <button
               key={i}
@@ -49,6 +55,7 @@ export default function QuizCard({ step, onComplete }) {
             >
               {emoji && <span className={styles.optEmoji}>{emoji}</span>}
               <span className={styles.optText}>{text}</span>
+              {mark && <span className={styles.mark} aria-hidden="true">{mark}</span>}
             </button>
           )
         })}

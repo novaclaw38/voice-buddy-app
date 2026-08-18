@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import styles from './AuthPage.module.css'
 import { IconArrowLeft, IconEye, IconEyeOff } from '../components/icons.jsx'
+import SkipLink from '../components/SkipLink.jsx'
 
 // Reached via the link in a password-reset email. Supabase's client detects
 // the recovery token in the URL fragment and establishes a temporary
@@ -48,10 +49,11 @@ export default function ResetPasswordPage() {
 
   return (
     <div className={styles.page}>
+      <SkipLink />
       <button className={styles.home} onClick={() => navigate('/')}>
         <IconArrowLeft size={16} /> Home
       </button>
-      <div className={styles.card}>
+      <main id="main" className={styles.card}>
         <h1 className={styles.title}>Set new password</h1>
         <p className={styles.subtitle}>Choose a new password for your account</p>
 
@@ -66,12 +68,13 @@ export default function ResetPasswordPage() {
                   id="new-password"
                   className={styles.input}
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="At least 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
                   autoComplete="new-password"
+                  aria-describedby="new-password-hint"
+                  aria-invalid={!!error}
                 />
                 <button
                   type="button"
@@ -82,17 +85,18 @@ export default function ResetPasswordPage() {
                   {showPassword ? <IconEyeOff size={19} /> : <IconEye size={19} />}
                 </button>
               </div>
+              <p id="new-password-hint" className={styles.hintText}>At least 6 characters</p>
             </div>
 
-            {error && <p className={styles.error}>{error}</p>}
-            {success && <p className={styles.successMsg}>{success}</p>}
+            {error && <p className={styles.error} role="alert">{error}</p>}
+            {success && <p className={styles.successMsg} role="status">{success}</p>}
 
             <button className={styles.submit} type="submit" disabled={loading}>
               {loading ? 'Please wait...' : 'Update password'}
             </button>
           </form>
         )}
-      </div>
+      </main>
     </div>
   )
 }

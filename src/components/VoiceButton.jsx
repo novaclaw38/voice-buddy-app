@@ -22,6 +22,15 @@ export default function VoiceButton({ status, onPress, onRelease, tapMode = true
         className={`${styles.button} ${styles[status]}`}
         onPointerDown={handlePress}
         onPointerUp={handleRelease}
+        onKeyDown={(e) => {
+          // Keyboard users have no pointerdown/pointerup pair, so a single
+          // Enter/Space press must do whatever pointerdown does: start
+          // listening in tap mode, or start-then-stop in press-and-hold mode.
+          if (e.key !== 'Enter' && e.key !== ' ') return
+          e.preventDefault()
+          handlePress()
+          if (!tapMode) handleRelease()
+        }}
         disabled={disabled}
         aria-label={isListening ? 'Tap to stop listening' : `Tap to talk to ${buddyName}`}
       >
@@ -54,7 +63,7 @@ export default function VoiceButton({ status, onPress, onRelease, tapMode = true
         )}
       </button>
 
-      <p className={styles.label}>
+      <p className={styles.label} role="status" aria-live="polite">
         {isListening ? 'Listening…' : isSpeaking ? `${buddyName} is talking…` : isThinking ? 'Thinking…' : 'Tap to talk!'}
       </p>
     </div>

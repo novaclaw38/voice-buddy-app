@@ -127,6 +127,12 @@
 .input:focus { border-color: var(--c-grape); background: #fff; box-shadow: 0 0 0 3px rgba(124,58,237,0.18); }
 .input::placeholder { color: #b6abce; }
 
+.hintText {
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  padding-left: 4px;
+}
+
 .error {
   font-size: 0.85rem;
   font-weight: 700;

@@ -170,6 +170,7 @@ export default function AuthPage() {
               required
               autoComplete="email"
               spellCheck={false}
+              aria-invalid={!!error}
             />
           </div>
 
@@ -181,7 +182,6 @@ export default function AuthPage() {
                   id="auth-password"
                   className={styles.input}
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="At least 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setPasswordFocused(true)}
@@ -189,6 +189,8 @@ export default function AuthPage() {
                   required
                   minLength={6}
                   autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                  aria-describedby="auth-password-hint"
+                  aria-invalid={!!error}
                 />
                 <button
                   type="button"
@@ -199,6 +201,7 @@ export default function AuthPage() {
                   {showPassword ? <IconEyeOff size={19} /> : <IconEye size={19} />}
                 </button>
               </div>
+              <p id="auth-password-hint" className={styles.hintText}>At least 6 characters</p>
             </div>
           )}
 
@@ -212,8 +215,8 @@ export default function AuthPage() {
             </button>
           )}
 
-          {error && <p className={styles.error}>{error}</p>}
-          {success && <p className={styles.successMsg}>{success}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
+          {success && <p className={styles.successMsg} role="status">{success}</p>}
 
           <button className={styles.submit} type="submit" disabled={loading}>
             {loading

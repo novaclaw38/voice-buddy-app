@@ -533,8 +533,8 @@ export default function LandingPage() {
 
       {/* Mobile-only sticky CTA — on a long phone-scroll, the signup button
           shouldn't require scrolling back to the top. */}
-      <div className={`${styles.stickyCta} ${pastHero ? styles.stickyCtaVisible : ''}`}>
-        <Link className={styles.stickyCtaBtn} to="/login" state={{ mode: 'signup', plan: 'pro' }}>
+      <div className={`${styles.stickyCta} ${pastHero ? styles.stickyCtaVisible : ''}`} inert={pastHero ? undefined : ''}>
+        <Link className={styles.stickyCtaBtn} to="/login" state={{ mode: 'signup', plan: 'pro' }} tabIndex={pastHero ? undefined : -1}>
           Start Free Trial
         </Link>
       </div>

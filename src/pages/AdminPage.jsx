@@ -64,7 +64,7 @@ export default function AdminPage() {
   const maxDay = Math.max(1, ...stats.signupsByDay.map((d) => d.count))
 
   return (
-    <div className={styles.page} id="main">
+    <main className={styles.page} id="main">
       <header className={styles.header}>
         <h1 className={styles.title}>Admin</h1>
         <button className={styles.back} onClick={() => navigate('/app')}>Back to app</button>
@@ -146,6 +146,6 @@ export default function AdminPage() {
         </table>
         {filtered.length === 0 && <p className={styles.empty}>No users match "{query}".</p>}
       </section>
-    </div>
+    </main>
   )
 }

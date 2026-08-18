@@ -184,7 +184,7 @@ export default function CoursesPage({ session }) {
                             {completions.has(`${course.id}:${lesson.id}`) && (
                               <span className={styles.lessonCheck}><IconCheck size={14} /></span>
                             )}
-                            <span className={styles.lessonArrow}>{isPro ? <IconArrowRight size={16} /> : <IconLock size={16} />}</span>
+                            <span className={styles.lessonArrow}>{isPro ? <IconArrowRight size={16} /> : <IconLock size={16} label="Locked, upgrade to Pro" />}</span>
                           </button>
                         </li>
                       ))}

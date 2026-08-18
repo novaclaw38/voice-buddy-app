@@ -57,6 +57,9 @@ export default function LabelCard({ step, onComplete }) {
 
       <span className={styles.visual}>{step.visual}</span>
       <p className={styles.instruction}>Tap the labels in order ↓</p>
+      <p className={styles.srOnly} role="status" aria-live="polite">
+        {placed.length} of {step.items.length} placed
+      </p>
 
       <div className={styles.chips}>
         {remaining.map(item => {

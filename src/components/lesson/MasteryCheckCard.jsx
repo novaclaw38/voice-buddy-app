@@ -45,15 +45,19 @@ export default function MasteryCheckCard({ step, speech, onComplete }) {
     return styles.option
   }
 
+  const liveStatus = selected === null ? '' : selected === item.correct ? 'Correct!' : 'Not quite — try again.'
+
   return (
     <div className={styles.card}>
       <p className={styles.progress}>Question {itemIndex + 1} of {items.length}</p>
       <p className={styles.question}>{item.question}</p>
+      <p className={styles.srOnly} role="status" aria-live="polite">{liveStatus}</p>
       <div className={styles.options}>
         {item.options.map((opt, i) => {
           const spaceIdx = opt.indexOf(' ')
           const emoji = spaceIdx > -1 ? opt.slice(0, spaceIdx) : ''
           const text  = spaceIdx > -1 ? opt.slice(spaceIdx + 1) : opt
+          const mark = selected === null ? '' : i === item.correct ? '✓' : i === selected ? '✗' : ''
           return (
             <button
               key={i}
@@ -63,6 +67,7 @@ export default function MasteryCheckCard({ step, speech, onComplete }) {
             >
               {emoji && <span className={styles.optEmoji}>{emoji}</span>}
               <span className={styles.optText}>{text}</span>
+              {mark && <span className={styles.mark} aria-hidden="true">{mark}</span>}
             </button>
           )
         })}
