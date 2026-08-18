@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { NURSERY_RHYMES } from '../utils/nurseryRhymes.js'
+import { WORD_TIMES } from '../utils/nurseryRhymeTimings.js'
 import styles from './SingAlong.module.css'
 import { IconArrowLeft, IconMusic, IconPlay, IconPause, IconRepeat } from './icons.jsx'
 import BuddyAvatar from './BuddyAvatar.jsx'
@@ -15,11 +16,14 @@ const screenMotion = {
   transition: SCREEN_SPRING,
 }
 
-// Sing-along plays a REAL sung recording per song. Recordings have no
-// per-word timestamps, so the karaoke highlight is driven by elapsed
-// playback time within the song's [leadIn, outro] window (see
-// nurseryRhymes.js), distributed across words by character length (longer
-// words get proportionally more time) for a natural-feeling bounce.
+// Sing-along plays a REAL sung recording per song. Most songs have real
+// per-word timing anchors in nurseryRhymeTimings.js, derived by running
+// onset-detection (energy-flux peak-picking) against each recording — see
+// scripts/analyze-sing-along-onsets.mjs. For any song without an entry
+// there (or an audio element that hasn't loaded), the karaoke highlight
+// falls back to elapsed playback time within the song's [leadIn, outro]
+// window (see nurseryRhymes.js), distributed across words by character
+// length (longer words get proportionally more time) for a natural bounce.
 export default function SingAlong({ onExit, avatarColor, avatarType = 'bear', costume }) {
   const [screen, setScreen] = useState('pick') // 'pick' | 'sing' | 'credits'
   const [song, setSong] = useState(null)
@@ -48,20 +52,30 @@ export default function SingAlong({ onExit, avatarColor, avatarType = 'bear', co
   const startTracking = useCallback((rhyme) => {
     stopRaf()
     const map = buildWordMap(rhyme)
+    const realTimes = WORD_TIMES[rhyme.id]
+    const hasRealTimes = Array.isArray(realTimes) && realTimes.length === map.length
     const totalChars = map.reduce((s, w) => s + w.len, 0) || 1
     const leadIn = rhyme.leadIn || 0
     const tick = () => {
       const audio = audioRef.current
       if (audio && audio.duration > 0) {
-        // Map word progress across [leadIn, outro] — the part of the
-        // recording that's actually singing — instead of the full file,
-        // so lead-in music and a trailing instrumental don't throw off sync.
-        const outro = rhyme.outro || audio.duration
-        const activeSpan = Math.max(outro - leadIn, 0.01)
-        if (audio.currentTime < leadIn) {
+        const t = audio.currentTime
+        if (t < leadIn) {
           setGlobalWord(-1)
+        } else if (hasRealTimes) {
+          // Real onset-derived timestamps: find the last word whose start
+          // time has passed. Words are in ascending time order, so a linear
+          // scan from the end is cheap and simple at 60fps scale (<400 words).
+          let idx = -1
+          for (let i = realTimes.length - 1; i >= 0; i--) {
+            if (realTimes[i] <= t) { idx = i; break }
+          }
+          setGlobalWord(idx)
         } else {
-          const progress = Math.min((audio.currentTime - leadIn) / activeSpan, 1)
+          // Fallback: proportional estimate across [leadIn, outro].
+          const outro = rhyme.outro || audio.duration
+          const activeSpan = Math.max(outro - leadIn, 0.01)
+          const progress = Math.min((t - leadIn) / activeSpan, 1)
           const charPos = progress * totalChars
           let cum = 0
           let idx = map.length - 1
@@ -202,6 +216,10 @@ export default function SingAlong({ onExit, avatarColor, avatarType = 'bear', co
 
     content = (
       <motion.div key="sing" className={styles.screenWrap} {...screenMotion}>
+      <div className={styles.marqueeLights} aria-hidden="true" />
+      <div className={styles.spotlight} aria-hidden="true" />
+      <div className={styles.stageFloor} aria-hidden="true" />
+
       <div className={styles.topBar}>
         <button className={styles.backBtn} onClick={handleBackToPick}><IconMusic size={17} /> Songs</button>
         <span className={styles.topTitle}>{song.emoji} {song.title}</span>

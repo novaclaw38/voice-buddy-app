@@ -1,4 +1,4 @@
-/* ── Overlay ─────────────────────────────────────── */
+/* ── Overlay: velvet stage curtain ────────────────── */
 .overlay {
   position: fixed;
   inset: 0;
@@ -6,8 +6,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Deep enough that white lyrics pass 4.5:1 — the old #ff8fc7 top measured 2.65:1 */
-  background: linear-gradient(160deg, #c2417f 0%, #6d3fc0 100%);
+  /* Deep velvet gradient (dark enough that white lyrics pass 4.5:1) with a
+     subtle vertical fold texture, like curtain drapery either side of the
+     stage. Warm maroon keeps the brand's "candy" warmth without competing
+     with the spotlight/highlight accents used on the sing screen. */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.16) 0px,
+      rgba(0,0,0,0.16) 3px,
+      rgba(255,255,255,0.03) 3px,
+      rgba(255,255,255,0.03) 26px
+    ),
+    linear-gradient(160deg, #7a1f4b 0%, #4a1338 55%, #240a24 100%);
   padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
   overflow: hidden;
 }
@@ -15,6 +26,7 @@
 /* Motion-animated screen container — replicates the overlay's column layout
    one level down so pick/credits/sing keep their original geometry. */
 .screenWrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,6 +37,8 @@
 
 /* ── Top bar ─────────────────────────────────────── */
 .topBar {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -181,6 +195,77 @@
   color: #6b21a8;
 }
 
+/* ── Stage dressing (sing screen only) ────────────── */
+/* Warm spotlight glow behind Buddy — a radial cone as if a follow-spot is
+   lighting the performer, brightest where Buddy stands. */
+.spotlight {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255,230,150,0.35) 0%,
+    rgba(255,210,120,0.16) 38%,
+    rgba(255,210,120,0) 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: spotlightPulse 3.2s ease-in-out infinite;
+}
+
+@keyframes spotlightPulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* Stage floor: warm wood-toned boards receding toward the footlights,
+   anchoring the bottom of the sing screen. */
+.stageFloor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.14) 0px,
+      rgba(0,0,0,0.14) 1px,
+      transparent 1px,
+      transparent 34px
+    ),
+    linear-gradient(180deg, rgba(90,40,20,0) 0%, rgba(94,45,24,0.55) 40%, rgba(74,32,16,0.78) 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 55%);
+          mask-image: linear-gradient(180deg, transparent 0%, black 55%);
+}
+
+/* Row of small marquee bulbs along the top bar, like a stage sign. */
+.marqueeLights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #ffe9a8 0 2px, transparent 2.2px);
+  background-size: 26px 5px;
+  background-position: center;
+  opacity: 0.8;
+  animation: marqueeTwinkle 1.6s steps(2) infinite;
+}
+
+@keyframes marqueeTwinkle {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
+}
+
 /* ── Sing screen ─────────────────────────────────── */
 .singTitle {
   font-family: var(--font-head);
@@ -193,6 +278,8 @@
 }
 
 .lyricsBlock {
+  position: relative;
+  z-index: 1;
   flex: 1;
   width: 100%;
   padding: 8px 20px;
@@ -224,6 +311,8 @@
 
 /* Buddy singing along above the lyrics */
 .singBuddy {
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -282,6 +371,8 @@
 
 /* ── Status line ─────────────────────────────────── */
 .statusLine {
+  position: relative;
+  z-index: 1;
   font-size: 0.9rem;
   font-weight: 700;
   color: rgba(255,255,255,0.85);
@@ -298,6 +389,8 @@
 
 /* ── Controls ────────────────────────────────────── */
 .controls {
+  position: relative;
+  z-index: 1;
   display: flex;
   gap: 12px;
   padding: 10px 16px 16px;
