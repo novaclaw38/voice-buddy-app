@@ -8,3 +8,6 @@ dist
 Payment Methods Logo Pack
 .env*
 .playwright-mcp
+.agents
+.claude
+.codex
