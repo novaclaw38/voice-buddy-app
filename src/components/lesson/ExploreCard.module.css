@@ -95,6 +95,20 @@
   text-align: center;
 }
 
+.chipYoung {
+  min-width: 92px;
+  padding: 14px 16px;
+}
+
+.chipYoung .chipEmoji {
+  font-size: 2.6rem;
+}
+
+.chipYoung .chipText {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
 .chipSelected {
   box-shadow: 0 0 0 3px var(--c-mint), 0 4px 0 var(--c-grape-d);
 }

@@ -21,17 +21,17 @@ function splitEmoji(s) {
 //   mode 'sort':     tap an item, then tap the bucket it belongs in
 //   mode 'match':    tap a left item, then its matching right item
 // See docs/superpowers/specs/2026-07-30-learn-section-redesign-design.md §2.
-export default function ExploreCard({ step, onComplete }) {
+export default function ExploreCard({ step, onComplete, young }) {
   const mode = step.mode || 'sequence'
   const timerRef = useRef(null)
   useEffect(() => () => clearTimeout(timerRef.current), [])
 
-  if (mode === 'sort') return <SortExplore step={step} onComplete={onComplete} timerRef={timerRef} />
-  if (mode === 'match') return <MatchExplore step={step} onComplete={onComplete} timerRef={timerRef} />
-  return <SequenceExplore step={step} onComplete={onComplete} timerRef={timerRef} />
+  if (mode === 'sort') return <SortExplore step={step} onComplete={onComplete} timerRef={timerRef} young={young} />
+  if (mode === 'match') return <MatchExplore step={step} onComplete={onComplete} timerRef={timerRef} young={young} />
+  return <SequenceExplore step={step} onComplete={onComplete} timerRef={timerRef} young={young} />
 }
 
-function SequenceExplore({ step, onComplete, timerRef }) {
+function SequenceExplore({ step, onComplete, timerRef, young }) {
   const [placed, setPlaced] = useState([])
   const shuffledItems = useMemo(() => shuffleArray(step.items), [step.items])
 
@@ -64,7 +64,7 @@ function SequenceExplore({ step, onComplete, timerRef }) {
         {remaining.map(item => {
           const { emoji, text } = splitEmoji(item)
           return (
-            <button key={item} className={styles.chip} onClick={() => handleTap(item)}>
+            <button key={item} className={`${styles.chip} ${young ? styles.chipYoung : ''}`} onClick={() => handleTap(item)}>
               {emoji && <span className={styles.chipEmoji}>{emoji}</span>}
               <span className={styles.chipText}>{text}</span>
             </button>
@@ -75,7 +75,7 @@ function SequenceExplore({ step, onComplete, timerRef }) {
   )
 }
 
-function SortExplore({ step, onComplete, timerRef }) {
+function SortExplore({ step, onComplete, timerRef, young }) {
   const [placedByBucket, setPlacedByBucket] = useState([[], []])
   const [selected, setSelected] = useState(null)
   const [shake, setShake] = useState(false)
@@ -122,7 +122,7 @@ function SortExplore({ step, onComplete, timerRef }) {
           return (
             <button
               key={it.text}
-              className={`${styles.chip} ${isSelected ? styles.chipSelected : ''}`}
+              className={`${styles.chip} ${isSelected ? styles.chipSelected : ''} ${young ? styles.chipYoung : ''}`}
               onClick={() => setSelected(it)}
             >
               {emoji && <span className={styles.chipEmoji}>{emoji}</span>}
@@ -135,7 +135,7 @@ function SortExplore({ step, onComplete, timerRef }) {
   )
 }
 
-function MatchExplore({ step, onComplete, timerRef }) {
+function MatchExplore({ step, onComplete, timerRef, young }) {
   const [matched, setMatched] = useState([])
   const [pickLeft, setPickLeft] = useState(null)
   const [wrongPair, setWrongPair] = useState(null)

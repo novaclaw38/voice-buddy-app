@@ -1,0 +1,412 @@
+export const cooking = {
+    id: 'cooking',
+    subject: 'life-skills',
+    title: 'Cooking for Kids',
+    emoji: '🍳',
+    color: ['#b45309', '#d97706'],
+    description: 'Learn kitchen safety, food facts, and simple recipes to try with a grown-up',
+    lessons: [
+      {
+        id: 'kitchen-safety',
+        title: 'Kitchen Safety First',
+        emoji: '🧑‍🍳',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Before we cook anything, let\'s learn the most important rule — always wash your hands with soap first, and let a grown-up handle anything hot or sharp!',
+            narrations: [
+              'Before we cook anything, let\'s learn the most important rule — always wash your hands with soap first, and let a grown-up handle anything hot or sharp!',
+              'Every great cook starts the same way — clean hands and a grown-up nearby for the hot and sharp stuff! Let\'s learn the rules.',
+            ],
+            narrationYoung: 'Wash your hands first! A grown-up handles hot and sharp things.',
+            emoji: '🧼',
+            fact: 'Washing your hands with soap for 20 seconds washes away germs before you touch any food.',
+          },
+          {
+            type: 'quiz',
+            narration: 'What should you always do before you start cooking?',
+            question: 'Before cooking, you should always…',
+            options: ['🧼 Wash your hands', '🔥 Turn on the oven', '🔪 Grab a knife', '🍪 Eat a snack'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Some kitchen jobs are just for grown-ups, like using the stove, oven, or sharp knives. But kids can safely stir, pour, and decorate with a grown-up watching!',
+            narrations: [
+              'Some kitchen jobs are just for grown-ups, like using the stove, oven, or sharp knives. But kids can safely stir, pour, and decorate with a grown-up watching!',
+              'Not every kitchen job is for kids — but plenty are! Let\'s sort out which jobs you can help with.',
+            ],
+            narrationYoung: 'Grown-ups handle hot pans and sharp knives. Kids can stir, pour, and mix!',
+            emoji: '🥣',
+            fact: 'Grown-ups handle hot pans and sharp knives; kids can safely stir, pour, and mix with supervision.',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s remember our kitchen safety steps. Tap each one in order!',
+            visual: '🧑‍🍳',
+            items: ['🧼 Wash your hands', '👕 Tie back hair, roll up sleeves', '🙋 Ask a grown-up for hot/sharp jobs', '🧹 Clean up after'],
+          },
+          {
+            type: 'quiz',
+            narration: 'True or false — should kids ever use a sharp knife or hot stove all by themselves?',
+            question: 'Should kids use knives or stoves alone?',
+            options: ['❌ No — always ask a grown-up', '✅ Yes — anytime'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'What is one cooking job you could do safely with a grown-up watching? Tell me!',
+            narrations: [
+              'What is one cooking job you could do safely with a grown-up watching? Tell me!',
+              'You know the safety rules now! What kitchen job would you like to try with a grown-up nearby?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Kitchen Safety First',
+          facts: [
+            'Always wash your hands with soap before cooking.',
+            'Grown-ups handle hot stoves, ovens, and sharp knives.',
+            'Kids can safely stir, pour, and decorate with supervision.',
+          ],
+          colourPrompt: 'Draw yourself wearing a chef\'s hat, washing your hands before cooking!',
+          visual: '🧑‍🍳',
+        },
+      },
+      {
+        id: 'food-sources',
+        title: 'Where Food Comes From',
+        emoji: '🌾',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Every single food comes from a plant or an animal! Bread comes from wheat plants, and milk comes from cows.',
+            narrations: [
+              'Every single food comes from a plant or an animal! Bread comes from wheat plants, and milk comes from cows.',
+              'Have you ever wondered where your food comes from before it reaches your plate? It all starts with a plant or an animal!',
+            ],
+            narrationYoung: 'All food comes from plants or animals — like bread from wheat and milk from cows!',
+            emoji: '🌾',
+            fact: 'Bread is made from wheat, a grain that grows in huge farm fields.',
+          },
+          {
+            type: 'quiz',
+            narration: 'Where does milk come from?',
+            question: 'Milk comes from…',
+            options: ['🐄 Cows (and other animals)', '🌳 Trees', '🪨 Rocks', '🌊 The ocean'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Farmers grow crops and raise animals, and their food travels from the farm to a truck, then to a shop, before it finally reaches your kitchen.',
+            narrations: [
+              'Farmers grow crops and raise animals, and their food travels from the farm to a truck, then to a shop, before it finally reaches your kitchen.',
+              'Here\'s the long journey your food takes — from a farmer\'s field, onto a truck, into a shop, and finally to your table!',
+            ],
+            narrationYoung: 'Food travels from a farm, to a truck, to a shop, and then to your kitchen!',
+            emoji: '🚚',
+            fact: 'Many foods travel a long way from a farm to your plate!',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s follow food\'s journey! Tap each step in order.',
+            visual: '🚜',
+            items: ['🌱 Farm grows food', '🚚 Truck delivers food', '🏪 Shop sells food', '🍽️ You cook and eat it'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Which of these grows on a farm?',
+            question: 'Which one grows on a farm?',
+            options: ['🌾 Wheat', '🧸 Plastic toys', '🚗 Toy cars', '🔋 Batteries'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'What is your favourite food, and do you know if it comes from a plant or an animal?',
+            narrations: [
+              'What is your favourite food, and do you know if it comes from a plant or an animal?',
+              'You know where food comes from now! Tell me your favourite food — is it from a plant or an animal?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Where Food Comes From',
+          facts: [
+            'All food comes from a plant or an animal.',
+            'Farmers grow crops and raise animals for our food.',
+            'Food travels from a farm to a truck to a shop before reaching your kitchen.',
+          ],
+          colourPrompt: 'Draw a farm with plants growing and animals, then draw the truck that delivers the food!',
+          visual: '🌾',
+        },
+      },
+      {
+        id: 'measuring',
+        title: 'Mixing, Measuring & Tools',
+        emoji: '🥣',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Recipes use exact measurements, like cups and teaspoons, so the food turns out right every single time — a recipe is like a science experiment!',
+            narrations: [
+              'Recipes use exact measurements, like cups and teaspoons, so the food turns out right every single time — a recipe is like a science experiment!',
+              'Did you know cooking is a lot like science? Recipes use exact measurements to make sure your food turns out just right!',
+            ],
+            narrationYoung: 'Recipes use exact measuring cups and spoons so the food turns out just right!',
+            emoji: '📏',
+            fact: 'A recipe is like a science experiment — the exact amounts matter!',
+          },
+          {
+            type: 'quiz',
+            narration: 'What tool do you use to measure exact amounts of flour or sugar?',
+            question: 'You measure flour or sugar with a…',
+            options: ['🥤 Measuring cup', '🧴 Bath towel', '📺 TV remote', '👟 Shoe'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Mixing tools each have their own job — a whisk beats air into eggs, a spoon stirs, and a spatula scrapes the bowl clean.',
+            narrations: [
+              'Mixing tools each have their own job — a whisk beats air into eggs, a spoon stirs, and a spatula scrapes the bowl clean.',
+              'Every kitchen tool has a special job! Let\'s meet a few of the most useful ones.',
+            ],
+            narrationYoung: 'A whisk beats eggs fluffy, a spoon stirs, and a spatula scrapes the bowl!',
+            emoji: '🥄',
+            fact: 'A whisk\'s wires trap tiny air bubbles, which is why whisked eggs get fluffy!',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s meet the kitchen tools! Tap each one in order.',
+            visual: '🥣',
+            items: ['🥤 Measuring cup', '🥣 Mixing bowl', '🍴 Whisk', '🍳 Spatula'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Why do recipes use exact measurements?',
+            question: 'Recipes use exact measurements so that…',
+            options: ['✅ The food turns out right every time', '🎉 Just for fun', '🧹 To make more mess', '🤷 No reason at all'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'If you were baking cookies, what would you like to measure and mix first?',
+            narrations: [
+              'If you were baking cookies, what would you like to measure and mix first?',
+              'You know your kitchen tools now! If we baked cookies together, what would you want to measure first?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Mixing, Measuring & Tools',
+          facts: [
+            'Recipes use exact measurements so food turns out right.',
+            'A whisk beats air into eggs to make them fluffy.',
+            'Each kitchen tool — spoon, whisk, spatula — has its own job.',
+          ],
+          colourPrompt: 'Draw your favourite kitchen tools and colour them in!',
+          visual: '🥣',
+        },
+      },
+      {
+        id: 'heat-cooking',
+        title: 'Hot & Cold: How Cooking Changes Food',
+        emoji: '🔥',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Heat changes food forever — a raw egg turns solid and white when it\'s cooked, and squishy dough rises into fluffy bread in a hot oven.',
+            narrations: [
+              'Heat changes food forever — a raw egg turns solid and white when it\'s cooked, and squishy dough rises into fluffy bread in a hot oven.',
+              'Here\'s a kitchen magic trick — heat can completely change how food looks, feels, and tastes! Let\'s see how.',
+            ],
+            narrationYoung: 'Heat changes food — a runny egg turns solid, and dough turns into fluffy bread!',
+            emoji: '🍳',
+            fact: 'Cooking with heat kills germs in food and makes many foods safer and tastier to eat.',
+          },
+          {
+            type: 'quiz',
+            narration: 'What happens to a raw egg when you cook it?',
+            question: 'A raw egg, when cooked, will…',
+            options: ['🍳 Turn solid', '👻 Turn invisible', '🥶 Get colder', '🙈 Nothing changes'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Cold does the opposite of heat — a fridge and freezer slow down the tiny germs that spoil food, so it stays fresh for longer.',
+            narrations: [
+              'Cold does the opposite of heat — a fridge and freezer slow down the tiny germs that spoil food, so it stays fresh for longer.',
+              'Heat isn\'t the only kitchen trick — cold works too! Let\'s find out why we keep some foods in the fridge.',
+            ],
+            narrationYoung: 'A cold fridge or freezer keeps food fresh for longer!',
+            emoji: '🧊',
+            fact: 'Freezing food can keep it fresh for months by slowing down the germs that make food spoil.',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s put these from coldest to hottest. Tap them in order!',
+            visual: '🌡️',
+            items: ['❄️ Freezer', '🧊 Fridge', '🌤️ Room temperature', '🔥 Oven'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Why do we put some food in the fridge?',
+            question: 'We put food in the fridge to…',
+            options: ['✅ Keep it fresh longer', '👻 Make it disappear', '📢 Make it louder', '🏋️ Make it heavier'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'Can you name one food that changes a lot when it\'s cooked?',
+            narrations: [
+              'Can you name one food that changes a lot when it\'s cooked?',
+              'You know how heat and cold change food now! Can you think of a food that looks totally different once it\'s cooked?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Hot & Cold: How Cooking Changes Food',
+          facts: [
+            'Heat cooks food — a raw egg turns solid when cooked.',
+            'Cold keeps food fresh by slowing down germs.',
+            'Freezers can keep food fresh for months.',
+          ],
+          colourPrompt: 'Draw a raw egg on one side and a cooked egg on the other — colour the difference!',
+          visual: '🔥',
+        },
+      },
+      {
+        id: 'food-groups',
+        title: 'Yummy & Healthy: Food Groups',
+        emoji: '🥦',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'Foods fit into groups — fruits & veggies, grains, proteins like eggs and beans, and dairy like milk and cheese. Eating from every group keeps your body strong!',
+            narrations: [
+              'Foods fit into groups — fruits & veggies, grains, proteins like eggs and beans, and dairy like milk and cheese. Eating from every group keeps your body strong!',
+              'Did you know food comes in different groups, and your body needs a bit from every group? Let\'s meet them!',
+            ],
+            narrationYoung: 'Food groups are fruits, veggies, grains, proteins, and dairy — your body needs a bit of each!',
+            emoji: '🥗',
+            fact: 'A balanced plate has a mix of food groups — no single food gives you everything you need!',
+          },
+          {
+            type: 'quiz',
+            narration: 'Which food group gives you calcium for strong bones?',
+            question: 'Calcium for strong bones comes from…',
+            options: ['🥛 Dairy (milk, cheese)', '🍬 Candy', '🥤 Soda', '🍟 Chips'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Colourful fruits and vegetables are full of vitamins that help your body fight off germs and grow strong — the more colours, the better!',
+            narrations: [
+              'Colourful fruits and vegetables are full of vitamins that help your body fight off germs and grow strong — the more colours, the better!',
+              'Here\'s a fun food trick — the color of a fruit or veggie tells you about the vitamins hiding inside it!',
+            ],
+            narrationYoung: 'Colourful fruits and veggies have vitamins that help your body stay strong!',
+            emoji: '🌈',
+            fact: 'Eating a "rainbow" of fruit and veggie colours gives your body many different vitamins.',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s meet the food groups! Tap each one in order.',
+            visual: '🍽️',
+            items: ['🍎 Fruits & vegetables', '🍞 Grains', '🥚 Proteins', '🥛 Dairy'],
+          },
+          {
+            type: 'quiz',
+            narration: 'Why should you eat lots of colourful fruits and veggies?',
+            question: 'Colourful fruits and veggies are good because…',
+            options: ['🌈 They have vitamins that help your body', '🍬 They taste like candy', '😴 They make you sleepy', '🤷 No reason'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'What is your favourite fruit or vegetable, and what colour is it?',
+            narrations: [
+              'What is your favourite fruit or vegetable, and what colour is it?',
+              'You know your food groups now! Tell me your favourite fruit or veggie, and its colour!',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Yummy & Healthy: Food Groups',
+          facts: [
+            'Food fits into groups: fruits & veggies, grains, proteins, and dairy.',
+            'Dairy foods give you calcium for strong bones.',
+            'Colourful fruits and veggies are packed with vitamins.',
+          ],
+          colourPrompt: 'Draw a plate with foods from every food group and colour them all in!',
+          visual: '🥦',
+        },
+      },
+      {
+        id: 'simple-snack',
+        title: 'Make a Simple Snack',
+        emoji: '🥪',
+        steps: [
+          {
+            type: 'explain',
+            narration: 'You can make a yummy snack without any cooking at all — just washing, cutting with help, and putting things together, like a fruit and yoghurt cup!',
+            narrations: [
+              'You can make a yummy snack without any cooking at all — just washing, cutting with help, and putting things together, like a fruit and yoghurt cup!',
+              'Not every yummy snack needs cooking! Let\'s learn how to make a "no-cook" snack all by yourself.',
+            ],
+            narrationYoung: 'A no-cook snack just needs washing, cutting with help, and mixing — like fruit and yoghurt!',
+            emoji: '🍓',
+            fact: 'A no-cook snack means no stove or oven needed — just clean hands and a bit of creativity!',
+          },
+          {
+            type: 'quiz',
+            narration: 'What is a "no-cook" snack?',
+            question: 'A "no-cook" snack is…',
+            options: ['🥗 A snack you don\'t need to cook', '🧊 A snack that\'s always cold', '🧊 A snack made of ice', '🚫 A snack with no food'],
+            correct: 0,
+          },
+          {
+            type: 'explain',
+            narration: 'Following a recipe step by step, in the right order, helps your snack turn out just right — just like a robot following its code!',
+            narrations: [
+              'Following a recipe step by step, in the right order, helps your snack turn out just right — just like a robot following its code!',
+              'Here\'s the secret to a great snack — following the steps in order, without skipping any!',
+            ],
+            narrationYoung: 'Following the recipe steps in order helps your snack turn out just right!',
+            emoji: '📋',
+            fact: 'Recipes work best when you follow every step in order, without skipping any.',
+          },
+          {
+            type: 'label',
+            narration: 'Let\'s make a fruit & yoghurt snack! Tap the steps in order.',
+            visual: '🥣',
+            items: ['🚿 Wash the fruit', '🔪 Cut it with help', '🥛 Add yoghurt', '🥄 Mix and enjoy'],
+          },
+          {
+            type: 'quiz',
+            narration: 'What should you do before touching any food?',
+            question: 'Before touching any food, you should…',
+            options: ['🧼 Wash your hands', '🙅 Nothing', '👟 Put on shoes', '📺 Turn on the TV'],
+            correct: 0,
+          },
+          {
+            type: 'activity',
+            narration: 'If you could make any snack right now, what would you make?',
+            narrations: [
+              'If you could make any snack right now, what would you make?',
+              'You\'re a snack-making expert now! If you could make any snack this second, what would it be?',
+            ],
+          },
+        ],
+        printSheet: {
+          title: 'Make a Simple Snack',
+          facts: [
+            'A "no-cook" snack needs no stove or oven — just clean hands.',
+            'Following recipe steps in order helps a snack turn out right.',
+            'Always wash your hands before touching food.',
+          ],
+          colourPrompt: 'Draw your favourite no-cook snack and colour it in!',
+          visual: '🥪',
+        },
+      },
+    ],
+  }

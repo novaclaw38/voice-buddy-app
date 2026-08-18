@@ -8,6 +8,7 @@ export const SUBJECTS = [
   { id: 'creativity', title: 'Creativity', emoji: '🎨' },
   { id: 'problem-solving', title: 'Problem Solving', emoji: '🤖' },
   { id: 'life-skills', title: 'Life Skills', emoji: '🍳' },
+  { id: 'community', title: 'Community Helpers', emoji: '🤝' },
 ]
 
 const BAND_BY_AGE = (age) => (age <= 5 ? 'young' : age <= 8 ? 'middle' : 'old')

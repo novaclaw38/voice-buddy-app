@@ -24,6 +24,14 @@
   line-height: 1.45;
 }
 
+.emojiYoung {
+  font-size: 5rem;
+}
+
+.factYoung {
+  font-size: 1.35rem;
+}
+
 .check {
   margin-top: 18px;
   padding-top: 16px;

@@ -5,7 +5,7 @@ import styles from './PracticeCard.module.css'
 // misconception (step.hints[wrongIndex]) before letting the child retry,
 // instead of silently resetting. Reports a 0-100 first-try score via
 // onComplete for the lesson's mastery tally.
-export default function PracticeCard({ step, speech, onComplete }) {
+export default function PracticeCard({ step, speech, onComplete, young }) {
   const [selected, setSelected] = useState(null)
   const [showConfetti, setShowConfetti] = useState(false)
   const attemptsRef = useRef(0)
@@ -52,7 +52,7 @@ export default function PracticeCard({ step, speech, onComplete }) {
           return (
             <button
               key={i}
-              className={getOptionClass(i)}
+              className={`${getOptionClass(i)} ${young ? styles.optionYoung : ''}`}
               onClick={() => handleSelect(i)}
               disabled={selected !== null}
             >

@@ -293,13 +293,13 @@ export default function LessonPage({ session }) {
           />
         )}
         {step.type === 'teach' && (
-          <TeachCard key={stepKey} step={step} />
+          <TeachCard key={stepKey} step={step} young={lesson.ageBand === 'young'} />
         )}
         {step.type === 'practice' && (
-          <PracticeCard key={stepKey} step={step} speech={speech} onComplete={handleStepComplete} />
+          <PracticeCard key={stepKey} step={step} speech={speech} onComplete={handleStepComplete} young={lesson.ageBand === 'young'} />
         )}
         {step.type === 'explore' && (
-          <ExploreCard key={stepKey} step={step} onComplete={handleStepComplete} />
+          <ExploreCard key={stepKey} step={step} onComplete={handleStepComplete} young={lesson.ageBand === 'young'} />
         )}
         {step.type === 'open-response' && (
           <OpenResponseCard
