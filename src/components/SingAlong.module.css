@@ -361,10 +361,14 @@
   line-height: 1;
   pointer-events: none;
   filter: drop-shadow(0 0 3px rgba(255,255,255,0.7));
-  animation: dotBounce 0.35s ease-in-out infinite alternate;
+  /* Exponential ease-out/in rather than symmetric ease-in-out — the hop
+     decelerates into its peak and accelerates back down like a real
+     object under gravity, instead of the floaty, elastic feel a
+     symmetric curve gives an alternating animation. */
+  animation: dotHop 0.35s cubic-bezier(0.22, 1, 0.36, 1) infinite alternate;
 }
 
-@keyframes dotBounce {
+@keyframes dotHop {
   from { transform: translateX(-50%) translateY(0);   opacity: 0.9; }
   to   { transform: translateX(-50%) translateY(-5px); opacity: 1; }
 }
