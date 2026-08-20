@@ -366,7 +366,7 @@ export default function ChildPage({ session }) {
     speech.stopSpeaking()
     speech.stopListening()
     setUiStatus('thinking')
-    const reply = await chat.sendMessage(`Tell me a story about: ${storyRequest.prompt_text}`, 'chat')
+    const reply = await chat.sendMessage(`Tell me a story about: ${storyRequest.prompt_text}`, 'story')
     setBuddyText(reply)
     setUiStatus('speaking')
     speech.speak(reply, () => { setUiStatus('idle'); scheduleBubbleClear() })

@@ -35,6 +35,12 @@ export function formatLessonsMemory(lessonRows, childName) {
   return `\n\nLESSONS ${childName} HAS COMPLETED: ${names}. Celebrate their learning if the topic comes up!`
 }
 
+// Picks the PROMPTS builder for a conversational mode. Factored out so the
+// chat/sing/story branching is unit-testable without rendering the hook.
+export function selectModePrompt(mode) {
+  return PROMPTS[mode] || PROMPTS.chat
+}
+
 export function useChat(settings) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -92,9 +98,7 @@ export function useChat(settings) {
     const childName  = settings?.childName  || 'there'
     const buddyName  = settings?.buddyName  || 'Buddy'
     const childAge   = settings?.childAge   || 7
-    const base = currentMode === 'sing'
-      ? PROMPTS.sing(childName, buddyName, childAge)
-      : PROMPTS.chat(childName, buddyName, childAge)
+    const base = selectModePrompt(currentMode)(childName, buddyName, childAge)
     return base + timeContextLine() + memoryRef.current
   }, [settings])
 

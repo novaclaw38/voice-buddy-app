@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { formatHistoryMemory, formatLessonsMemory } from './useChat.js'
+import { formatHistoryMemory, formatLessonsMemory, selectModePrompt } from './useChat.js'
+import { PROMPTS } from '../utils/prompts.js'
 
 describe('formatHistoryMemory', () => {
   it('returns an empty string when there are no entries', () => {
@@ -53,6 +54,22 @@ describe('formatHistoryMemory', () => {
 
   it('tolerates a missing user_text on an entry', () => {
     expect(() => formatHistoryMemory([{ mode: 'chat' }], 'Mia')).not.toThrow()
+  })
+})
+
+describe('selectModePrompt', () => {
+  it('picks the sing prompt for sing mode', () => {
+    expect(selectModePrompt('sing')).toBe(PROMPTS.sing)
+  })
+
+  it('picks the story prompt for story mode', () => {
+    expect(selectModePrompt('story')).toBe(PROMPTS.story)
+  })
+
+  it('falls back to the chat prompt for chat mode or anything unrecognized', () => {
+    expect(selectModePrompt('chat')).toBe(PROMPTS.chat)
+    expect(selectModePrompt('nonsense')).toBe(PROMPTS.chat)
+    expect(selectModePrompt(undefined)).toBe(PROMPTS.chat)
   })
 })
 
