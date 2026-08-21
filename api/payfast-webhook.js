@@ -1,6 +1,12 @@
 import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 
+function normalizeStatus(payfastStatus) {
+  if (payfastStatus === 'COMPLETE') return 'complete'
+  if (payfastStatus === 'CANCELLED') return 'cancelled'
+  return 'failed'
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
@@ -78,6 +84,21 @@ export default async function handler(req, res) {
   if (!ALLOWED_AMOUNTS.some((a) => Math.abs(amount - a) < 0.01)) {
     console.warn('PayFast ITN: unexpected amount_gross', amount)
     return res.status(400).end()
+  }
+
+  const paymentType = amount >= 149 ? 'recurring' : 'trial_setup'
+  const { error: paymentInsertErr } = await db.from('payments').insert({
+    pf_payment_id: pfPaymentId,
+    user_id:       userId,
+    amount,
+    status:        normalizeStatus(status),
+    payment_type:  paymentType,
+  })
+  if (paymentInsertErr) {
+    console.error('PayFast ITN: payments ledger insert failed', paymentInsertErr)
+    // Don't abort — the subscription-state update below is the
+    // user-facing effect and must still happen even if the ledger write
+    // fails.
   }
 
   if (status === 'COMPLETE' && amount >= 149) {
