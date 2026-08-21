@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import BuddyMenu from '../BuddyMenu.jsx'
 import VoiceButton from '../VoiceButton.jsx'
 import SkipLink from '../SkipLink.jsx'
+import { SING_MODE_ENABLED } from '../../config/featureFlags.js'
 import styles from './VoiceOnlyScreen.module.css'
 
 // Accessibility-oriented alternate skin of the normal screen — same voice
@@ -36,6 +37,7 @@ export default function VoiceOnlyScreen({
             onLearn={() => navigate('/courses')}
             onCustomize={onCustomize}
             onSettings={onShowPin}
+            showSongs={SING_MODE_ENABLED}
           />
         </div>
 

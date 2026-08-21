@@ -9,6 +9,7 @@ import Clock from '../Clock.jsx'
 import DailyActivity from '../DailyActivity.jsx'
 import SkipLink from '../SkipLink.jsx'
 import { IconMail, IconCamera, IconPlay, IconMusic, IconBook, IconPalette, IconGear, IconSparkle } from '../icons.jsx'
+import { SING_MODE_ENABLED } from '../../config/featureFlags.js'
 import styles from './NormalScreen.module.css'
 
 // The default chat/story-mode screen — Buddy's world, the dock, the speech
@@ -152,10 +153,12 @@ export default function NormalScreen({
             )}
             <nav className={styles.dock} aria-label="Navigation">
             <div className={styles.dockSide}>
-                <button className={styles.dockBtn} onClick={onStartSing}>
-                  <span className={`${styles.dockIcon} ${styles.dockPink}`}><IconMusic size={26} /></span>
-                  <span className={styles.dockLabel}>Songs</span>
-                </button>
+                {SING_MODE_ENABLED && (
+                  <button className={styles.dockBtn} onClick={onStartSing}>
+                    <span className={`${styles.dockIcon} ${styles.dockPink}`}><IconMusic size={26} /></span>
+                    <span className={styles.dockLabel}>Songs</span>
+                  </button>
+                )}
                 <button className={styles.dockBtn} onClick={onStartStory}>
                   <span className={`${styles.dockIcon} ${styles.dockBerry}`}><IconSparkle size={26} /></span>
                   <span className={styles.dockLabel}>Story</span>

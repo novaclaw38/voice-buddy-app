@@ -1,6 +1,9 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+
+vi.mock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: true }))
+
 import VoiceOnlyScreen from './VoiceOnlyScreen.jsx'
 
 const baseProps = {
@@ -60,5 +63,24 @@ describe('VoiceOnlyScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
     fireEvent.click(screen.getByRole('menuitem', { name: /parent settings/i }))
     expect(onShowPin).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('VoiceOnlyScreen with sing mode disabled', () => {
+  beforeEach(() => {
+    vi.resetModules()
+    vi.doMock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: false }))
+  })
+
+  it('hides the Songs menu entry', async () => {
+    const { default: VoiceOnlyScreenDisabled } = await import('./VoiceOnlyScreen.jsx')
+    render(
+      <MemoryRouter>
+        <VoiceOnlyScreenDisabled {...baseProps} />
+      </MemoryRouter>
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
+    expect(screen.queryByRole('menuitem', { name: /songs/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /customise buddy/i })).toBeInTheDocument()
   })
 })

@@ -1,6 +1,9 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+
+vi.mock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: true }))
+
 import NormalScreen from './NormalScreen.jsx'
 
 const baseSpeech = {
@@ -122,5 +125,23 @@ describe('NormalScreen', () => {
   it('does not render the story overlay when storyPhase is null', () => {
     renderScreen({ storyPhase: null })
     expect(screen.queryByText(/Someone left you a story idea/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('NormalScreen with sing mode disabled', () => {
+  beforeEach(() => {
+    vi.resetModules()
+    vi.doMock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: false }))
+  })
+
+  it('hides the Songs dock button', async () => {
+    const { default: NormalScreenDisabled } = await import('./NormalScreen.jsx')
+    render(
+      <MemoryRouter>
+        <NormalScreenDisabled {...baseProps} />
+      </MemoryRouter>
+    )
+    expect(screen.queryByText('Songs')).not.toBeInTheDocument()
+    expect(screen.getByText('Story')).toBeInTheDocument()
   })
 })

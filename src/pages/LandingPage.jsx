@@ -7,6 +7,7 @@ import {
   IconSparkle, IconCamera, IconLock, IconBolt, IconMic, IconMail, IconHeart,
   IconBook, IconMusic, IconCheck, IconX, IconPlay, IconShield,
 } from '../components/icons.jsx'
+import { SING_MODE_ENABLED } from '../config/featureFlags.js'
 
 // Floating particle field
 function Particles({ count = 36 }) {
@@ -364,7 +365,7 @@ export default function LandingPage() {
           <div className={styles.featureChips}>
             <span><IconBook size={14} /> Chat</span>
             <span><IconSparkle size={14} /> Playful</span>
-            <span><IconMusic size={14} /> Sing-along</span>
+            {SING_MODE_ENABLED && <span><IconMusic size={14} /> Sing-along</span>}
             <span><IconShield size={14} /> Child-safe</span>
           </div>
         </RevealSection>
@@ -441,7 +442,7 @@ export default function LandingPage() {
             <p className={styles.planDesc}>Great for getting started</p>
             <ul className={styles.planFeatures}>
               <li className={styles.yes}><IconCheck size={14} /> Chat with Buddy (10/day)</li>
-              <li className={styles.yes}><IconCheck size={14} /> Sing-along mode</li>
+              {SING_MODE_ENABLED && <li className={styles.yes}><IconCheck size={14} /> Sing-along mode</li>}
               <li className={styles.no}><IconX size={14} /> Peace of mind camera</li>
               <li className={styles.no}><IconX size={14} /> Parent voice messages</li>
               <li className={styles.no}><IconX size={14} /> Courses &amp; lessons</li>

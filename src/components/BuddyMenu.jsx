@@ -6,7 +6,7 @@ import useFocusTrap from '../hooks/useFocusTrap.js'
 // Single overflow menu replacing the old scattered top-bar buttons (customise,
 // settings) and mode tiles (songs, learn) — one predictable place for the
 // handful of things that live outside the main chat loop.
-export default function BuddyMenu({ onSongs, onLearn, onCustomize, onSettings, variant = 'light' }) {
+export default function BuddyMenu({ onSongs, onLearn, onCustomize, onSettings, variant = 'light', showSongs = true }) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef(null)
   const menuRef = useRef(null)
@@ -39,9 +39,11 @@ export default function BuddyMenu({ onSongs, onLearn, onCustomize, onSettings, v
       </button>
       {open && (
         <div className={styles.menu} role="menu" ref={menuRef}>
-          <button className={styles.item} role="menuitem" onClick={pick(onSongs)}>
-            <span className={styles.itemIcon} style={{ color: 'var(--c-pink-d)' }}><IconMusic /></span> Songs
-          </button>
+          {showSongs && (
+            <button className={styles.item} role="menuitem" onClick={pick(onSongs)}>
+              <span className={styles.itemIcon} style={{ color: 'var(--c-pink-d)' }}><IconMusic /></span> Songs
+            </button>
+          )}
           <button className={styles.item} role="menuitem" onClick={pick(onLearn)}>
             <span className={styles.itemIcon} style={{ color: 'var(--c-sky)' }}><IconBook /></span> Learn
           </button>
