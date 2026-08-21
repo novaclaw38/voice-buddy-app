@@ -18,6 +18,7 @@ const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage.jsx'))
 const RefundPolicyPage   = lazy(() => import('./pages/RefundPolicyPage.jsx'))
 const CookiePolicyPage   = lazy(() => import('./pages/CookiePolicyPage.jsx'))
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
+const AdminUserDetailPage = lazy(() => import('./pages/AdminUserDetailPage.jsx'))
 
 // Must match ADMIN_EMAIL in api/_admin.js exactly. This check is UX-only —
 // the API endpoints re-check server-side, which is the real security boundary.
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="/courses" element={session ? <CoursesPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/lesson"  element={session ? <LessonPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/admin" element={session?.user?.email === ADMIN_EMAIL ? <AdminPage /> : <Navigate to={session ? '/app' : '/'} replace />} />
+          <Route path="/admin/users/:id" element={session?.user?.email === ADMIN_EMAIL ? <AdminUserDetailPage /> : <Navigate to={session ? '/app' : '/'} replace />} />
 
           {/* Dev-only preview routes. Wrapped in import.meta.env.DEV so Vite
               statically eliminates them from production builds — they mint a
