@@ -6,6 +6,8 @@ import { extractTopics } from '../utils/topics.js'
 import { timeContextLine } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
 import { getActiveChildId } from '../utils/storage.js'
+import { hasConcernSignal, buildClassifyPrompt } from '../utils/emotionalSignal.js'
+import { fetchTodaySignal, upsertSignal } from '../services/signalsService.js'
 
 const MAX_HISTORY = 16
 
@@ -39,6 +41,40 @@ export function formatLessonsMemory(lessonRows, childName) {
 // chat/sing/story branching is unit-testable without rendering the hook.
 export function selectModePrompt(mode) {
   return PROMPTS[mode] || PROMPTS.chat
+}
+
+// Fire-and-forget from sendMessage, after the turn is already stored via
+// addHistory. Every branch below short-circuits silently — this must never
+// throw into sendMessage's own try/catch, and never delay or block the
+// child's chat turn. See docs/superpowers/specs/2026-08-21-emotional-checkin-nudge-design.md.
+export async function maybeFlagEmotionalSignal(userText, childName) {
+  try {
+    if (!hasConcernSignal(userText)) return
+    const childId = getActiveChildId()
+    const existing = await fetchTodaySignal(childId)
+    if (existing) return
+
+    const raw = await chatCompletion(
+      [
+        { role: 'system', content: buildClassifyPrompt(childName) },
+        { role: 'user', content: userText },
+      ],
+      { mode: 'classify-checkin', maxTokens: 100, temperature: 0 }
+    )
+
+    let parsed
+    try {
+      parsed = JSON.parse(raw)
+    } catch {
+      return
+    }
+    if (!parsed?.concern || !parsed.blurb) return
+
+    await upsertSignal({ childId, blurb: parsed.blurb })
+  } catch {
+    // Silent by default — a background safety-signal check failing must
+    // never surface an error to the child or block their conversation.
+  }
 }
 
 export function useChat(settings) {
@@ -147,6 +183,8 @@ export function useChat(settings) {
         userText,
         buddyText: reply,
       })
+
+      maybeFlagEmotionalSignal(userText, settings?.childName || 'there').catch(() => {})
 
       return reply
     } catch (err) {
