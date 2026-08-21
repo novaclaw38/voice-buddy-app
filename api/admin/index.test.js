@@ -46,3 +46,21 @@ describe('api/admin access control', () => {
     expect(res.statusCode).toBe(400)
   })
 })
+
+describe('api/admin new capabilities', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('rejects a POST with an unknown action with 400', async () => {
+    mocks.requireAdmin.mockResolvedValue({ id: 'admin', email: 'rebawntech@gmail.com' })
+    const res = mockRes()
+    await handler({ method: 'POST', headers: {}, body: { action: 'nonsense', userId: 'u1' } }, res)
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('still accepts a cancelSubscription action (renamed from the old bare-userId shape)', async () => {
+    mocks.requireAdmin.mockResolvedValue({ id: 'admin', email: 'rebawntech@gmail.com' })
+    const res = mockRes()
+    await handler({ method: 'POST', headers: {}, body: { action: 'cancelSubscription' } }, res)
+    expect(res.statusCode).toBe(400) // missing userId still 400s, same as before
+  })
+})
