@@ -1,6 +1,24 @@
-import { describe, it, expect } from 'vitest'
-import { formatHistoryMemory, formatLessonsMemory, selectModePrompt } from './useChat.js'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { formatHistoryMemory, formatLessonsMemory, selectModePrompt, maybeFlagEmotionalSignal } from './useChat.js'
 import { PROMPTS } from '../utils/prompts.js'
+
+const mocks = vi.hoisted(() => ({
+  fetchTodaySignal: vi.fn(),
+  upsertSignal: vi.fn(),
+  chatCompletion: vi.fn(),
+  getActiveChildId: vi.fn(),
+}))
+vi.mock('../services/signalsService.js', () => ({
+  fetchTodaySignal: mocks.fetchTodaySignal,
+  upsertSignal: mocks.upsertSignal,
+}))
+vi.mock('../services/chatService.js', () => ({
+  chatCompletion: mocks.chatCompletion,
+}))
+vi.mock('../utils/storage.js', async (importOriginal) => ({
+  ...(await importOriginal()),
+  getActiveChildId: mocks.getActiveChildId,
+}))
 
 describe('formatHistoryMemory', () => {
   it('returns an empty string when there are no entries', () => {
@@ -91,5 +109,55 @@ describe('formatLessonsMemory', () => {
     expect(block).toContain('Mia')
     expect(block).toContain('counting-1 (math)')
     expect(block).toContain('letters-a (reading)')
+  })
+})
+
+describe('maybeFlagEmotionalSignal', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.getActiveChildId.mockReturnValue('c1')
+  })
+
+  it('does nothing when the text has no concern keyword', async () => {
+    await maybeFlagEmotionalSignal('I love dinosaurs', 'Mia')
+    expect(mocks.fetchTodaySignal).not.toHaveBeenCalled()
+    expect(mocks.chatCompletion).not.toHaveBeenCalled()
+  })
+
+  it('skips classification when a signal already exists for today', async () => {
+    mocks.fetchTodaySignal.mockResolvedValue({ id: 's1' })
+    await maybeFlagEmotionalSignal('I feel so sad', 'Mia')
+    expect(mocks.chatCompletion).not.toHaveBeenCalled()
+  })
+
+  it('calls chatCompletion with classify-checkin mode and upserts on a confirmed concern', async () => {
+    mocks.fetchTodaySignal.mockResolvedValue(null)
+    mocks.chatCompletion.mockResolvedValue('{"concern":true,"blurb":"Buddy noticed Mia seemed sad today."}')
+    await maybeFlagEmotionalSignal('I feel so sad', 'Mia')
+    expect(mocks.chatCompletion).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ mode: 'classify-checkin' })
+    )
+    expect(mocks.upsertSignal).toHaveBeenCalledWith({ childId: 'c1', blurb: 'Buddy noticed Mia seemed sad today.' })
+  })
+
+  it('does not upsert when the classifier returns concern:false', async () => {
+    mocks.fetchTodaySignal.mockResolvedValue(null)
+    mocks.chatCompletion.mockResolvedValue('{"concern":false,"blurb":""}')
+    await maybeFlagEmotionalSignal('I feel so sad', 'Mia')
+    expect(mocks.upsertSignal).not.toHaveBeenCalled()
+  })
+
+  it('never throws — a malformed classifier response is swallowed', async () => {
+    mocks.fetchTodaySignal.mockResolvedValue(null)
+    mocks.chatCompletion.mockResolvedValue('not json at all')
+    await expect(maybeFlagEmotionalSignal('I feel so sad', 'Mia')).resolves.toBeUndefined()
+    expect(mocks.upsertSignal).not.toHaveBeenCalled()
+  })
+
+  it('never throws when chatCompletion itself rejects', async () => {
+    mocks.fetchTodaySignal.mockResolvedValue(null)
+    mocks.chatCompletion.mockRejectedValue(new Error('network down'))
+    await expect(maybeFlagEmotionalSignal('I feel so sad', 'Mia')).resolves.toBeUndefined()
   })
 })
