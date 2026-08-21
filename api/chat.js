@@ -6,6 +6,7 @@ const MAX_TOKENS_CAP = 800
 const RATE_LIMIT_PER_MIN = 20
 const RATE_LIMIT_PER_DAY = 500
 const FREE_CHAT_LIMIT_PER_DAY = 10 // matches the "Chat with Buddy (10/day)" free-plan claim on the pricing page
+const CLASSIFY_LIMIT_PER_DAY = 20 // cost-guard against a runaway client bug, not a real usage cap — the client only calls this on a keyword hit with no existing row for today
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -45,9 +46,16 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: { message: 'This mode is part of Buddy Pro.', code: 'PRO_REQUIRED' } })
   }
 
-  // Free-tier daily message cap — the one thing that's supposed to make
-  // free chat/story/sing "10/day" rather than unlimited.
-  if (!entitled) {
+  if (mode === 'classify-checkin') {
+    // Background safety-signal check, not user-facing chat — its own small
+    // cap, never the free-tier chat quota below.
+    const withinClassifyLimit = await allowRequest(user.id, 'classify-1d', CLASSIFY_LIMIT_PER_DAY, 86400)
+    if (!withinClassifyLimit) {
+      return res.status(429).json({ error: { message: 'Too many requests — take a short break.' } })
+    }
+  } else if (!entitled) {
+    // Free-tier daily message cap — the one thing that's supposed to make
+    // free chat/story/sing "10/day" rather than unlimited.
     const withinFreeLimit = await allowRequest(user.id, 'chat-free-1d', FREE_CHAT_LIMIT_PER_DAY, 86400)
     if (!withinFreeLimit) {
       return res.status(403).json({ error: { message: "You've used today's free chats with Buddy.", code: 'FREE_LIMIT_REACHED' } })
