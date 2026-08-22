@@ -8,7 +8,9 @@ import styles from './OpenResponseCard.module.css'
 // existing Buddy chat model. Falls back to warm, unconditional
 // acknowledgment if the API call fails for any reason — a lesson's
 // progress should never be blocked by network flakiness, matching the
-// TTS fallback pattern in useSpeech.js. See
+// TTS fallback pattern in useSpeech.js. The fallback score is capped at
+// the NOT_MET level so an infra failure can never outscore a real,
+// ungraded answer or read as genuine mastery in lesson_completions. See
 // docs/superpowers/specs/2026-07-30-learn-section-redesign-design.md §2-3.
 export default function OpenResponseCard({ step, settings, speech, onComplete }) {
   const [transcript, setTranscript] = useState('')
@@ -43,7 +45,7 @@ export default function OpenResponseCard({ step, settings, speech, onComplete })
       const spoken = `Thanks for sharing that with me!`
       setFeedback(spoken)
       speech?.speak(spoken, () => {
-        timerRef.current = setTimeout(() => onComplete(100), 400)
+        timerRef.current = setTimeout(() => onComplete(70), 400)
       })
     } finally {
       setEvaluating(false)
