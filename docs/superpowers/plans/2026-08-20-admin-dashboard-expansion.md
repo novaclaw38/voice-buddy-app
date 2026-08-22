@@ -298,7 +298,7 @@ git commit -m "feat: log every PayFast ITN to the payments ledger"
 - Consumes: `payments`, `children`, `lesson_completions` tables (existing/Task 1); `requireAdmin`/`computeTier` from `api/_admin.js` (unchanged).
 - Produces:
   - `GET /api/admin` response gains `stats.revenue = { total, mrr, byDay }` and `stats.failedPayments30d`.
-  - `GET /api/admin?userId=<id>` → `{ payments, children, lessonActivity }`.
+  - `GET /api/admin?userId=<id>` → `{ banned, payments, children, lessonActivity }`.
   - `POST /api/admin` body shape changes from `{ userId }` (cancel-only) to `{ action, userId, ...extra }` with `action` one of `cancelSubscription | grantPro | banUser | unbanUser | deleteUser`.
   - These exact shapes are consumed by Task 4 (`adminService.js`).
 
@@ -452,6 +452,13 @@ function bucketRevenueByDay(payments, days) {
 }
 
 async function handleUserDetail(client, userId) {
+  const { data: authUser, error: authErr } = await client.auth.admin.getUserById(userId)
+  if (authErr) {
+    console.error('admin/userDetail: getUserById failed', authErr)
+    return { status: 500, body: { error: { message: 'Could not load user.' } } }
+  }
+  const banned = !!(authUser?.user?.banned_until && new Date(authUser.user.banned_until) > new Date())
+
   const { data: payments, error: paymentsErr } = await client
     .from('payments')
     .select('id, amount, status, payment_type, created_at')
@@ -492,6 +499,7 @@ async function handleUserDetail(client, userId) {
   return {
     status: 200,
     body: {
+      banned,
       payments: payments.map((p) => ({
         id: p.id, amount: Number(p.amount), status: p.status,
         paymentType: p.payment_type, createdAt: p.created_at,
@@ -539,6 +547,26 @@ export default async function handler(req, res) {
 ```
 
 This reuses the existing `db()` and `buildSignature()` functions already defined earlier in the file (unchanged) and the existing `handleOverview` function (modified in Step 3b below). Note `handleCancelSubscription`'s signature changed from `(req, res)` to `(client, userId)` returning `{ status, body }` — this lets every action share one `client = db()` call and one response-writing site in `handler`, instead of each handler managing `res` directly.
+
+- [ ] **Step 3a: Surface real ban status on the users list**
+
+`db().auth.admin.listUsers()` already returns `banned_until` on each auth user — the existing `users` mapping in `handleOverview` just doesn't read it, which would leave the client with no way to know a user's real ban state (see Task 5/6, which need it). In the existing `users = authUsers.map((u) => ({ ... }))` block, add a `banned` field:
+
+```js
+  const users = authUsers.map((u) => {
+    const sub = subsByUser.get(u.id) || null
+    return {
+      id: u.id,
+      email: u.email,
+      createdAt: u.created_at,
+      tier: computeTier(sub),
+      status: sub?.status ?? null,
+      trialEnd: sub?.trial_end ?? null,
+      subscriptionEnd: sub?.subscription_end ?? null,
+      banned: !!(u.banned_until && new Date(u.banned_until) > new Date()),
+    }
+  })
+```
 
 - [ ] **Step 3b: Extend `handleOverview` with revenue stats**
 
@@ -780,7 +808,7 @@ Update the `overview` fixture in `AdminPage.test.jsx` to include the new stats f
 
 ```js
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -797,8 +825,8 @@ import AdminPage from './AdminPage.jsx'
 
 const overview = {
   users: [
-    { id: 'u1', email: 'trial@x.com', createdAt: '2026-07-20T00:00:00.000Z', tier: 'trial', status: 'trial', trialEnd: '2099-01-01T00:00:00.000Z', subscriptionEnd: null },
-    { id: 'u2', email: 'free@x.com', createdAt: '2026-07-21T00:00:00.000Z', tier: 'free', status: null, trialEnd: null, subscriptionEnd: null },
+    { id: 'u1', email: 'trial@x.com', createdAt: '2026-07-20T00:00:00.000Z', tier: 'trial', status: 'trial', trialEnd: '2099-01-01T00:00:00.000Z', subscriptionEnd: null, banned: false },
+    { id: 'u2', email: 'free@x.com', createdAt: '2026-07-21T00:00:00.000Z', tier: 'free', status: null, trialEnd: null, subscriptionEnd: null, banned: true },
   ],
   stats: {
     tierCounts: { free: 1, trial: 1, pro: 0 },
@@ -865,6 +893,15 @@ describe('AdminPage', () => {
 
     expect(screen.getByText('R149.00')).toBeInTheDocument() // total revenue
     expect(screen.getByText(/1/)).toBeInTheDocument() // failedPayments30d somewhere in stats
+  })
+
+  it('shows Unban for a user the server already reports as banned', async () => {
+    fetchOverview.mockResolvedValue(overview)
+    renderPage()
+    await waitFor(() => expect(screen.getByText('free@x.com')).toBeInTheDocument())
+
+    const row = screen.getByText('free@x.com').closest('tr')
+    expect(within(row).getByRole('button', { name: /^unban$/i })).toBeInTheDocument()
   })
 
   it('bans a user and shows Unban afterwards', async () => {
@@ -935,7 +972,13 @@ export default function AdminPage() {
     setLoading(true)
     setError(null)
     fetchOverview()
-      .then((data) => { setUsers(data.users); setStats(data.stats) })
+      .then((data) => {
+        setUsers(data.users)
+        setStats(data.stats)
+        // Seed from the server's real ban state, not an empty object — otherwise
+        // every row would read "Ban" on load even for already-banned users.
+        setBanned(Object.fromEntries(data.users.map((u) => [u.id, !!u.banned])))
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }
@@ -1211,7 +1254,7 @@ Create `src/pages/AdminUserDetailPage.test.jsx`:
 
 ```js
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
@@ -1227,6 +1270,7 @@ import { fetchUserDetail, grantPro, deleteUser } from '../services/adminService.
 import AdminUserDetailPage from './AdminUserDetailPage.jsx'
 
 const detail = {
+  banned: false,
   payments: [
     { id: 'p1', amount: 149, status: 'complete', paymentType: 'recurring', createdAt: '2026-08-01T00:00:00.000Z' },
   ],
@@ -1276,11 +1320,22 @@ describe('AdminUserDetailPage', () => {
     renderPage()
     await waitFor(() => expect(screen.getByText('Ada')).toBeInTheDocument())
 
+    // fireEvent.change, not userEvent.type — jsdom/user-event's keystroke-by-
+    // keystroke typing into input[type=date]'s month/day/year segments is
+    // unreliable; a direct value change is what real date-picker input and
+    // paste both funnel through anyway.
+    fireEvent.change(screen.getByLabelText(/extend pro until/i), { target: { value: '2026-12-01' } })
     const user = userEvent.setup()
-    await user.type(screen.getByLabelText(/extend pro until/i), '2026-12-01')
     await user.click(screen.getByRole('button', { name: /grant/i }))
 
     expect(grantPro).toHaveBeenCalledWith('u1', '2026-12-01')
+  })
+
+  it('shows Unban when the server reports the user as already banned', async () => {
+    fetchUserDetail.mockResolvedValue({ ...detail, banned: true })
+    renderPage()
+    await waitFor(() => expect(screen.getByText('Ada')).toBeInTheDocument())
+    expect(screen.getByRole('button', { name: /^unban$/i })).toBeInTheDocument()
   })
 
   it('deletes the user after confirming', async () => {
@@ -1333,7 +1388,12 @@ export default function AdminUserDetailPage() {
     setLoading(true)
     setError(null)
     fetchUserDetail(id)
-      .then(setDetail)
+      .then((d) => {
+        setDetail(d)
+        // Seed from the server's real ban state — see AdminPage.jsx's load()
+        // for why this can't just default to false.
+        setBanned(!!d.banned)
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }
