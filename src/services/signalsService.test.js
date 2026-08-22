@@ -8,6 +8,7 @@ function makeBuilder(result) {
   const builder = {
     select: vi.fn(() => builder),
     eq: vi.fn(() => builder),
+    is: vi.fn(() => builder),
     update: vi.fn(() => builder),
     upsert: vi.fn(() => Promise.resolve(result)),
     maybeSingle: vi.fn(() => Promise.resolve(result)),
@@ -45,6 +46,28 @@ describe('signalsService', () => {
     const result = await fetchTodaySignal('c1')
     expect(result).toEqual({ id: 's1', blurb: 'hi' })
     expect(mocks.from).toHaveBeenCalledWith('daily_signals')
+  })
+
+  // Regression: `.eq('child_id', null)` compiles to `child_id = NULL`, which
+  // Postgres evaluates as NULL (never true), so the dedupe lookup silently
+  // missed every existing row for users with no active child profile — the
+  // legacy single-child path, which still writes child_id IS NULL rows. That
+  // fired a fresh Groq classify call and inserted a duplicate row on every
+  // concern-keyword message. NULL child_id must be matched with `.is()`.
+  it('fetchTodaySignal matches a null child_id with .is(), not .eq()', async () => {
+    const builder = makeBuilder({ data: null, error: null })
+    mocks.from.mockReturnValue(builder)
+    await fetchTodaySignal(null)
+    expect(builder.is).toHaveBeenCalledWith('child_id', null)
+    expect(builder.eq).not.toHaveBeenCalledWith('child_id', null)
+  })
+
+  it('fetchTodaySignal still matches a concrete child_id with .eq()', async () => {
+    const builder = makeBuilder({ data: null, error: null })
+    mocks.from.mockReturnValue(builder)
+    await fetchTodaySignal('c1')
+    expect(builder.eq).toHaveBeenCalledWith('child_id', 'c1')
+    expect(builder.is).not.toHaveBeenCalled()
   })
 
   it('fetchTodaySignal throws on a Supabase error', async () => {

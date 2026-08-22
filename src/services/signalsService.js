@@ -7,11 +7,17 @@ function todayISO() {
 export async function fetchTodaySignal(childId) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
-  const { data, error } = await supabase
+  let query = supabase
     .from('daily_signals')
     .select('*')
     .eq('user_id', user.id)
-    .eq('child_id', childId)
+  // A null childId is the legacy single-child path, which writes rows with
+  // child_id IS NULL. `.eq('child_id', null)` compiles to `child_id = NULL`,
+  // which Postgres evaluates as NULL rather than true — it matches nothing,
+  // so the caller's "already flagged today" guard would never fire. NULL has
+  // to be matched with IS NULL.
+  query = childId ? query.eq('child_id', childId) : query.is('child_id', null)
+  const { data, error } = await query
     .eq('signal_date', todayISO())
     .eq('dismissed', false)
     .maybeSingle()
