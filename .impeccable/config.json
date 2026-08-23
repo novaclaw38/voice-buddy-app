@@ -182,6 +182,51 @@
         ],
         "createdAt": "2026-08-23T16:05:48.553Z",
         "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Academy Gold)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0f1729",
+        "files": [
+          "src/components/promotionCenter/EliteAcademyCard.module.css"
+        ],
+        "createdAt": "2026-08-23T16:06:36.907Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Deep Navy upgrade card)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#1a2333",
+        "files": [
+          "src/components/promotionCenter/EliteAcademyCard.module.css"
+        ],
+        "createdAt": "2026-08-23T16:06:37.010Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Deep Navy upgrade card gradient)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#d4af37",
+        "files": [
+          "src/components/promotionCenter/EliteAcademyCard.module.css"
+        ],
+        "createdAt": "2026-08-23T16:06:37.099Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Academy Gold)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#9d50bb",
+        "files": [
+          "src/components/promotionCenter/EliteAcademyCard.module.css"
+        ],
+        "createdAt": "2026-08-23T16:06:37.189Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple CTA gradient)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#6e48aa",
+        "files": [
+          "src/components/promotionCenter/EliteAcademyCard.module.css"
+        ],
+        "createdAt": "2026-08-23T16:06:37.311Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple CTA gradient end)"
       }
     ]
   }

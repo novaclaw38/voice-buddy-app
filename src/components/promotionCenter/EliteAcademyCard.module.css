@@ -1,0 +1,61 @@
+.card {
+  background: #0f1729;
+  background-image: linear-gradient(135deg, #0f1729 0%, #1a2333 100%);
+  border-radius: var(--r-lg, 34px);
+  padding: 24px;
+  color: #fff;
+}
+
+.heading {
+  font-family: var(--font-head, sans-serif);
+  color: var(--pc-gold, #D4AF37);
+  font-size: var(--fs-lg, 1.125rem);
+  margin-bottom: 8px;
+}
+
+.price {
+  font-family: var(--font-head, sans-serif);
+  font-weight: 700;
+  font-size: var(--fs-2xl, 1.75rem);
+}
+
+.period {
+  font-size: var(--fs-md, 1rem);
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+}
+
+.perks {
+  list-style: none;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.perk {
+  font-size: var(--fs-sm, 0.8125rem);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  width: fit-content;
+}
+
+.error {
+  color: var(--c-alert, #ef4444);
+  font-size: var(--fs-xs, 0.75rem);
+  margin-bottom: 10px;
+}
+
+.cta {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--r-md, 24px);
+  background: linear-gradient(135deg, #9D50BB, #6E48AA);
+  color: #fff;
+  font-weight: 700;
+}
+
+.cta:hover {
+  filter: brightness(1.08);
+}
