@@ -405,6 +405,7 @@ describe('useProgress markComplete — XP awarding', () => {
     mocks.getUser.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
     mocks.getActiveChildId.mockReturnValue('c1')
     mocks.from.mockReturnValue(makeBuilder())
+    mocks.bumpChildXp.mockResolvedValue(100)
   })
 
   it('awards XP equal to the mastery score on a first-time old-band completion', async () => {

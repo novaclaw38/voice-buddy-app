@@ -196,7 +196,7 @@ export default function LessonPage({ session }) {
       const averageScore = scores.length
         ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
         : 100 // legacy lessons with no scored steps still read as fully complete
-      markComplete(courseId, lessonId, averageScore)
+      markComplete(courseId, lessonId, averageScore, lesson.ageBand)
       setFinalScore(averageScore)
       setPhase('reward')
     }
