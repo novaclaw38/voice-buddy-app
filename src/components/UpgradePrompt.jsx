@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
-import { supabase } from '../lib/supabase.js'
 import useFocusTrap from '../hooks/useFocusTrap.js'
+import { startCheckout } from '../services/checkoutService.js'
 import styles from './UpgradePrompt.module.css'
 import { IconX, IconStar, IconCheck } from './icons.jsx'
 
@@ -29,26 +29,11 @@ export default function UpgradePrompt({ onClose, session, trigger }) {
   const copy = TRIGGERS[trigger] || { title: 'Unlock Buddy Pro', sub: 'This feature is part of Buddy Pro' }
 
   const handleUpgrade = async () => {
-    if (!session) return
     setLoading(true)
     setUpgradeError('')
-    try {
-      const res = await fetch('/api/payfast-create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          firstName: session.user.user_metadata?.full_name?.split(' ')[0] || 'Parent',
-        }),
-      })
-      const { paymentUrl, error } = await res.json()
-      if (error) throw new Error(error)
-      window.location.href = paymentUrl
-    } catch (err) {
-      console.error('Upgrade error:', err)
-      setUpgradeError('Something went wrong starting checkout. Please try again.')
+    const result = await startCheckout(session)
+    if (!result.ok) {
+      setUpgradeError(result.message)
       setLoading(false)
     }
   }
