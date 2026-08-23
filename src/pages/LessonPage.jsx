@@ -20,6 +20,8 @@ import ExploreCard from '../components/lesson/ExploreCard.jsx'
 import OpenResponseCard from '../components/lesson/OpenResponseCard.jsx'
 import StoryBuildCard from '../components/lesson/StoryBuildCard.jsx'
 import MasteryCheckCard from '../components/lesson/MasteryCheckCard.jsx'
+import DragMatchCard from '../components/lesson/DragMatchCard.jsx'
+import SliderCard from '../components/lesson/SliderCard.jsx'
 import RewardScreen from '../components/lesson/RewardScreen.jsx'
 import styles from './LessonPage.module.css'
 import { IconArrowLeft, IconArrowRight, IconPrinter, IconStar, IconSparkle } from '../components/icons.jsx'
@@ -315,6 +317,12 @@ export default function LessonPage({ session }) {
         )}
         {step.type === 'mastery-check' && (
           <MasteryCheckCard key={stepKey} step={step} speech={speech} onComplete={handleStepComplete} />
+        )}
+        {step.type === 'drag-match' && (
+          <DragMatchCard key={stepKey} step={step} onComplete={handleStepComplete} />
+        )}
+        {step.type === 'slider' && (
+          <SliderCard key={stepKey} step={step} onComplete={handleStepComplete} />
         )}
       </div>
 
