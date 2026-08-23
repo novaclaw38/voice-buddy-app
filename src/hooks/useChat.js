@@ -188,6 +188,7 @@ export function useChat(settings) {
 
       addHistory({
         ts: Date.now(),
+        childId: getActiveChildId(),
         mode: currentM,
         userText,
         buddyText: reply,

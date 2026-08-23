@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const mocks = vi.hoisted(() => ({ getUser: vi.fn() }))
 vi.mock('./_auth.js', () => mocks)
 
-import { requireAdmin, computeTier, ADMIN_EMAIL } from './_admin.js'
+import { requireAdmin, requireCronSecret, computeTier, ADMIN_EMAIL } from './_admin.js'
 
 describe('requireAdmin', () => {
   beforeEach(() => vi.clearAllMocks())
@@ -48,5 +48,28 @@ describe('computeTier', () => {
   it('is free when the subscription has expired', () => {
     const past = new Date(Date.now() - 86400000).toISOString()
     expect(computeTier({ status: 'active', subscription_end: past })).toBe('free')
+  })
+})
+
+describe('requireCronSecret', () => {
+  const OLD_ENV = process.env
+  beforeEach(() => { process.env = { ...OLD_ENV, CRON_SECRET: 'super-secret' } })
+  afterEach(() => { process.env = OLD_ENV })
+
+  it('returns false when CRON_SECRET is not configured', () => {
+    process.env.CRON_SECRET = ''
+    expect(requireCronSecret({ headers: { 'x-cron-secret': 'anything' } })).toBe(false)
+  })
+
+  it('returns false when the header is missing', () => {
+    expect(requireCronSecret({ headers: {} })).toBe(false)
+  })
+
+  it('returns false when the header does not match', () => {
+    expect(requireCronSecret({ headers: { 'x-cron-secret': 'wrong' } })).toBe(false)
+  })
+
+  it('returns true when the header matches exactly', () => {
+    expect(requireCronSecret({ headers: { 'x-cron-secret': 'super-secret' } })).toBe(true)
   })
 })

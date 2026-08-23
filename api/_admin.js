@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { getUser } from './_auth.js'
 
 // Single hardcoded admin — this is a solo-owner app. Must match the client-side
@@ -9,6 +10,19 @@ export async function requireAdmin(req) {
   const user = await getUser(req)
   if (!user || user.email !== ADMIN_EMAIL) return null
   return user
+}
+
+// The weekly-digest cron trigger has no logged-in Supabase session to check
+// against requireAdmin — it's an external scheduler (e.g. cron-job.org)
+// hitting the endpoint directly, authenticated by a shared secret instead.
+export function requireCronSecret(req) {
+  const expected = process.env.CRON_SECRET
+  const provided = req.headers['x-cron-secret']
+  if (!expected || !provided) return false
+  const expectedBuf = Buffer.from(expected)
+  const providedBuf = Buffer.from(String(provided))
+  if (expectedBuf.length !== providedBuf.length) return false
+  return crypto.timingSafeEqual(expectedBuf, providedBuf)
 }
 
 // Mirrors the entitlement logic in useSubscription.jsx / api/_auth.js's

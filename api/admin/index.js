@@ -1,6 +1,9 @@
 import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
-import { requireAdmin, computeTier } from '../_admin.js'
+import { requireAdmin, requireCronSecret, computeTier } from '../_admin.js'
+import { COURSES } from '../_courseData.js'
+import { sendWhatsAppTemplateMessage } from '../_whatsapp.js'
+import { generateWeeklyNarrative } from '../_groqNarrative.js'
 
 // Merged with cancel-subscription into one function to stay under Vercel's
 // Hobby-plan 12-Serverless-Function cap — routed by HTTP method instead of path.
@@ -300,6 +303,143 @@ async function handleUserDetail(client, userId) {
   }
 }
 
+// Monday of the current ISO week, UTC, as YYYY-MM-DD — the natural key for
+// one recap per child per week (matches weekly_recaps.week_start).
+function isoWeekStartUTC(now = new Date()) {
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const day = d.getUTCDay() // 0=Sun..6=Sat
+  d.setUTCDate(d.getUTCDate() + (day === 0 ? -6 : 1 - day))
+  return d.toISOString().slice(0, 10)
+}
+
+function lessonTitle(courseId, lessonId) {
+  const course = COURSES.find((c) => c.id === courseId)
+  const lesson = course?.lessons.find((l) => l.id === lessonId)
+  return lesson?.title || lessonId
+}
+
+// The Sunday Storybook cron: for every parent who's opted into WhatsApp,
+// generate (if not already generated) and send this week's recap for each
+// of their children. Safe to re-run — the unique (user_id, child_id,
+// week_start) constraint on weekly_recaps makes each child idempotent.
+async function handleWeeklyDigest(client) {
+  const weekStart = isoWeekStartUTC()
+  const weekStartDate = new Date(`${weekStart}T00:00:00Z`)
+  const weekEnd = new Date(weekStartDate)
+  weekEnd.setUTCDate(weekEnd.getUTCDate() + 7)
+
+  const { data: profiles, error: profilesErr } = await client
+    .from('profiles')
+    .select('id, whatsapp_number')
+    .eq('whatsapp_opt_in', true)
+    .not('whatsapp_number', 'is', null)
+  if (profilesErr) {
+    console.error('weekly-digest: profiles query failed', profilesErr)
+    return { status: 500, body: { error: { message: 'Could not load opted-in parents.' } } }
+  }
+
+  let sent = 0, skipped = 0, failed = 0
+
+  for (const profile of profiles) {
+    const { data: children, error: childrenErr } = await client
+      .from('children')
+      .select('id, name')
+      .eq('user_id', profile.id)
+    if (childrenErr) {
+      console.error('weekly-digest: children query failed', childrenErr)
+      failed++
+      continue
+    }
+
+    for (const child of children) {
+      const { data: existing } = await client
+        .from('weekly_recaps')
+        .select('id')
+        .eq('child_id', child.id)
+        .eq('week_start', weekStart)
+        .maybeSingle()
+      if (existing) { skipped++; continue }
+
+      const { data: completions } = await client
+        .from('lesson_completions')
+        .select('course_id, lesson_id, mastery_score')
+        .eq('child_id', child.id)
+        .gte('completed_at', weekStartDate.toISOString())
+        .lt('completed_at', weekEnd.toISOString())
+      const lessonsSummary = (completions || []).map((c) => ({
+        title: lessonTitle(c.course_id, c.lesson_id),
+        masteryScore: c.mastery_score,
+      }))
+
+      const { data: rank } = await client
+        .from('child_ranks')
+        .select('total_xp')
+        .eq('child_id', child.id)
+        .maybeSingle()
+      const { data: lastRecap } = await client
+        .from('weekly_recaps')
+        .select('xp_earned')
+        .eq('child_id', child.id)
+        .lt('week_start', weekStart)
+        .order('week_start', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      const currentXp = rank?.total_xp || 0
+      // First-ever recap has no prior snapshot to diff against — report the
+      // running total rather than a misleading full-history "delta".
+      const xpEarned = lastRecap ? Math.max(0, currentXp - (lastRecap.xp_earned || 0)) : currentXp
+
+      const { data: historyRows } = await client
+        .from('history')
+        .select('user_text')
+        .eq('child_id', child.id)
+        .gte('ts', weekStartDate.getTime())
+        .lt('ts', weekEnd.getTime())
+      const chatHighlights = (historyRows || []).map((h) => h.user_text).filter(Boolean)
+
+      const narrative = await generateWeeklyNarrative(child.name, lessonsSummary, chatHighlights)
+
+      const { data: inserted, error: insertErr } = await client
+        .from('weekly_recaps')
+        .insert({
+          user_id: profile.id,
+          child_id: child.id,
+          week_start: weekStart,
+          narrative,
+          lessons_summary: lessonsSummary,
+          xp_earned: xpEarned,
+        })
+        .select('token')
+        .single()
+      if (insertErr) {
+        console.error('weekly-digest: insert failed', insertErr)
+        failed++
+        continue
+      }
+
+      const storybookUrl = `${process.env.APP_URL}/storybook/${inserted.token}`
+      const result = await sendWhatsAppTemplateMessage(
+        profile.whatsapp_number,
+        process.env.WHATSAPP_TEMPLATE_NAME || 'weekly_storybook',
+        [child.name, storybookUrl]
+      )
+      if (!result.ok) {
+        console.error('weekly-digest: whatsapp send failed', child.id, result.error)
+        failed++
+        continue
+      }
+
+      await client
+        .from('weekly_recaps')
+        .update({ whatsapp_message_id: result.messageId, sent_at: new Date().toISOString() })
+        .eq('token', inserted.token)
+      sent++
+    }
+  }
+
+  return { status: 200, body: { ok: true, weekStart, sent, skipped, failed } }
+}
+
 // db() throws when env vars are misconfigured — called lazily, only in the
 // branches that actually need Supabase, so validation-only paths (missing
 // userId, unsupported method) still 400/405 cleanly without it, and a real
@@ -315,6 +455,17 @@ function tryDb(res) {
 }
 
 export default async function handler(req, res) {
+  // The weekly-digest cron trigger is a bulk job with no target userId and
+  // no logged-in admin session — check it before the requireAdmin gate below,
+  // which every other action on this endpoint goes through.
+  if (req.method === 'POST' && req.body?.action === 'weeklyDigest') {
+    if (!requireCronSecret(req)) return res.status(403).json({ error: { message: 'Forbidden' } })
+    const client = tryDb(res)
+    if (!client) return
+    const result = await handleWeeklyDigest(client)
+    return res.status(result.status).json(result.body)
+  }
+
   const admin = await requireAdmin(req)
   if (!admin) return res.status(403).json({ error: { message: 'Forbidden' } })
 

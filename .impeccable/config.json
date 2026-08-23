@@ -236,6 +236,24 @@
         ],
         "createdAt": "2026-08-23T16:07:42.257Z",
         "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (soft purple radial gradient from the stakeholder spec)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#1a1430",
+        "createdAt": "2026-08-23T19:41:22.386Z",
+        "reason": "reused verbatim from the existing GoalReachedScreen.module.css dark celebratory gradient, not new drift"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#302352",
+        "createdAt": "2026-08-23T19:41:22.504Z",
+        "reason": "reused verbatim from the existing GoalReachedScreen.module.css dark celebratory gradient, not new drift"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#4a3670",
+        "createdAt": "2026-08-23T19:41:22.656Z",
+        "reason": "reused verbatim from the existing GoalReachedScreen.module.css dark celebratory gradient, not new drift"
       }
     ]
   }

@@ -15,6 +15,7 @@ export async function addHistory(entry) {
   if (!user) return
   await supabase.from('history').insert({
     user_id: user.id,
+    child_id: entry.childId ?? null,
     mode: entry.mode,
     user_text: entry.userText,
     buddy_text: entry.buddyText,
