@@ -1,0 +1,107 @@
+/* src/components/lesson/DragMatchCard.module.css */
+.card {
+  composes: card from './shared.module.css';
+  padding: 20px 20px 24px;
+  text-align: center;
+}
+
+.instruction {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  margin-bottom: 12px;
+}
+
+.targets {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.target {
+  flex: 1;
+  min-width: 140px;
+  padding: 14px 10px;
+  border-radius: var(--r-md);
+  background: rgba(124,58,237,0.06);
+  border: 2px dashed rgba(124,58,237,0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.targetActive {
+  border-color: var(--c-mint);
+  background: rgba(52,211,153,0.12); /* ignore-value design-system-color */
+}
+
+.targetLabel {
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.targetItems {
+  font-size: 1.3rem; /* ignore-value design-system-font-size */
+  min-height: 1.6rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.chip {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--c-grape), var(--c-berry));
+  color: #fff;
+  border-radius: var(--r-md);
+  font-family: var(--font-head);
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--c-grape-d);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 72px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.chip:active {
+  cursor: grabbing;
+}
+
+.chipEmoji {
+  font-size: 1.8rem; /* ignore-value design-system-font-size */
+  line-height: 1;
+  display: block;
+}
+
+.chipText {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.chipSelected {
+  box-shadow: 0 0 0 3px var(--c-mint), 0 4px 0 var(--c-grape-d);
+}
+
+.shake {
+  animation: shakeTarget 0.4s ease;
+}
+
+@keyframes shakeTarget {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
