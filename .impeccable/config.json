@@ -38,6 +38,60 @@
         "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
         "createdAt": "2026-08-17T17:52:03.357Z",
         "reason": "PRODUCT.md brand commitment: candy palette 'squish' identity, --spring token used deliberately for playful child-facing bounce animations, predates this session"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "typingbounce",
+        "files": [
+          "src/pages/LandingPage.module.css"
+        ],
+        "createdAt": "2026-08-22T07:34:00.944Z",
+        "reason": "Standard three-dot chat typing indicator (WhatsApp/iMessage convention) — the bounce motion is the recognized pattern for this exact UI element, not a decorative entrance/button easing choice the rule is meant to catch."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#9d50bb",
+        "files": [
+          "src/components/promotionCenter/RankStatusHeader.module.css"
+        ],
+        "createdAt": "2026-08-23T16:03:54.866Z",
+        "reason": "user confirmed: Promotion Center is a sanctioned sub-brand exception (Buddy Purple), scoped to /parent/promotion — see docs/superpowers/specs/2026-08-23-promotion-center-design.md"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#d4af37",
+        "files": [
+          "src/components/promotionCenter/RankStatusHeader.module.css"
+        ],
+        "createdAt": "2026-08-23T16:03:55.025Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Academy Gold)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#27ae60",
+        "files": [
+          "src/components/promotionCenter/RankStatusHeader.module.css"
+        ],
+        "createdAt": "2026-08-23T16:03:55.197Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Tactical Green)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(157, 80, 187, 0.15)",
+        "files": [
+          "src/components/promotionCenter/RankStatusHeader.module.css"
+        ],
+        "createdAt": "2026-08-23T16:03:55.339Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple tint)"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "roboto mono', monospace",
+        "files": [
+          "src/components/promotionCenter/RankStatusHeader.module.css"
+        ],
+        "createdAt": "2026-08-23T16:03:55.476Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Roboto Mono for numeric rank/XP stats)"
       }
     ]
   }
