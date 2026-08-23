@@ -137,6 +137,51 @@
         ],
         "createdAt": "2026-08-23T16:05:07.833Z",
         "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple pulse ring)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0a0a12",
+        "files": [
+          "src/components/promotionCenter/TacticalPreview.module.css"
+        ],
+        "createdAt": "2026-08-23T16:05:48.091Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (dark HUD frame, TacticalPreview only)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#9d50bb",
+        "files": [
+          "src/components/promotionCenter/TacticalPreview.module.css"
+        ],
+        "createdAt": "2026-08-23T16:05:48.214Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(157, 80, 187, 0.35)",
+        "files": [
+          "src/components/promotionCenter/TacticalPreview.module.css"
+        ],
+        "createdAt": "2026-08-23T16:05:48.311Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple glow)"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "roboto mono', monospace",
+        "files": [
+          "src/components/promotionCenter/TacticalPreview.module.css"
+        ],
+        "createdAt": "2026-08-23T16:05:48.438Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Roboto Mono for HUD stats)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#d4af37",
+        "files": [
+          "src/components/promotionCenter/TacticalPreview.module.css"
+        ],
+        "createdAt": "2026-08-23T16:05:48.553Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Academy Gold)"
       }
     ]
   }

@@ -1,0 +1,47 @@
+.frame {
+  border-radius: var(--r-lg, 34px);
+  overflow: hidden;
+}
+
+.hud {
+  aspect-ratio: 16 / 9;
+  background: #0a0a12;
+  color: #fff;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 2px solid var(--pc-purple, #9D50BB);
+  box-shadow: 0 0 24px rgba(157, 80, 187, 0.35) inset;
+}
+
+.hudBar {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Roboto Mono', monospace;
+  font-size: var(--fs-xs, 0.75rem);
+  letter-spacing: 0.08em;
+  color: var(--pc-gold, #D4AF37);
+}
+
+.hudBody {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.hudText {
+  font-family: var(--font-head, sans-serif);
+  text-align: center;
+  font-size: var(--fs-md, 1rem);
+  color: #fff;
+  max-width: 80%;
+}
+
+.caption {
+  font-size: var(--fs-xs, 0.75rem);
+  color: var(--ink-dim, #6b5d8f);
+  text-align: center;
+  margin-top: 8px;
+}
