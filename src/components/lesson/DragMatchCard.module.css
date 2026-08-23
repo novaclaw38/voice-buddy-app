@@ -37,7 +37,7 @@
 
 .targetActive {
   border-color: var(--c-mint);
-  background: rgba(52,211,153,0.12); /* ignore-value design-system-color */
+  background: rgba(52,211,153,0.12);
 }
 
 .targetLabel {
@@ -48,7 +48,7 @@
 }
 
 .targetItems {
-  font-size: 1.3rem; /* ignore-value design-system-font-size */
+  font-size: 1.3rem;
   min-height: 1.6rem;
 }
 
@@ -81,7 +81,7 @@
 }
 
 .chipEmoji {
-  font-size: 1.8rem; /* ignore-value design-system-font-size */
+  font-size: 1.8rem;
   line-height: 1;
   display: block;
 }
