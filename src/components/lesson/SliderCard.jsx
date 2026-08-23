@@ -70,6 +70,7 @@ export default function SliderCard({ step, onComplete }) {
             aria-valuemin={min}
             aria-valuemax={max}
             aria-valuenow={value}
+            aria-label={prompt || 'Slider'}
             className={styles.handle}
             style={{ x }}
             drag="x"
