@@ -7,7 +7,6 @@
 const MODE_VOICE = {
   chat:  { pitchOffset: 0, rateMul: 1    },
   story: { pitchOffset: 2, rateMul: 0.95 }, // warm, slightly slower storyteller
-  sing:  { pitchOffset: 4, rateMul: 1    },
 }
 
 export function getModeVoice(modeId) {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { formatHistoryMemory, formatLessonsMemory, selectModePrompt, maybeFlagEmotionalSignal } from './useChat.js'
-import { PROMPTS } from '../utils/prompts.js'
+import { formatHistoryMemory, formatLessonsMemory, selectModePrompt, selectModeIntros, maybeFlagEmotionalSignal } from './useChat.js'
+import { PROMPTS, MODE_INTROS, MODE_INTROS_TACTICAL } from '../utils/prompts.js'
 
 const mocks = vi.hoisted(() => ({
   fetchTodaySignal: vi.fn(),
@@ -76,10 +76,6 @@ describe('formatHistoryMemory', () => {
 })
 
 describe('selectModePrompt', () => {
-  it('picks the sing prompt for sing mode', () => {
-    expect(selectModePrompt('sing')).toBe(PROMPTS.sing)
-  })
-
   it('picks the story prompt for story mode', () => {
     expect(selectModePrompt('story')).toBe(PROMPTS.story)
   })
@@ -88,6 +84,27 @@ describe('selectModePrompt', () => {
     expect(selectModePrompt('chat')).toBe(PROMPTS.chat)
     expect(selectModePrompt('nonsense')).toBe(PROMPTS.chat)
     expect(selectModePrompt(undefined)).toBe(PROMPTS.chat)
+  })
+})
+
+describe('selectModeIntros', () => {
+  it('picks the gentle intro pool under the old age band', () => {
+    expect(selectModeIntros('chat', 7)).toBe(MODE_INTROS.chat)
+    expect(selectModeIntros('story', 8)).toBe(MODE_INTROS.story)
+  })
+
+  it('picks the tactical intro pool at 9+', () => {
+    expect(selectModeIntros('chat', 9)).toBe(MODE_INTROS_TACTICAL.chat)
+    expect(selectModeIntros('story', 10)).toBe(MODE_INTROS_TACTICAL.story)
+  })
+
+  it('falls back to chat pool for an unrecognized mode, gentle or tactical', () => {
+    expect(selectModeIntros('nonsense', 7)).toBe(MODE_INTROS.chat)
+    expect(selectModeIntros('nonsense', 10)).toBe(MODE_INTROS_TACTICAL.chat)
+  })
+
+  it('defaults to the middle band (gentle) when age is not given', () => {
+    expect(selectModeIntros('chat', undefined)).toBe(MODE_INTROS.chat)
   })
 })
 

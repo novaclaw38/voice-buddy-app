@@ -1,10 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { chatCompletion } from '../services/chatService.js'
 import { addHistory, fetchHistory } from '../services/historyService.js'
-import { PROMPTS, MODE_INTROS, pickRandomDistinct } from '../utils/prompts.js'
+import { PROMPTS, MODE_INTROS, MODE_INTROS_TACTICAL, pickRandomDistinct } from '../utils/prompts.js'
 import { extractTopics } from '../utils/topics.js'
 import { timeContextLine } from '../utils/timeOfDay.js'
 import { supabase } from '../lib/supabase.js'
+import { BAND_BY_AGE } from '../utils/subjects.js'
 import { getActiveChildId } from '../utils/storage.js'
 import { hasConcernSignal, buildClassifyPrompt } from '../utils/emotionalSignal.js'
 import { fetchTodaySignal, upsertSignal } from '../services/signalsService.js'
@@ -38,9 +39,16 @@ export function formatLessonsMemory(lessonRows, childName) {
 }
 
 // Picks the PROMPTS builder for a conversational mode. Factored out so the
-// chat/sing/story branching is unit-testable without rendering the hook.
+// chat/story branching is unit-testable without rendering the hook.
 export function selectModePrompt(mode) {
   return PROMPTS[mode] || PROMPTS.chat
+}
+
+// Picks the MODE_INTROS pool for a mode, gentle or tactical depending on the
+// child's age band. Factored out for the same reason as selectModePrompt.
+export function selectModeIntros(mode, childAge) {
+  const pools = BAND_BY_AGE(childAge ?? 7) === 'old' ? MODE_INTROS_TACTICAL : MODE_INTROS
+  return pools[mode] || pools.chat
 }
 
 // Fire-and-forget from sendMessage, after the turn is already stored via
@@ -97,8 +105,8 @@ export function useChat(settings) {
   // whichever settles last can never silently wipe out the other.
   const memoryPartsRef = useRef({ history: '', lessons: '' })
   // One last-picked-index slot per mode, so excluding a repeat in "chat"
-  // doesn't accidentally also exclude an unrelated index in "sing"/"story".
-  const introIndexRef = useRef({ chat: { current: -1 }, sing: { current: -1 }, story: { current: -1 } })
+  // doesn't accidentally also exclude an unrelated index in "story".
+  const introIndexRef = useRef({ chat: { current: -1 }, story: { current: -1 } })
 
   useEffect(() => {
     const childName = settings?.childName || 'there'
@@ -149,10 +157,11 @@ export function useChat(settings) {
 
     const childName = settings?.childName || 'there'
     const buddyName = settings?.buddyName  || 'Buddy'
-    const variants = MODE_INTROS[newMode] || MODE_INTROS.chat
+    const childAge  = settings?.childAge   || 7
+    const variants = selectModeIntros(newMode, childAge)
     const indexState = introIndexRef.current[newMode] || introIndexRef.current.chat
     return pickRandomDistinct(variants, indexState)(childName, buddyName)
-  }, [settings?.childName, settings?.buddyName])
+  }, [settings?.childName, settings?.buddyName, settings?.childAge])
 
   const sendMessage = useCallback(async (userText, currentMode) => {
     setError(null)

@@ -1,9 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-
-vi.mock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: true }))
-
 import VoiceOnlyScreen from './VoiceOnlyScreen.jsx'
 
 const baseProps = {
@@ -12,7 +9,6 @@ const baseProps = {
   userText: '',
   buddyName: 'Buddy',
   onVoicePress: vi.fn(),
-  onStartSing: vi.fn(),
   onCustomize: vi.fn(),
   onShowPin: vi.fn(),
 }
@@ -46,41 +42,18 @@ describe('VoiceOnlyScreen', () => {
     expect(onVoicePress).toHaveBeenCalledTimes(1)
   })
 
-  it('wires the menu\'s Songs/Customise/Settings entries to the right callbacks', () => {
-    const onStartSing = vi.fn()
+  it('wires the menu\'s Customise/Settings entries to the right callbacks, and never shows Songs', () => {
     const onCustomize = vi.fn()
     const onShowPin = vi.fn()
-    renderScreen({ onStartSing, onCustomize, onShowPin })
+    renderScreen({ onCustomize, onShowPin })
 
     fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
-    fireEvent.click(screen.getByRole('menuitem', { name: /songs/i }))
-    expect(onStartSing).toHaveBeenCalledTimes(1)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
+    expect(screen.queryByRole('menuitem', { name: /songs/i })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('menuitem', { name: /customise buddy/i }))
     expect(onCustomize).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
     fireEvent.click(screen.getByRole('menuitem', { name: /parent settings/i }))
     expect(onShowPin).toHaveBeenCalledTimes(1)
-  })
-})
-
-describe('VoiceOnlyScreen with sing mode disabled', () => {
-  beforeEach(() => {
-    vi.resetModules()
-    vi.doMock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: false }))
-  })
-
-  it('hides the Songs menu entry', async () => {
-    const { default: VoiceOnlyScreenDisabled } = await import('./VoiceOnlyScreen.jsx')
-    render(
-      <MemoryRouter>
-        <VoiceOnlyScreenDisabled {...baseProps} />
-      </MemoryRouter>
-    )
-    fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
-    expect(screen.queryByRole('menuitem', { name: /songs/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('menuitem', { name: /customise buddy/i })).toBeInTheDocument()
   })
 })

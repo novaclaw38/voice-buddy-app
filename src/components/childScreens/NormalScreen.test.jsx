@@ -1,9 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-
-vi.mock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: true }))
-
 import NormalScreen from './NormalScreen.jsx'
 
 const baseSpeech = {
@@ -33,7 +30,6 @@ const baseProps = {
   onPlayStory: vi.fn(),
   onDeclineStory: vi.fn(),
   onExitMode: vi.fn(),
-  onStartSing: vi.fn(),
   onStartStory: vi.fn(),
   onVoicePress: vi.fn(),
   onShowPicker: vi.fn(),
@@ -54,14 +50,11 @@ describe('NormalScreen', () => {
   })
 
   it('wires the dock buttons to their callbacks', () => {
-    const onStartSing = vi.fn()
     const onStartStory = vi.fn()
     const onShowPicker = vi.fn()
     const onShowPin = vi.fn()
-    renderScreen({ onStartSing, onStartStory, onShowPicker, onShowPin })
+    renderScreen({ onStartStory, onShowPicker, onShowPin })
 
-    fireEvent.click(screen.getByText('Songs'))
-    expect(onStartSing).toHaveBeenCalledTimes(1)
     fireEvent.click(screen.getByText('Story'))
     expect(onStartStory).toHaveBeenCalledTimes(1)
     fireEvent.click(screen.getByText('My Buddy'))
@@ -126,22 +119,9 @@ describe('NormalScreen', () => {
     renderScreen({ storyPhase: null })
     expect(screen.queryByText(/Someone left you a story idea/i)).not.toBeInTheDocument()
   })
-})
 
-describe('NormalScreen with sing mode disabled', () => {
-  beforeEach(() => {
-    vi.resetModules()
-    vi.doMock('../../config/featureFlags.js', () => ({ SING_MODE_ENABLED: false }))
-  })
-
-  it('hides the Songs dock button', async () => {
-    const { default: NormalScreenDisabled } = await import('./NormalScreen.jsx')
-    render(
-      <MemoryRouter>
-        <NormalScreenDisabled {...baseProps} />
-      </MemoryRouter>
-    )
+  it('never renders a Songs dock button (sing mode removed)', () => {
+    renderScreen()
     expect(screen.queryByText('Songs')).not.toBeInTheDocument()
-    expect(screen.getByText('Story')).toBeInTheDocument()
   })
 })

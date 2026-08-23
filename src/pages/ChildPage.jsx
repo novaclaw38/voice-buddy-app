@@ -21,10 +21,10 @@ import { supabase } from '../lib/supabase.js'
 import { fetchMessageById, markPlayed, fetchLatestUnplayed } from '../services/messageService.js'
 import { fetchLatestUndelivered, markStoryDelivered } from '../services/storyRequestService.js'
 import { startAsChild } from '../services/cameraSignal.js'
-import SingAlong from '../components/SingAlong.jsx'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
 import { getModeVoice } from '../utils/modeVoice.js'
 import { pickRandomDistinct } from '../utils/prompts.js'
+import { BAND_BY_AGE } from '../utils/subjects.js'
 import styles from './ChildPage.module.css'
 import { IconMail, IconPlay, IconX, IconCheck } from '../components/icons.jsx'
 
@@ -39,18 +39,43 @@ const WELCOME_BACK = [
   (childName, buddyName) => `Back again, ${childName}? Awesome! Let's find something fun to do.`,
 ]
 
+// Tactical-tone counterpart to WELCOME_BACK, IDLE_NUDGES and
+// LISTEN_FAIL_PROMPTS below — selected for BAND_BY_AGE 'old' (9+) kids via
+// pickVoiceLine, mirroring how useChat.js picks MODE_INTROS_TACTICAL.
+const WELCOME_BACK_TACTICAL = [
+  (childName, buddyName) => `Recruit ${childName}, welcome back! What's our next objective?`,
+  (childName, buddyName) => `${buddyName} standing by again, Recruit ${childName}! Ready for round two?`,
+  (childName, buddyName) => `Good to have you back, Recruit ${childName} — what's the mission?`,
+  (childName, buddyName) => `${childName}! Reporting for duty again — what should we tackle?`,
+  (childName, buddyName) => `Welcome back, Recruit ${childName}! I've got fresh intel — want to hear it?`,
+  (childName, buddyName) => `Copy that, ${childName}'s back! ${buddyName}'s ready — what sounds like a good op?`,
+  (childName, buddyName) => `${childName}, perfect timing, Recruit — I was just running diagnostics! What's up?`,
+  (childName, buddyName) => `Back again, Recruit ${childName}? Outstanding! Let's find our next objective.`,
+]
+
 // Buddy shouldn't just sit there waiting to be tapped — after a stretch of
 // silence he proactively invites the child to do something.
 const IDLE_NUDGE_MS = 45000
 const IDLE_NUDGES = [
-  (childName) => `Psst, ${childName}! I'm still here — want to chat, sing, or hear a joke?`,
+  (childName) => `Psst, ${childName}! I'm still here — want to chat or hear a joke?`,
   (childName) => `Hey ${childName}, I know a fun game — want to play 20 Questions with me?`,
   (childName) => `${childName}? I'm getting a little bored just sitting here — let's do something fun!`,
   (childName) => `Did you know I love surprises, ${childName}? Tap the mic and tell me something cool!`,
   (childName) => `${childName}, I just thought of a silly joke — want to hear it?`,
-  (childName) => `Still there, ${childName}? Let's do something — a song, a story, or just talk!`,
+  (childName) => `Still there, ${childName}? Let's do something — a story, or just talk!`,
   (childName) => `${childName}, I bet I can guess your favorite animal — want to try me?`,
-  (childName) => `Whenever you're ready, ${childName}, I've got games, songs, and stories waiting!`,
+  (childName) => `Whenever you're ready, ${childName}, I've got games and stories waiting!`,
+]
+
+const IDLE_NUDGES_TACTICAL = [
+  (childName) => `Stand by, Recruit ${childName}! I'm still here — want to chat or run a drill?`,
+  (childName) => `Hey Recruit ${childName}, I know a good drill — want to play Intel Drill (20 Questions) with me?`,
+  (childName) => `Recruit ${childName}? Going quiet on comms — let's find our next objective!`,
+  (childName) => `Did you know I love a surprise report, ${childName}? Tap the mic and give me your intel!`,
+  (childName) => `Recruit ${childName}, I just thought of a mission update — want to hear it?`,
+  (childName) => `Still there, Recruit ${childName}? Let's do something — a mission log, or just talk!`,
+  (childName) => `Recruit ${childName}, I bet I can guess your favorite gadget — want to try me?`,
+  (childName) => `Whenever you're ready, Recruit ${childName}, I've got drills and mission logs waiting!`,
 ]
 
 // Said when speech recognition ends with nothing usable (silence, timeout,
@@ -62,6 +87,20 @@ const LISTEN_FAIL_PROMPTS = [
   () => `My ears must've been napping! Try that again?`,
   () => `I didn't hear you that time — go ahead, I'm listening!`,
 ]
+
+const LISTEN_FAIL_PROMPTS_TACTICAL = [
+  () => `Negative, didn't quite catch that transmission! Try again, Recruit?`,
+  () => `Comms broke up — can you repeat that, Recruit?`,
+  () => `My receivers must've glitched! Say that again?`,
+  () => `Didn't copy that one — go ahead, I'm listening, Recruit!`,
+]
+
+// Selects the gentle or tactical pool for a voice-line array, based on the
+// child's age band — mirrors useChat.js's selectModeIntros.
+function pickVoiceLine(childAge, gentlePool, tacticalPool, indexState, ...args) {
+  const pool = BAND_BY_AGE(childAge ?? 7) === 'old' ? tacticalPool : gentlePool
+  return pickRandomDistinct(pool, indexState)(...args)
+}
 
 // This page can remount many times per browser session (parent settings,
 // courses, lessons all navigate away and back) — only the very first mount
@@ -78,11 +117,11 @@ const listenFailIndex = { current: -1 }
 // ChildPage is the shell: it owns everything that must survive a screen
 // switch — camera check-in signaling, the parent-message and story-request
 // realtime listeners, settings/onboarding, screen-time ticking, boot
-// greeting, idle nudge — and renders exactly one of five screens
-// (NormalScreen, VoiceOnlyScreen, GoalReachedScreen x2 variants, or
-// SingAlong) based on current state. None of those cross-cutting effects
-// live inside a screen component, because a screen can unmount (e.g. the
-// child hits the wind-down screen) while the shell — and the camera/
+// greeting, idle nudge — and renders exactly one of four screens
+// (NormalScreen, VoiceOnlyScreen, GoalReachedScreen x2 variants) based on
+// current state. None of those cross-cutting effects live inside a screen
+// component, because a screen can unmount (e.g. the child hits the
+// wind-down screen) while the shell — and the camera/
 // message connections it owns — needs to keep running.
 //
 // See the 2026-08-17 architecture review (Candidate B) for the full
@@ -204,7 +243,7 @@ export default function ChildPage({ session }) {
   // indicator dot ('error' collapses to off, same as 'idle' — a young
   // child shouldn't see a camera-error message). Lives in the shell, not
   // NormalScreen, so a parent can still check the camera while the child
-  // is on the wind-down/voice-only/sing screen.
+  // is on the wind-down/voice-only screen.
   const [cameraOn, setCameraOn] = useState(false)
 
   useEffect(() => {
@@ -388,7 +427,7 @@ export default function ChildPage({ session }) {
       : ''
     const greet = isFirstGreeting
       ? `${greetingWord()}, ${childName}! I'm ${buddyName}! Pick something to do, or just tap the mic and talk to me!${activityPart}`
-      : pickRandomDistinct(WELCOME_BACK, welcomeBackIndex)(childName, buddyName)
+      : pickVoiceLine(settings.childAge, WELCOME_BACK, WELCOME_BACK_TACTICAL, welcomeBackIndex, childName, buddyName)
     setBuddyText(greet)
     setUiStatus('speaking')
     speech.speak(greet, () => {
@@ -403,7 +442,7 @@ export default function ChildPage({ session }) {
   useEffect(() => {
     if (uiStatus !== 'idle' || showPin || showPicker || msgAsk.phase === 'ask' || playingMessage || chat.mode !== 'chat') return
     const id = setTimeout(() => {
-      const nudge = pickRandomDistinct(IDLE_NUDGES, idleNudgeIndex)(childName)
+      const nudge = pickVoiceLine(settings.childAge, IDLE_NUDGES, IDLE_NUDGES_TACTICAL, idleNudgeIndex, childName)
       setBuddyText(nudge)
       setUiStatus('speaking')
       speech.speak(nudge, () => {
@@ -412,19 +451,7 @@ export default function ChildPage({ session }) {
       })
     }, IDLE_NUDGE_MS)
     return () => clearTimeout(id)
-  }, [uiStatus, showPin, showPicker, msgAsk.phase, playingMessage, chat.mode, childName, speech, scheduleBubbleClear])
-
-  const handleStartSing = useCallback(() => {
-    cancelBubbleClear()
-    const intro = chat.switchMode('sing')
-    setBuddyText(intro)
-    setUserText('')
-    setUiStatus('speaking')
-    speech.speak(intro, () => {
-      setUiStatus('idle')
-      scheduleBubbleClear()
-    }, getModeVoice('sing'))
-  }, [chat, speech, scheduleBubbleClear, cancelBubbleClear])
+  }, [uiStatus, showPin, showPicker, msgAsk.phase, playingMessage, chat.mode, childName, speech, scheduleBubbleClear, settings.childAge])
 
   const handleStartStory = useCallback(() => {
     if (!isPro) { setUpgradeTrigger('storyMode'); return }
@@ -507,13 +534,13 @@ export default function ChildPage({ session }) {
   const handleListenFail = useCallback(() => {
     cancelBubbleClear()
     setUiStatus('confused')
-    const msg = pickRandomDistinct(LISTEN_FAIL_PROMPTS, listenFailIndex)()
+    const msg = pickVoiceLine(settings.childAge, LISTEN_FAIL_PROMPTS, LISTEN_FAIL_PROMPTS_TACTICAL, listenFailIndex)
     setBuddyText(msg)
     speech.speak(msg, () => {
       setUiStatus('idle')
       scheduleBubbleClear()
     })
-  }, [speech, cancelBubbleClear, scheduleBubbleClear])
+  }, [speech, cancelBubbleClear, scheduleBubbleClear, settings.childAge])
 
   // isAuto distinguishes Buddy starting the mic himself (after his own
   // reply, when autoListen is on) from the child tapping it — same
@@ -542,7 +569,7 @@ export default function ChildPage({ session }) {
 
   // ── Screen selection ──────────────────────────────────────────────
   // Precedence matches the original early-return order: a limit screen
-  // always wins over voice-only/sing/normal.
+  // always wins over voice-only/normal.
   let screen
   if (showWindDown) {
     screen = (
@@ -583,28 +610,8 @@ export default function ChildPage({ session }) {
         userText={userText}
         buddyName={buddyName}
         onVoicePress={handleVoicePress}
-        onStartSing={handleStartSing}
         onCustomize={() => setShowPicker(true)}
         onShowPin={() => setShowPin(true)}
-      />
-    )
-  } else if (chat.mode === 'sing') {
-    screen = (
-      <SingAlong
-        avatarColor={settings.avatarColor}
-        avatarType={avatarType}
-        costume={settings.costume}
-        onExit={() => {
-          cancelBubbleClear()
-          const intro = chat.switchMode('chat')
-          setBuddyText(intro)
-          setUserText('')
-          setUiStatus('speaking')
-          speech.speak(intro, () => {
-            setUiStatus('idle')
-            scheduleBubbleClear()
-          })
-        }}
       />
     )
   } else {
@@ -628,7 +635,6 @@ export default function ChildPage({ session }) {
         onPlayStory={storyAsk.accept}
         onDeclineStory={storyAsk.decline}
         onExitMode={handleExitMode}
-        onStartSing={handleStartSing}
         onStartStory={handleStartStory}
         onVoicePress={handleVoicePress}
         onShowPicker={() => setShowPicker(true)}
@@ -639,15 +645,13 @@ export default function ChildPage({ session }) {
 
   // Parent-message ask/playing overlay is rendered once here (not per
   // screen) — NormalScreen has its own inline envelope button in its top
-  // bar (showEnvelope=false below), VoiceOnlyScreen and sing mode get the
-  // shared floating envelope, and the wind-down/free-limit screens simply
-  // never see msgOverlayPhase !== null thanks to the guard above.
+  // bar (showEnvelope=false below), VoiceOnlyScreen gets the shared floating
+  // envelope, and the wind-down/free-limit screens simply never see
+  // msgOverlayPhase !== null thanks to the guard above.
   const msgOverlayPhase = msgAsk.phase === 'ask' ? 'ask' : (playingMessage ? 'playing' : null)
-  const envelopeConfig = chat.mode === 'sing'
-    ? { envelopeClass: styles.envelopeFloat }
-    : voiceOnly
-      ? { envelopeClass: styles.envelopeBtn, onEnvelopeClick: () => msgAsk.ask(MSG_ASK_PROMPT, playParentMessageNow) }
-      : { showEnvelope: false }
+  const envelopeConfig = voiceOnly
+    ? { envelopeClass: styles.envelopeBtn, onEnvelopeClick: () => msgAsk.ask(MSG_ASK_PROMPT, playParentMessageNow) }
+    : { showEnvelope: false }
 
   return (
     <>
@@ -708,8 +712,8 @@ export default function ChildPage({ session }) {
 }
 
 /* Parent voice message: envelope indicator + ask-first / playing bubble.
-   Shared across the default, voice-only, and sing-mode screens so the
-   ask-then-play flow stays identical everywhere a message can appear. */
+   Shared across the default and voice-only screens so the ask-then-play
+   flow stays identical everywhere a message can appear. */
 function ParentMessageOverlay({ msgPhase, showEnvelope = true, envelopeClass, onEnvelopeClick, onYes, onNo, onReplay, onDismiss }) {
   const trapRef = useRef(null)
   useFocusTrap(trapRef, !!msgPhase, msgPhase === 'ask' ? onNo : onDismiss)

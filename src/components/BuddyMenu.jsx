@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from './BuddyMenu.module.css'
-import { IconMenu, IconMusic, IconBook, IconPalette, IconGear } from './icons.jsx'
+import { IconMenu, IconBook, IconPalette, IconGear } from './icons.jsx'
 import useFocusTrap from '../hooks/useFocusTrap.js'
 
 // Single overflow menu replacing the old scattered top-bar buttons (customise,
-// settings) and mode tiles (songs, learn) — one predictable place for the
-// handful of things that live outside the main chat loop.
-export default function BuddyMenu({ onSongs, onLearn, onCustomize, onSettings, variant = 'light', showSongs = true }) {
+// settings) and mode tiles — one predictable place for the handful of things
+// that live outside the main chat loop.
+export default function BuddyMenu({ onLearn, onCustomize, onSettings, variant = 'light' }) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef(null)
   const menuRef = useRef(null)
@@ -39,11 +39,6 @@ export default function BuddyMenu({ onSongs, onLearn, onCustomize, onSettings, v
       </button>
       {open && (
         <div className={styles.menu} role="menu" ref={menuRef}>
-          {showSongs && (
-            <button className={styles.item} role="menuitem" onClick={pick(onSongs)}>
-              <span className={styles.itemIcon} style={{ color: 'var(--c-pink-d)' }}><IconMusic /></span> Songs
-            </button>
-          )}
           <button className={styles.item} role="menuitem" onClick={pick(onLearn)}>
             <span className={styles.itemIcon} style={{ color: 'var(--c-sky)' }}><IconBook /></span> Learn
           </button>
