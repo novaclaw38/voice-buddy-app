@@ -227,6 +227,15 @@
         ],
         "createdAt": "2026-08-23T16:06:37.311Z",
         "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple CTA gradient end)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(230, 210, 255, 0.4)",
+        "files": [
+          "src/pages/PromotionCenterPage.module.css"
+        ],
+        "createdAt": "2026-08-23T16:07:42.257Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (soft purple radial gradient from the stakeholder spec)"
       }
     ]
   }

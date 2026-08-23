@@ -114,6 +114,11 @@ export default function ParentPage({ session }) {
         </div>
       )}
 
+      <button className={styles.promotionBanner} onClick={() => navigate('/parent/promotion')}>
+        <span>🎖️ See {settings.childName || 'your child'}&apos;s rank and mission progress</span>
+        <span aria-hidden="true">→</span>
+      </button>
+
       {/* Tabs */}
       <div className={styles.tabsScroller}>
         <div

@@ -7,6 +7,7 @@ import { authHeaders } from './services/chatService.js'
 
 const ChildPage   = lazy(() => import('./pages/ChildPage.jsx'))
 const ParentPage  = lazy(() => import('./pages/ParentPage.jsx'))
+const PromotionCenterPage = lazy(() => import('./pages/PromotionCenterPage.jsx'))
 const AuthPage    = lazy(() => import('./pages/AuthPage.jsx'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage.jsx'))
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'))
@@ -76,6 +77,7 @@ export default function App() {
           {/* Authenticated */}
           <Route path="/app"     element={session ? <ChildPage session={session} />  : <Navigate to="/" replace />} />
           <Route path="/parent"  element={session ? <ParentPage session={session} /> : <Navigate to="/" replace />} />
+          <Route path="/parent/promotion" element={session ? <PromotionCenterPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/courses" element={session ? <CoursesPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/lesson"  element={session ? <LessonPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/admin" element={session?.user?.email === ADMIN_EMAIL ? <AdminPage /> : <Navigate to={session ? '/app' : '/'} replace />} />
@@ -89,6 +91,7 @@ export default function App() {
               <Route path="/dev-child" element={<ChildPage session={{ user: { id: 'dev-preview' } }} />} />
               <Route path="/dev-courses" element={<CoursesPage session={{ user: { id: 'dev-preview' } }} />} />
               <Route path="/dev-parent" element={<ParentPage session={{ user: { id: 'dev-preview' } }} />} />
+              <Route path="/dev-promotion" element={<PromotionCenterPage session={{ access_token: 'dev', user: { id: 'dev-preview' } }} />} />
               <Route path="/dev-lesson" element={<LessonPage session={{ user: { id: 'dev-preview' } }} />} />
             </>
           )}
