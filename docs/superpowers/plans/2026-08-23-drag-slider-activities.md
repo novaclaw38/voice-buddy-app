@@ -28,7 +28,7 @@
 **Interfaces:**
 - Produces: `findTargetAtPoint(point: {x, y}, targetRects: Record<string, DOMRect-like>): string | null` — used by `DragMatchCard` (Task 2) to resolve which target a dropped item landed on.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```js
 // src/utils/dragHitTest.test.js
@@ -54,12 +54,12 @@ describe('findTargetAtPoint', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/utils/dragHitTest.test.js`
 Expected: FAIL — `dragHitTest.js` doesn't exist yet.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```js
 // src/utils/dragHitTest.js
@@ -73,12 +73,12 @@ export function findTargetAtPoint(point, targetRects) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/utils/dragHitTest.test.js`
 Expected: PASS (3 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/utils/dragHitTest.js src/utils/dragHitTest.test.js
@@ -98,7 +98,7 @@ git commit -m "feat: add pure hit-testing utility for drag-and-drop targets"
 - Consumes: `findTargetAtPoint` from `../../utils/dragHitTest.js` (Task 1).
 - Produces: `DragMatchCard({ step, onComplete })` — `onComplete(score: number)` called once, matching the calling convention already used by `ExploreCard`/`MasteryCheckCard`/`PracticeCard` (`onComplete(100)` on success). `step` shape: `{ prompt?, targets: [{id, label}], items: [{id, label, value}], rule }` where `rule` is `{ kind: 'exact', correct: Record<targetId, itemId> }` for this task (the `budget` variant is added in Task 3).
 
-- [ ] **Step 1: Write the failing test (exact rule only)**
+- [x] **Step 1: Write the failing test (exact rule only)**
 
 ```jsx
 // src/components/lesson/DragMatchCard.test.jsx
@@ -149,12 +149,12 @@ describe('DragMatchCard — exact rule, tap path', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/components/lesson/DragMatchCard.test.jsx`
 Expected: FAIL — `DragMatchCard.jsx` doesn't exist yet.
 
-- [ ] **Step 3: Write the component (exact rule + drag gesture) and its stylesheet**
+- [x] **Step 3: Write the component (exact rule + drag gesture) and its stylesheet**
 
 ```jsx
 // src/components/lesson/DragMatchCard.jsx
@@ -405,12 +405,12 @@ export default function DragMatchCard({ step, onComplete }) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/components/lesson/DragMatchCard.test.jsx`
 Expected: PASS (2 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/lesson/DragMatchCard.jsx src/components/lesson/DragMatchCard.module.css src/components/lesson/DragMatchCard.test.jsx
@@ -428,7 +428,7 @@ git commit -m "feat: add DragMatchCard with drag gesture and tap fallback (exact
 - Consumes: `DragMatchCard` from Task 2 (already implements `rule.kind === 'budget'` — `{ kind: 'budget', max, required: itemId[] }`, one target).
 - No new production code — Task 2's `place()` function already branches on `rule.kind`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```jsx
 // append to src/components/lesson/DragMatchCard.test.jsx
@@ -481,19 +481,19 @@ describe('DragMatchCard — budget rule, tap path', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails (or already passes)**
+- [x] **Step 2: Run test to verify it fails (or already passes)**
 
 Run: `npx vitest run src/components/lesson/DragMatchCard.test.jsx`
 Expected: The two new tests should already PASS since Task 2's `place()` implements the budget branch — this step confirms that, rather than driving new production code. If either fails, fix `place()`'s budget branch in `DragMatchCard.jsx` before proceeding.
 
-- [ ] **Step 3: N/A — no new implementation needed**
+- [x] **Step 3: N/A — no new implementation needed**
 
-- [ ] **Step 4: Run full test file to verify all 4 tests pass**
+- [x] **Step 4: Run full test file to verify all 4 tests pass**
 
 Run: `npx vitest run src/components/lesson/DragMatchCard.test.jsx`
 Expected: PASS (4 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/lesson/DragMatchCard.test.jsx
@@ -512,7 +512,7 @@ git commit -m "test: cover DragMatchCard budget rule (Mission 04 breadboard)"
 **Interfaces:**
 - Produces: `SliderCard({ step, onComplete })` — `onComplete(100)` called once value settles inside `step.target` for 500ms. `step` shape: `{ prompt?, min, max, target: {min, max}, startAt? }`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```jsx
 // src/components/lesson/SliderCard.test.jsx
@@ -587,12 +587,12 @@ describe('SliderCard', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/components/lesson/SliderCard.test.jsx`
 Expected: FAIL — `SliderCard.jsx` doesn't exist yet.
 
-- [ ] **Step 3: Write the component and its stylesheet**
+- [x] **Step 3: Write the component and its stylesheet**
 
 ```jsx
 // src/components/lesson/SliderCard.jsx
@@ -761,12 +761,12 @@ export default function SliderCard({ step, onComplete }) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/components/lesson/SliderCard.test.jsx`
 Expected: PASS (4 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/lesson/SliderCard.jsx src/components/lesson/SliderCard.module.css src/components/lesson/SliderCard.test.jsx
@@ -784,7 +784,7 @@ git commit -m "feat: add SliderCard with drag handle and keyboard/tap fallback"
 - Consumes: `DragMatchCard` (Task 2/3), `SliderCard` (Task 4).
 - No new exports — this task only extends `LessonPage`'s existing step-type dispatch.
 
-- [ ] **Step 1: Add imports**
+- [x] **Step 1: Add imports**
 
 In `src/pages/LessonPage.jsx`, after the existing `import MasteryCheckCard from '../components/lesson/MasteryCheckCard.jsx'` line:
 
@@ -793,7 +793,7 @@ import DragMatchCard from '../components/lesson/DragMatchCard.jsx'
 import SliderCard from '../components/lesson/SliderCard.jsx'
 ```
 
-- [ ] **Step 2: Add the render branches**
+- [x] **Step 2: Add the render branches**
 
 In the JSX render switch (the block containing `{step.type === 'mastery-check' && (...)}` around line 316-318), add immediately after it, before the closing `</div>` of `cardArea`:
 
@@ -808,16 +808,16 @@ In the JSX render switch (the block containing `{step.type === 'mastery-check' &
 
 No change is needed to the narration-speaking `useEffect` (lines ~100-156): neither `drag-match` nor `slider` needs special post-narration speech (unlike `quiz`/`label`/`practice`/`explore`, which read options aloud) — the existing default fallthrough (`setUiStatus('idle')` at line 140) already applies to any unmatched step type, which is exactly the behavior wanted here.
 
-- [ ] **Step 3: Manual smoke check**
+- [x] **Step 3: Manual smoke check**
 
 Run: `npm run dev` (or confirm an already-running dev server), navigate to `/dev-lesson`, and confirm the page still renders for the existing step types (no regression) — full mission playthrough is deferred to Task 7 once `robotics.js` is updated.
 
-- [ ] **Step 4: Run the full unit test suite to check for regressions**
+- [x] **Step 4: Run the full unit test suite to check for regressions**
 
 Run: `npx vitest run`
 Expected: All existing suites still PASS (no `LessonPage.test.jsx` assertions reference the new types yet, so none should break).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/pages/LessonPage.jsx
@@ -836,7 +836,7 @@ git commit -m "feat: dispatch drag-match and slider step types in LessonPage"
 - Consumes: the `drag-match`/`slider` step shapes defined in Tasks 2-4.
 - Produces: updated `MISSION_STEP_TYPES` expectations for the course-data shape test.
 
-- [ ] **Step 1: Update the shape test first (RED)**
+- [x] **Step 1: Update the shape test first (RED)**
 
 In `api/_courseData/robotics.test.js`, change the constant and the per-step assertions:
 
@@ -957,12 +957,12 @@ describe('robotics course — Operation Iron Blueprint missions (old band)', () 
 
 (Delete the stray unused `MISSION_STEP_TYPES` line from Step 1 above — it was scaffolding for this rewrite, not part of the final file.)
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run api/_courseData/robotics.test.js`
 Expected: FAIL — Step 04 in `robotics.js` is still `{ type: 'activity', narration }` for all 4 missions, which doesn't satisfy the new `['drag-match', 'slider']` / field assertions.
 
-- [ ] **Step 3: Replace each mission's Step 04 in `robotics.js`**
+- [x] **Step 3: Replace each mission's Step 04 in `robotics.js`**
 
 Mission 01 (`mission-neural-uplink`, currently lines 157-160) — replace:
 
@@ -1068,12 +1068,12 @@ with:
 
 (Mission 04's required set — `cpu` 3 + `sensor-array` 2 = 5 — fits under the 9V max; adding `motor` (5) would push it to 10 and correctly gets rejected, matching the script's "don't exceed the limit" stakes. `extra-light` is an optional distractor that also fits.)
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run api/_courseData/robotics.test.js`
 Expected: PASS (all 6 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add api/_courseData/robotics.js api/_courseData/robotics.test.js
@@ -1086,24 +1086,24 @@ git commit -m "feat: replace mission Step 04 voice placeholder with real drag/sl
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Run the full automated test suite**
+- [x] **Step 1: Run the full automated test suite**
 
 Run: `npx vitest run`
 Expected: All suites PASS, including the new/updated ones from Tasks 1-6.
 
-- [ ] **Step 2: Manual playthrough — drag path**
+- [x] **Step 2: Manual playthrough — drag path**
 
 `npm run dev`, open `/dev-lesson` (or the real Courses → Robotics for Kids flow with a 9+ profile), play each of the 4 missions end-to-end using real drag gestures for Step 04. Confirm: Mission 01 & 03 complete only when the correct item is dropped on the target (wrong item bounces back with a shake); Mission 02's handle drags smoothly and the step completes once it settles in the target zone; Mission 04 accepts the required components and rejects any drop that would exceed 9V.
 
-- [ ] **Step 3: Manual playthrough — tap/keyboard-only path**
+- [x] **Step 3: Manual playthrough — tap/keyboard-only path**
 
 Repeat the same 4 missions using only tap (no drag gesture) for Missions 01/03/04, and only the `−`/`+` buttons plus Tab+Arrow-key control for Mission 02's slider. Confirm every mission completes identically to the drag path.
 
-- [ ] **Step 4: Re-run the manual axe-core-in-Chrome accessibility check**
+- [x] **Step 4: Re-run the manual axe-core-in-Chrome accessibility check**
 
 `pa11y-ci` cannot run in this sandbox (no Chrome binary — same limitation hit earlier this session). Reuse the established workaround: with the dev server running, use the `claude-in-chrome` MCP tools to navigate to `/dev-lesson`, inject axe-core 4.9.1 via a CDN `<script>` tag, and run `axe.run(document, {runOnly:{type:'tag',values:['wcag2a','wcag2aa']}})` for each of the 4 missions' Step 04 screen (both an empty-state render and a mid-interaction render with an item selected/placed). Confirm 0 violations, matching the app's existing clean scan.
 
-- [ ] **Step 5: Report results to the user**
+- [x] **Step 5: Report results to the user**
 
 Summarize: test suite status, manual drag/tap playthrough results, and the axe-core scan results (violation count per mission). Do not commit anything in this task — it's verification-only.
 
