@@ -155,8 +155,17 @@ export const robotics = {
             correct: 0,
           },
           {
-            type: 'activity',
-            narration: 'I\'ve uploaded a digital logic board, Recruit. Tell me out loud: if the bot hits a perimeter line, what should it do next?',
+            type: 'drag-match',
+            narration: 'I\'ve uploaded a digital logic board, Recruit. Drag the correct response onto the Perimeter Hit target — or tap it, then tap the target.',
+            prompt: 'What should the bot do when it hits a perimeter line?',
+            targets: [{ id: 'perimeter-response', label: '🚧 Perimeter Hit' }],
+            items: [
+              { id: 'stop-reverse', label: '🛑 Stop, then reverse', value: 1 },
+              { id: 'speed-up', label: '🏎️ Speed up', value: 1 },
+              { id: 'ignore', label: '🙈 Ignore it', value: 1 },
+              { id: 'play-sound', label: '🔊 Play a sound', value: 1 },
+            ],
+            rule: { kind: 'exact', correct: { 'perimeter-response': 'stop-reverse' } },
           },
           {
             type: 'mastery-check',
@@ -212,8 +221,13 @@ export const robotics = {
             correct: 0,
           },
           {
-            type: 'activity',
-            narration: 'Calibration time, Recruit — tell me: if an IR sensor keeps picking up false readings from bright floor reflections, what would you adjust to fix it?',
+            type: 'slider',
+            narration: 'Calibration time, Recruit. Drag the sensitivity dial — or use the arrow keys or the plus and minus buttons — until it\'s tuned right, away from those bright floor reflections.',
+            prompt: 'Dial in the IR sensor\'s sensitivity',
+            min: 0,
+            max: 100,
+            target: { min: 55, max: 70 },
+            startAt: 15,
           },
           {
             type: 'mastery-check',
@@ -269,8 +283,15 @@ export const robotics = {
             correct: 0,
           },
           {
-            type: 'activity',
-            narration: 'I\'ve dropped a chassis into the sim, Recruit. Tell me: to clear a 30-degree incline, would you choose a fast motor or a strong motor — and why?',
+            type: 'drag-match',
+            narration: 'I\'ve dropped a chassis into the sim, Recruit. Drag the right motor onto the chassis — or tap it, then tap the target — to clear that 30-degree incline.',
+            prompt: 'Which motor clears a 30° incline?',
+            targets: [{ id: 'incline-motor', label: '⛰️ 30° Incline' }],
+            items: [
+              { id: 'torque-motor', label: '💪 Strong (high-torque) motor', value: 1 },
+              { id: 'fast-motor', label: '⚡ Fast motor', value: 1 },
+            ],
+            rule: { kind: 'exact', correct: { 'incline-motor': 'torque-motor' } },
           },
           {
             type: 'mastery-check',
@@ -326,8 +347,17 @@ export const robotics = {
             correct: 0,
           },
           {
-            type: 'activity',
-            narration: 'You have a 9V limit, Recruit. Tell me out loud: if your components are about to draw more power than the battery can handle, what\'s your move?',
+            type: 'drag-match',
+            narration: 'You have a 9-volt limit, Recruit. Drag components onto the breadboard — or tap them, then tap the board — but don\'t go over budget.',
+            prompt: 'Wire the breadboard without exceeding 9V',
+            targets: [{ id: 'breadboard', label: '🔋 Breadboard (max 9V)' }],
+            items: [
+              { id: 'cpu', label: '🧠 CPU', value: 3 },
+              { id: 'sensor-array', label: '📡 Sensor array', value: 2 },
+              { id: 'motor', label: '⚙️ Motor', value: 5 },
+              { id: 'extra-light', label: '💡 Extra light', value: 3 },
+            ],
+            rule: { kind: 'budget', max: 9, required: ['cpu', 'sensor-array'] },
           },
           {
             type: 'mastery-check',

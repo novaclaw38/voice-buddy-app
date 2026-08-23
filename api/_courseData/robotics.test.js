@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { robotics } from './robotics.js'
 
-const MISSION_STEP_TYPES = ['explain', 'teach', 'quiz', 'activity', 'mastery-check']
-
 describe('robotics course — Operation Iron Blueprint missions (old band)', () => {
   const missions = robotics.lessons.filter((l) => l.ageBand === 'old')
 
@@ -10,15 +8,18 @@ describe('robotics course — Operation Iron Blueprint missions (old band)', () 
     expect(missions.length).toBe(4)
   })
 
-  it('each mission has the 5-step explain/teach/quiz/activity/mastery-check sequence', () => {
+  it('each mission has the explain/teach/quiz/[drag-match|slider]/mastery-check sequence', () => {
     for (const lesson of missions) {
-      expect(lesson.steps.map((s) => s.type)).toEqual(MISSION_STEP_TYPES)
+      const types = lesson.steps.map((s) => s.type)
+      expect(types.slice(0, 3)).toEqual(['explain', 'teach', 'quiz'])
+      expect(['drag-match', 'slider']).toContain(types[3])
+      expect(types[4]).toBe('mastery-check')
     }
   })
 
   it('each step carries the fields its component reads', () => {
     for (const lesson of missions) {
-      const [explain, teach, quiz, activity, masteryCheck] = lesson.steps
+      const [explain, teach, quiz, interactive, masteryCheck] = lesson.steps
 
       expect(explain.narration).toBeTruthy()
       expect(explain.emoji).toBeTruthy()
@@ -36,7 +37,30 @@ describe('robotics course — Operation Iron Blueprint missions (old band)', () 
       expect(typeof quiz.correct).toBe('number')
       expect(quiz.options[quiz.correct]).toBeTruthy()
 
-      expect(activity.narration).toBeTruthy()
+      expect(interactive.narration).toBeTruthy()
+      if (interactive.type === 'drag-match') {
+        expect(interactive.targets.length).toBeGreaterThanOrEqual(1)
+        expect(interactive.items.length).toBeGreaterThanOrEqual(2)
+        expect(['exact', 'budget']).toContain(interactive.rule.kind)
+        if (interactive.rule.kind === 'exact') {
+          for (const target of interactive.targets) {
+            expect(interactive.items.map((it) => it.id)).toContain(interactive.rule.correct[target.id])
+          }
+        } else {
+          expect(interactive.rule.max).toBeGreaterThan(0)
+          expect(interactive.rule.required.length).toBeGreaterThanOrEqual(1)
+          const requiredSum = interactive.rule.required.reduce(
+            (sum, id) => sum + interactive.items.find((it) => it.id === id).value, 0
+          )
+          expect(requiredSum).toBeLessThanOrEqual(interactive.rule.max)
+        }
+      } else {
+        expect(typeof interactive.min).toBe('number')
+        expect(typeof interactive.max).toBe('number')
+        expect(interactive.target.min).toBeGreaterThanOrEqual(interactive.min)
+        expect(interactive.target.max).toBeLessThanOrEqual(interactive.max)
+        expect(interactive.target.min).toBeLessThan(interactive.target.max)
+      }
 
       expect(masteryCheck.narration).toBeTruthy()
       expect(masteryCheck.items.length).toBeGreaterThanOrEqual(2)
