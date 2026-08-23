@@ -41,6 +41,14 @@ export default function LessonPage({ session }) {
   const { markComplete } = useProgress()
   const { isPro, loading: subLoading } = useSubscription()
 
+  // The /dev-lesson preview route mocks a client-side session (see App.jsx)
+  // but has no real Supabase JWT, so the authenticated api/lesson.js call
+  // always 401s. Load lesson content straight from the course-data modules
+  // instead — never reaches the network or touches auth. Stripped from
+  // production builds by import.meta.env.DEV, same as the dev-only routes.
+  const isDevPreview = import.meta.env.DEV && session?.user?.id === 'dev-preview'
+  const canViewLesson = isPro || isDevPreview
+
   const courseId = searchParams.get('course')
   const lessonId = searchParams.get('lesson')
 
@@ -50,13 +58,26 @@ export default function LessonPage({ session }) {
   const lesson = lessonData?.lesson
 
   useEffect(() => {
-    if (!courseId || !lessonId || !isPro) return
+    if (!courseId || !lessonId || !canViewLesson) return
     let cancelled = false
+    if (isDevPreview) {
+      import('../../api/_courseData.js').then(({ COURSES }) => {
+        if (cancelled) return
+        const foundCourse = COURSES.find((c) => c.id === courseId)
+        const foundLesson = foundCourse?.lessons.find((l) => l.id === lessonId)
+        if (!foundLesson) { setLessonError(new Error('Lesson not found.')); return }
+        setLessonData({
+          lesson: foundLesson,
+          course: { id: foundCourse.id, title: foundCourse.title, emoji: foundCourse.emoji },
+        })
+      })
+      return () => { cancelled = true }
+    }
     fetchLesson(courseId, lessonId)
       .then((data) => { if (!cancelled) setLessonData(data) })
       .catch((err) => { if (!cancelled) setLessonError(err) })
     return () => { cancelled = true }
-  }, [courseId, lessonId, isPro])
+  }, [courseId, lessonId, canViewLesson, isDevPreview])
 
   const [stepIndex, setStepIndex] = useState(0)
   const [stepComplete, setStepComplete] = useState(false)
@@ -100,7 +121,7 @@ export default function LessonPage({ session }) {
 
   // Fix 1: hoisted above the if (!lesson) guard; guard inside the effect body
   useEffect(() => {
-    if (!lesson || !isPro) return
+    if (!lesson || !canViewLesson) return
     stepKeyRef.current += 1
     setStepComplete(false)
     setBuddyText(narration)
@@ -155,13 +176,13 @@ export default function LessonPage({ session }) {
       }
     })
     return () => speech.stopSpeaking()
-  }, [stepIndex, isPro, lesson]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stepIndex, canViewLesson, lesson]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Entitlement is checked before the lesson-presence guard below: for a free
   // user, lesson content is never fetched (the effect above short-circuits on
-  // !isPro), so `lesson` would stay null forever and this branch would never
-  // be reached if it came second — a direct link to /lesson must still show
-  // the upgrade prompt, not silently render nothing.
+  // !canViewLesson), so `lesson` would stay null forever and this branch would
+  // never be reached if it came second — a direct link to /lesson must still
+  // show the upgrade prompt, not silently render nothing.
   if (subLoading) {
     return (
       <div className={styles.page}>
@@ -170,7 +191,7 @@ export default function LessonPage({ session }) {
       </div>
     )
   }
-  if (!isPro) {
+  if (!canViewLesson) {
     return (
       <UpgradePrompt
         session={session}
