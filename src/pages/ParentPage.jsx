@@ -1,11 +1,13 @@
 import { useState, useEffect, Fragment } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { getSettings, saveSettings, migratePinIfNeeded } from '../utils/storage.js'
+import { getSettings, saveSettings, migratePinIfNeeded, getActiveChildId } from '../utils/storage.js'
 import { useSubscription } from '../hooks/useSubscription.jsx'
 import { supabase } from '../lib/supabase.js'
+import { fetchTodaySignal, dismissSignal } from '../services/signalsService.js'
 import ChildrenManager from '../components/ChildrenManager.jsx'
 import SkipLink from '../components/SkipLink.jsx'
 import UpgradePrompt from '../components/UpgradePrompt.jsx'
+import SignalBanner from '../components/SignalBanner.jsx'
 import SettingsTab from '../components/parentTabs/SettingsTab.jsx'
 import SubscriptionTab from '../components/parentTabs/SubscriptionTab.jsx'
 import AccountTab from '../components/parentTabs/AccountTab.jsx'
@@ -52,12 +54,19 @@ export default function ParentPage({ session }) {
   // cross-tab dependency, so it stays here rather than local to either.
   const [printData, setPrintData] = useState(null)
   const [printType, setPrintType] = useState('story')
+  const [signal, setSignal] = useState(null)
 
   // ChildPage redirects here with this when a child hits the free daily
   // chat limit and a grown-up enters the PIN to unlock more.
   useEffect(() => {
     if (location.state?.openUpgrade) setUpgradeTrigger(location.state.openUpgrade)
   }, [location.state])
+
+  useEffect(() => {
+    const childId = getActiveChildId()
+    if (!childId) return
+    fetchTodaySignal(childId).then(setSignal).catch(() => {})
+  }, [])
 
   // One-time migration of any pre-existing plaintext parentPin to a hash.
   useEffect(() => {
@@ -85,6 +94,12 @@ export default function ParentPage({ session }) {
     setTab('Print')
   }
 
+  const handleDismissSignal = () => {
+    if (!signal) return
+    dismissSignal(signal.id).catch(() => {})
+    setSignal(null)
+  }
+
   return (
     <>
       <SkipLink />
@@ -99,6 +114,12 @@ export default function ParentPage({ session }) {
           Log out
         </button>
       </div>
+
+      <SignalBanner
+        signal={signal}
+        onReview={() => setTab('History')}
+        onDismiss={handleDismissSignal}
+      />
 
       {/* Trial status banner */}
       {tier === 'trial' && daysLeft !== null && daysLeft <= 3 && (
