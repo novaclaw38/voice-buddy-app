@@ -5,23 +5,39 @@
 
 .hud {
   aspect-ratio: 16 / 9;
-  background: #0a0a12;
+  background: var(--command-black);
   color: #fff;
   padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 2px solid var(--pc-purple, #9D50BB);
-  box-shadow: 0 0 24px rgba(157, 80, 187, 0.35) inset;
+  border: 2px solid var(--tactical-teal);
+  box-shadow: var(--glow-shadow), inset 0 0 20px rgba(0, 245, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.hud::before {
+  display: none;
+}
+
+.hudLabel {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 8px;
+  color: var(--data-text);
+  font-family: var(--font-terminal);
+  letter-spacing: 1px;
 }
 
 .hudBar {
   display: flex;
   justify-content: space-between;
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-terminal);
   font-size: var(--fs-xs, 0.75rem);
   letter-spacing: 0.08em;
-  color: var(--pc-gold, #D4AF37);
+  color: var(--alert-orange);
 }
 
 .hudBody {
@@ -35,13 +51,17 @@
   font-family: var(--font-head, sans-serif);
   text-align: center;
   font-size: var(--fs-md, 1rem);
-  color: #fff;
+  color: var(--tactical-teal);
   max-width: 80%;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .caption {
   font-size: var(--fs-xs, 0.75rem);
-  color: var(--ink-dim, #6b5d8f);
+  color: var(--data-text);
   text-align: center;
   margin-top: 8px;
+  font-family: var(--font-terminal);
+  letter-spacing: 0.05em;
 }

@@ -1,9 +1,28 @@
 .card {
-  background: #0f1729;
-  background-image: linear-gradient(135deg, #0f1729 0%, #1a2333 100%);
+  background: rgba(10, 10, 11, 0.85);
+  background-image: linear-gradient(135deg, rgba(0, 245, 255, 0.05) 0%, rgba(10, 10, 11, 0.95) 100%);
+  border: 1px solid var(--tactical-teal);
   border-radius: var(--r-lg, 34px);
   padding: 24px;
-  color: #fff;
+  color: #E5E7EB;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glow-shadow), inset 0 0 20px rgba(0, 245, 255, 0.1);
+}
+
+/* Add decorative pseudo-element for that "Specialist" feel */
+.card::before {
+  display: none;
+}
+
+.cardLabel {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 8px;
+  color: var(--data-text);
+  font-family: var(--font-terminal);
+  letter-spacing: 1px;
 }
 
 .heading {
@@ -11,18 +30,24 @@
   color: var(--pc-gold, #D4AF37);
   font-size: var(--fs-lg, 1.125rem);
   margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .price {
   font-family: var(--font-head, sans-serif);
   font-weight: 700;
   font-size: var(--fs-2xl, 1.75rem);
+  color: var(--tactical-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .period {
   font-size: var(--fs-md, 1rem);
   font-weight: 400;
-  color: rgba(255,255,255,0.7);
+  color: var(--data-text);
+  text-transform: lowercase;
 }
 
 .perks {
@@ -34,28 +59,53 @@
 }
 
 .perk {
+  font-family: var(--font-terminal);
   font-size: var(--fs-sm, 0.8125rem);
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(0, 245, 255, 0.08);
   width: fit-content;
+  color: var(--tactical-teal);
+  letter-spacing: 0.03em;
 }
 
 .error {
-  color: var(--c-alert, #ef4444);
+  color: var(--alert-orange);
   font-size: var(--fs-xs, 0.75rem);
   margin-bottom: 10px;
+  font-family: var(--font-terminal);
 }
 
+/* Tactical Button */
 .cta {
   width: 100%;
   padding: 14px;
   border-radius: var(--r-md, 24px);
-  background: linear-gradient(135deg, #9D50BB, #6E48AA);
-  color: #fff;
+  background: transparent;
+  border: 1px solid var(--tactical-teal);
+  color: var(--tactical-teal);
+  font-family: var(--font-terminal);
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .cta:hover {
-  filter: brightness(1.08);
+  background: var(--tactical-teal);
+  color: var(--command-black);
+  box-shadow: 0 0 30px var(--tactical-teal);
+}
+
+/* Data-Corner accents */
+.cta span::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-right: 1px solid var(--tactical-teal);
+  border-bottom: 1px solid var(--tactical-teal);
+  bottom: -2px;
+  right: -2px;
 }

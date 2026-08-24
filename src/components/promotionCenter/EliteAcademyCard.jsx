@@ -25,6 +25,7 @@ export default function EliteAcademyCard({ session }) {
 
   return (
     <div className={styles.card}>
+      <div className={styles.cardLabel}>SECURE_STORAGE_V.04</div>
       <h3 className={styles.heading}>Enroll in Elite Academy</h3>
       <p className={styles.price}>R149 <span className={styles.period}>/ month</span></p>
       <ul className={styles.perks}>
@@ -32,7 +33,7 @@ export default function EliteAcademyCard({ session }) {
       </ul>
       {error && <p className={styles.error} role="alert">{error}</p>}
       <button className={styles.cta} onClick={handleUpgrade} disabled={loading}>
-        {loading ? 'Redirecting…' : 'Unlock Full Potential'}
+        <span>{loading ? 'Redirecting…' : 'Unlock Full Potential'}</span>
       </button>
     </div>
   )

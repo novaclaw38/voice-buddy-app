@@ -11,51 +11,77 @@
   gap: 12px;
   padding: 14px 16px;
   border-radius: var(--r-md, 24px);
-  background: var(--surface, #fff);
-  border: 1px dashed var(--parent-border, #e9e5f2);
+  background: rgba(10, 10, 11, 0.5);
+  border: 1px dashed rgba(0, 245, 255, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 .node.completed {
-  background: var(--pc-purple, #9D50BB);
+  background: rgba(0, 245, 255, 0.08);
   border-style: solid;
-  color: #fff;
+  border-color: var(--tactical-teal);
+  color: var(--tactical-teal);
+  box-shadow: var(--glow-shadow);
 }
 
 .node.inprogress {
-  border: 2px solid var(--pc-purple, #9D50BB);
+  border: 2px solid var(--alert-orange);
   animation: pulse-ring-soft 2s ease-in-out infinite;
+  box-shadow: 0 0 15px rgba(255, 138, 0, 0.4);
 }
 
 .node.locked {
   opacity: 0.6;
+  border-color: rgba(0, 245, 255, 0.1);
+}
+
+/* Circuit-board aesthetic connector lines */
+.node::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  background: rgba(0, 245, 255, 0.2);
+  transform: translateY(-50%);
 }
 
 .nodeIndex {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-terminal);
   font-size: var(--fs-xs, 0.75rem);
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.06);
+  background: rgba(0, 245, 255, 0.1);
+  border: 1px solid var(--tactical-teal);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: var(--tactical-teal);
+  letter-spacing: 0.05em;
 }
 
 .nodeTitle {
   flex: 1;
-  font-family: var(--font-head, sans-serif);
+  font-family: var(--font-terminal);
   font-weight: 600;
   font-size: var(--fs-base, 0.875rem);
+  color: var(--tactical-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .nodeProgress {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-terminal);
   font-size: var(--fs-xs, 0.75rem);
+  color: var(--alert-orange);
+  letter-spacing: 0.05em;
 }
 
 @keyframes pulse-ring-soft {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(157, 80, 187, 0.25); }
-  50% { box-shadow: 0 0 0 6px rgba(157, 80, 187, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 138, 0, 0.25); }
+  50% { box-shadow: 0 0 0 6px rgba(255, 138, 0, 0); }
 }

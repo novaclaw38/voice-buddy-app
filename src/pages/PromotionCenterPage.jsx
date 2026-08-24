@@ -7,18 +7,26 @@ import RankStatusHeader from '../components/promotionCenter/RankStatusHeader.jsx
 import SkillTreeMap from '../components/promotionCenter/SkillTreeMap.jsx'
 import TacticalPreview from '../components/promotionCenter/TacticalPreview.jsx'
 import EliteAcademyCard from '../components/promotionCenter/EliteAcademyCard.jsx'
+import TerminalReveal from '../components/promotionCenter/TerminalReveal.jsx'
 import SkipLink from '../components/SkipLink.jsx'
 import { IconArrowLeft } from '../components/icons.jsx'
 import styles from './PromotionCenterPage.module.css'
 
-export default function PromotionCenterPage({ session }) {
+export default function PromotionCenterPage({ session, childName = 'Commander' }) {
   const navigate = useNavigate()
   const [children, setChildren] = useState([])
   const [activeId, setActiveId] = useState(() => getActiveChildId())
+  const [showScanline, setShowScanline] = useState(true)
   const { completions } = useProgress()
 
   useEffect(() => {
     listChildren().then(setChildren).catch(() => {})
+  }, [])
+
+  // Hide scanline after animation completes
+  useEffect(() => {
+    const timer = setTimeout(() => setShowScanline(false), 1500)
+    return () => clearTimeout(timer)
   }, [])
 
   const handleSwitchChild = (id) => {
@@ -30,7 +38,9 @@ export default function PromotionCenterPage({ session }) {
 
   return (
     <div className={styles.page}>
+      {showScanline && <div className={styles.scanline} />}
       <SkipLink />
+      <TerminalReveal name={childName} />
       <main id="main">
         <div className={styles.header}>
           <button className={styles.backBtn} onClick={() => navigate('/parent')}>

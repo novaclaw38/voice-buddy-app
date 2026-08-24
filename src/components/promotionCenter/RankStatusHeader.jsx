@@ -10,6 +10,7 @@ export default function RankStatusHeader({ child, allChildren, onSwitchChild }) 
 
   return (
     <div className={styles.header}>
+      <div className={styles.headerLabel}>SECURE_STORAGE_V.04</div>
       <div className={`${styles.avatarRing} ${styles[`rank_${rank}`]}`}>
         <BuddyAvatar status="idle" avatarColor={child?.avatar_color} type={child?.avatar_type} size={88} live={false} />
       </div>

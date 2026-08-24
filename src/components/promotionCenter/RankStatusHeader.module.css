@@ -1,8 +1,17 @@
 .header {
-  background: var(--surface, #fff);
+  background: rgba(10, 10, 11, 0.8);
+  border: 1px solid var(--tactical-teal);
   border-radius: var(--r-lg, 34px);
   padding: 20px 16px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glow-shadow), inset 0 0 20px rgba(0, 245, 255, 0.1);
+}
+
+/* Add decorative pseudo-element for that "Specialist" feel */
+.header::before {
+  display: none;
 }
 
 .avatarRing {
@@ -13,39 +22,54 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 10px;
-  border: 3px solid var(--pc-purple, #9D50BB);
+  border: 3px solid var(--tactical-teal);
+  box-shadow: var(--glow-shadow);
 }
 
-.rank_Specialist { border-color: var(--pc-gold, #D4AF37); }
+.rank_Specialist { border-color: var(--alert-orange); }
 .rank_Commander { border-color: var(--pc-green, #27AE60); }
 
+.headerLabel {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 8px;
+  color: var(--data-text);
+  font-family: var(--font-terminal);
+  letter-spacing: 1px;
+}
+
 .childName {
-  font-family: var(--font-head, sans-serif);
+  font-family: var(--font-terminal);
   font-weight: 700;
   font-size: var(--fs-lg, 1.125rem);
-  color: var(--ink);
+  color: var(--tactical-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .rankLabel {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-terminal);
   font-size: var(--fs-sm, 0.8125rem);
-  color: var(--pc-purple, #9D50BB);
+  color: var(--alert-orange);
   margin: 4px 0 10px;
+  letter-spacing: 0.05em;
 }
 
 .xpTrack {
   height: 8px;
   border-radius: 999px;
-  background: rgba(157, 80, 187, 0.15);
+  background: rgba(0, 245, 255, 0.15);
   overflow: hidden;
 }
 
 .xpFill {
   height: 100%;
   width: 100%;
-  background: var(--pc-purple, #9D50BB);
+  background: var(--tactical-teal);
   transform-origin: left;
   transition: transform 0.3s ease;
+  box-shadow: var(--glow-shadow);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -55,10 +79,11 @@
 }
 
 .xpCaption {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-terminal);
   font-size: var(--fs-xs, 0.75rem);
-  color: var(--ink-dim, #6b5d8f);
+  color: var(--data-text);
   margin-top: 6px;
+  letter-spacing: 0.05em;
 }
 
 .switcher {
@@ -72,7 +97,18 @@
 .switchBtn {
   padding: 6px 12px;
   border-radius: 999px;
-  background: var(--surface-tint, #f4f0fc);
+  background: transparent;
+  border: 1px solid var(--tactical-teal);
+  font-family: var(--font-terminal);
   font-size: var(--fs-sm, 0.8125rem);
-  color: var(--ink);
+  color: var(--tactical-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+.switchBtn:hover {
+  background: var(--tactical-teal);
+  color: var(--command-black);
+  box-shadow: var(--glow-shadow);
 }

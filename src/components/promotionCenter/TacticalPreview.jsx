@@ -7,6 +7,7 @@ export default function TacticalPreview({ childName }) {
   return (
     <figure className={styles.frame}>
       <div className={styles.hud}>
+        <div className={styles.hudLabel}>LIVE_VIEW_ACTIVE</div>
         <div className={styles.hudBar}>
           <span className={styles.hudRank}>RECRUIT</span>
           <span className={styles.hudMission}>MISSION 01</span>
