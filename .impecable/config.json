@@ -48,49 +48,133 @@
       },
       {
         "rule": "design-system-color",
-        "value": "#9d50bb",
-        "files": ["src/components/promotionCenter/RankStatusHeader.module.css"],
-        "createdAt": "2026-08-23T16:03:54.866Z",
-        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple, now retired in tactical theme)"
-      },
-      {
-        "rule": "design-system-color",
-        "value": "#d4af37",
-        "files": ["src/components/promotionCenter/RankStatusHeader.module.css"],
-        "createdAt": "2026-08-23T16:03:55.025Z",
-        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Academy Gold, now retired in tactical theme)"
-      },
-      {
-        "rule": "design-system-color",
-        "value": "#27ae60",
-        "files": ["src/components/promotionCenter/RankStatusHeader.module.css"],
-        "createdAt": "2026-08-23T16:03:55.197Z",
-        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Tactical Green, now retired in tactical theme)"
-      },
-      {
-        "rule": "design-system-color",
-        "value": "#0a0a0b",
-        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/pages/PromotionCenterPage.module.css"],
+        "value": "#0A0A0B",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/pages/PromotionCenterPage.module.css"],
         "createdAt": "2026-08-25T01:30:00.000Z",
-        "reason": "Tactical Specialist sub-brand: command-black foundation (#0A0A0B) for /parent/promotion route, sanctioned by user"
+        "reason": "Tactical Specialist sub-brand: command-black foundation for /parent/promotion route, sanctioned by user via MASTER IMPLEMENTATION DOCUMENT"
       },
       {
         "rule": "design-system-color",
-        "value": "#00f5ff",
-        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/pages/PromotionCenterPage.module.css"],
+        "value": "rgba(10, 10, 11, 0.5)",
+        "files": ["src/components/promotionCenter/SkillTreeMap.module.css"],
         "createdAt": "2026-08-25T01:30:00.000Z",
-        "reason": "Tactical Specialist sub-brand: tactical-teal accent (#00F5FF) for /parent/promotion route, sanctioned by user"
+        "reason": "Tactical Specialist sub-brand: command-black overlay tint (50%) for SkillTreeMap nodes"
       },
       {
         "rule": "design-system-color",
-        "value": "#ff8a00",
-        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css"],
+        "value": "rgba(10, 10, 11, 0.8)",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css"],
         "createdAt": "2026-08-25T01:30:00.000Z",
-        "reason": "Tactical Specialist sub-brand: alert-orange accent (#FF8A00) for /parent/promotion route, sanctioned by user"
+        "reason": "Tactical Specialist sub-brand: command-black vault background (80%) for RankStatusHeader"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(10, 10, 11, 0.85)",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: command-black vault background (85%) for EliteAcademyCard"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(10, 10, 11, 0.95)",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: command-black gradient stop (95%) for EliteAcademyCard"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#E5E7EB",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: light text color for EliteAcademyCard (light text on dark vault)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00F5FF",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/components/promotionCenter/TacticalPreview.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal accent for /parent/promotion route, sanctioned by user"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.08)",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/SkillTreeMap.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal subtle tint (8%) for node backgrounds and perks"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.1)",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/components/promotionCenter/TacticalPreview.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal subtle tint (10%) for vault inner glows and node backgrounds"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.15)",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal subtle tint (15%) for vault inner glows and XP track background"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.2)",
+        "files": ["src/components/promotionCenter/SkillTreeMap.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal connector line (20%)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.3)",
+        "files": ["src/components/promotionCenter/SkillTreeMap.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal node border (30%)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.4)",
+        "files": ["src/pages/PromotionCenterPage.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal grid line (40%) in page background"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.6)",
+        "files": ["src/components/promotionCenter/TerminalReveal.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal data-text (60%) in TerminalReveal"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#FF8A00",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/TerminalReveal.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: alert-orange accent for Specialist rank and HUD bars"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 138, 0, 0.25)",
+        "files": ["src/components/promotionCenter/SkillTreeMap.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: alert-orange pulse ring (25%) for in-progress nodes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 138, 0, 0.4)",
+        "files": ["src/components/promotionCenter/SkillTreeMap.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: alert-orange glow (40%) for in-progress nodes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 0, 0, 0.06)",
+        "files": ["src/pages/PromotionCenterPage.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: red grid tint (6%) in page background circuit pattern"
       },
       {
         "rule": "design-system-font",
-        "value": "JetBrains Mono",
+        "value": "var(--font-terminal)",
         "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/components/promotionCenter/TerminalReveal.module.css", "src/pages/PromotionCenterPage.module.css"],
         "createdAt": "2026-08-25T01:30:00.000Z",
         "reason": "Tactical Specialist sub-brand: JetBrains Mono terminal font for /parent/promotion route, sanctioned by user (replaces Roboto Mono per MASTER IMPLEMENTATION DOCUMENT)"
@@ -107,6 +191,20 @@
         "value": "JetBrains Mono",
         "createdAt": "2026-08-25T01:30:00.000Z",
         "reason": "Tactical Specialist sub-brand: JetBrains Mono chosen deliberately for terminal/HUD aesthetic on /parent/promotion route, part of sanctioned tactical theme (not AI-slop default)"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "8px",
+        "files": ["src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: 8px terminal label text (SECURE_STORAGE_V.04, LIVE_VIEW_ACTIVE) is intentionally small for HUD/diagnostic aesthetic, sanctioned by user"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "10px",
+        "files": ["src/components/promotionCenter/TerminalReveal.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: 10px terminal boot sequence text for HUD/diagnostic aesthetic, sanctioned by user"
       }
     ]
   }
