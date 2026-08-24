@@ -48,6 +48,12 @@
   transition: transform 0.3s ease;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .xpFill {
+    transition: none;
+  }
+}
+
 .xpCaption {
   font-family: 'Roboto Mono', monospace;
   font-size: var(--fs-xs, 0.75rem);
