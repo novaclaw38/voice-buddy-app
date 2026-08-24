@@ -29,28 +29,28 @@ import styles from './ChildPage.module.css'
 import { IconMail, IconPlay, IconX, IconCheck } from '../components/icons.jsx'
 
 const WELCOME_BACK = [
-  (childName, buddyName) => `Hey ${childName}, I'm back! What do you want to do now?`,
+  (childName, _buddyName) => `Hey ${childName}, I'm back! What do you want to do now?`,
   (childName, buddyName) => `${buddyName}'s here again, ${childName}! Ready to keep having fun?`,
-  (childName, buddyName) => `Ooh, ${childName}! Good to see you again — what's next?`,
-  (childName, buddyName) => `${childName}! You're back! I missed you — what should we do?`,
-  (childName, buddyName) => `Welcome back, ${childName}! I've got all sorts of fun ideas — want to hear one?`,
+  (childName, _buddyName) => `Ooh, ${childName}! Good to see you again — what's next?`,
+  (childName, _buddyName) => `${childName}! You're back! I missed you — what should we do?`,
+  (childName, _buddyName) => `Welcome back, ${childName}! I've got all sorts of fun ideas — want to hear one?`,
   (childName, buddyName) => `Hey hey, ${childName}! ${buddyName}'s ready for round two — what sounds fun?`,
-  (childName, buddyName) => `${childName}, perfect timing — I was just thinking about you! What's up?`,
-  (childName, buddyName) => `Back again, ${childName}? Awesome! Let's find something fun to do.`,
+  (childName, _buddyName) => `${childName}, perfect timing — I was just thinking about you! What's up?`,
+  (childName, _buddyName) => `Back again, ${childName}? Awesome! Let's find something fun to do.`,
 ]
 
 // Tactical-tone counterpart to WELCOME_BACK, IDLE_NUDGES and
 // LISTEN_FAIL_PROMPTS below — selected for BAND_BY_AGE 'old' (9+) kids via
 // pickVoiceLine, mirroring how useChat.js picks MODE_INTROS_TACTICAL.
 const WELCOME_BACK_TACTICAL = [
-  (childName, buddyName) => `Recruit ${childName}, welcome back! What's our next objective?`,
+  (childName, _buddyName) => `Recruit ${childName}, welcome back! What's our next objective?`,
   (childName, buddyName) => `${buddyName} standing by again, Recruit ${childName}! Ready for round two?`,
-  (childName, buddyName) => `Good to have you back, Recruit ${childName} — what's the mission?`,
-  (childName, buddyName) => `${childName}! Reporting for duty again — what should we tackle?`,
-  (childName, buddyName) => `Welcome back, Recruit ${childName}! I've got fresh intel — want to hear it?`,
+  (childName, _buddyName) => `Good to have you back, Recruit ${childName} — what's the mission?`,
+  (childName, _buddyName) => `${childName}! Reporting for duty again — what should we tackle?`,
+  (childName, _buddyName) => `Welcome back, Recruit ${childName}! I've got fresh intel — want to hear it?`,
   (childName, buddyName) => `Copy that, ${childName}'s back! ${buddyName}'s ready — what sounds like a good op?`,
-  (childName, buddyName) => `${childName}, perfect timing, Recruit — I was just running diagnostics! What's up?`,
-  (childName, buddyName) => `Back again, Recruit ${childName}? Outstanding! Let's find our next objective.`,
+  (childName, _buddyName) => `${childName}, perfect timing, Recruit — I was just running diagnostics! What's up?`,
+  (childName, _buddyName) => `Back again, Recruit ${childName}? Outstanding! Let's find our next objective.`,
 ]
 
 // Buddy shouldn't just sit there waiting to be tapped — after a stretch of

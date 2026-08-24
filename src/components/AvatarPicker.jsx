@@ -2,7 +2,6 @@ import { useState, useRef } from 'react'
 import BuddyAvatar from './BuddyAvatar.jsx'
 import UpgradePrompt from './UpgradePrompt.jsx'
 import { useSubscription } from '../hooks/useSubscription.jsx'
-import { COSTUME_OVERLAY_IDS } from './BuddyCostumeOverlays.jsx'
 import useFocusTrap from '../hooks/useFocusTrap.js'
 import styles from './AvatarPicker.module.css'
 import { IconPencil, IconSparkle, IconLock, IconX } from './icons.jsx'
@@ -25,7 +24,7 @@ const COSTUMES = [
 
 const AGES = [3, 4, 5, 6, 7, 8, 9, 10]
 
-export default function AvatarPicker({ currentType, currentName, currentColor, currentCostume, currentAge, onSave, onClose, session }) {
+export default function AvatarPicker({ currentType, currentName, currentCostume, currentAge, onSave, onClose, session }) {
   const { isPro } = useSubscription()
   const [selType,  setSelType]  = useState(currentType  || 'bear')
   const [buddyName, setBuddyName] = useState(currentName || 'Buddy')

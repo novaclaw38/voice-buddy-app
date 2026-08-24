@@ -27,7 +27,7 @@ export default function ExploreCard({ step, onComplete, young }) {
   useEffect(() => () => clearTimeout(timerRef.current), [])
 
   if (mode === 'sort') return <SortExplore step={step} onComplete={onComplete} timerRef={timerRef} young={young} />
-  if (mode === 'match') return <MatchExplore step={step} onComplete={onComplete} timerRef={timerRef} young={young} />
+  if (mode === 'match') return <MatchExplore step={step} onComplete={onComplete} timerRef={timerRef} />
   return <SequenceExplore step={step} onComplete={onComplete} timerRef={timerRef} young={young} />
 }
 
@@ -135,7 +135,7 @@ function SortExplore({ step, onComplete, timerRef, young }) {
   )
 }
 
-function MatchExplore({ step, onComplete, timerRef, young }) {
+function MatchExplore({ step, onComplete, timerRef }) {
   const [matched, setMatched] = useState([])
   const [pickLeft, setPickLeft] = useState(null)
   const [wrongPair, setWrongPair] = useState(null)

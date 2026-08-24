@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import VoiceButton from '../VoiceButton.jsx'
 import styles from './ActivityCard.module.css'
 
-export default function ActivityCard({ step, settings, speech, onComplete }) {
+export default function ActivityCard({ settings, speech, onComplete }) {
   const [transcript, setTranscript] = useState('')
   const [listening, setListening] = useState(false)
   const timerRef = useRef(null)

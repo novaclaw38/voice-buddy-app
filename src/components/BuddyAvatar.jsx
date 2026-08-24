@@ -37,7 +37,7 @@ export default function BuddyAvatar({
   const isConfused  = status === 'confused'
 
   const getMouthLevel = useMouthLevel(audioRef, isSpeaking && live)
-  const { containerRef, poke, celebratingRef } = useBuddyLife({ status, live, getMouthLevel })
+  const { containerRef, poke } = useBuddyLife({ status, live, getMouthLevel })
 
   const eyeR = isListening ? 10 : 9
   const gradId = useId()
