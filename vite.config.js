@@ -18,7 +18,10 @@ export default defineConfig({
         '**/node_modules/**',
         '**/.cache/**',
         '**/ovos-installer/**',
-        '/home/byron/.cache/**',
+        // Cache directories outside the project are not portable across
+        // machines — use env vars or a generic glob instead of hardcoded
+        // absolute paths that only resolve on the original developer's machine.
+        process.env.HOME ? `${process.env.HOME}/.cache/**` : '**/.cache/**',
       ],
     },
   },

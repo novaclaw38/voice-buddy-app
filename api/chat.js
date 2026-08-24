@@ -64,7 +64,8 @@ export default async function handler(req, res) {
 
   const key = process.env.GROQ_API_KEY
   if (!key) {
-    return res.status(500).json({ error: { message: 'GROQ_API_KEY not set in Vercel environment variables' } })
+    console.error('chat: GROQ_API_KEY not configured')
+    return res.status(500).json({ error: { message: 'Buddy is temporarily unavailable. Please try again in a moment.' } })
   }
 
   const MODELS = [
@@ -98,13 +99,36 @@ export default async function handler(req, res) {
 
       if (!response.ok) {
         if (i < MODELS.length - 1) continue
-        return res.status(response.status).json(data)
+        // Sanitize: don't pass through raw Groq error bodies to the client.
+        // Groq errors can contain model names, internal request IDs, type
+        // validation messages, and error codes that leak implementation details.
+        // Only forward the HTTP status and a safe, client-facing message.
+        const groqError = data?.error?.message || data?.error
+        const safeMessage = typeof groqError === 'string' && groqError.length > 0
+          ? groqError
+          : `Buddy ran into a problem (${response.status})`
+        // Preserve known client-handled error codes from our own 400/403/429
+        // checks (PRO_REQUIRED, FREE_LIMIT_REACHED). For upstream Groq errors,
+        // only forward a safe message — never Groq's error code, type, or request_id.
+        const CLIENT_ERROR_CODES = new Set(['PRO_REQUIRED', 'FREE_LIMIT_REACHED'])
+        const code = data?.error?.code
+        const hasClientCode = typeof code === 'string' && CLIENT_ERROR_CODES.has(code)
+        return res.status(response.status).json({
+          error: {
+            message: safeMessage,
+            ...(hasClientCode ? { code } : {}),
+          }
+        })
       }
 
       return res.status(200).json(data)
     } catch (err) {
       if (i < MODELS.length - 1) continue
-      return res.status(500).json({ error: { message: err.message } })
+      // Sanitize: network errors and abort errors can contain detail strings
+      // that leak internal endpoint URLs, timeouts, or stack info. Return a
+      // generic message to the client; log the real error server-side.
+      console.error('chat: model call failed', { error: err.message, model: MODELS[i] })
+      return res.status(500).json({ error: { message: 'Buddy is temporarily unavailable. Please try again in a moment.' } })
     } finally {
       clearTimeout(timer)
     }

@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "lint": "eslint src/ api/ --ext .js,.jsx",
+    "type-check": "tsc --noEmit",
     "scan:a11y": "pa11y-ci -c .pa11yci.json",
     "icons": "node scripts/generate-icons.mjs"
   },
@@ -22,14 +24,22 @@
     "react-router-dom": "^6.24.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/parser": "^8.67.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^10.9.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.11.0",
     "jest-axe": "^11.0.0",
     "jsdom": "^25.0.1",
     "pa11y-ci": "^4.1.1",
     "sharp": "^0.33.5",
+    "typescript": "^5.9.3",
     "vite": "^5.3.1",
     "vitest": "^2.1.9"
   }
