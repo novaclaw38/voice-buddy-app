@@ -1,0 +1,113 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "var(--spring)",
+        "createdAt": "2026-08-16T19:44:16.130Z",
+        "reason": "Brand-documented 'squish' press interaction (PRODUCT.md Brand Commitments); a named, reused design token, not accidental bounce easing"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "var(--spring-subtle)",
+        "createdAt": "2026-08-16T19:44:16.250Z",
+        "reason": "Brand-documented 'squish' press interaction (PRODUCT.md Brand Commitments); a named, reused design token, not accidental bounce easing"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "msgbounce",
+        "createdAt": "2026-08-16T20:18:24.682Z",
+        "reason": "False positive: detector matched the animation NAME containing 'Bounce', not the easing curve — actual timing-function is plain 'ease'"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "tapbounce",
+        "createdAt": "2026-08-16T20:18:24.789Z",
+        "reason": "False positive: detector matched the animation NAME containing 'Bounce', not the easing curve — actual timing-function is 'ease-in-out'"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "bounce-in",
+        "createdAt": "2026-08-17T17:52:03.251Z",
+        "reason": "PRODUCT.md brand commitment: candy palette 'squish' identity, --spring token used deliberately for playful child-facing bounce animations"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "createdAt": "2026-08-17T17:52:03.357Z",
+        "reason": "PRODUCT.md brand commitment: candy palette 'squish' identity"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "typingbounce",
+        "files": ["src/pages/LandingPage.module.css"],
+        "createdAt": "2026-08-22T07:34:00.944Z",
+        "reason": "Standard three-dot chat typing indicator (WhatsApp/iMessage convention)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#9d50bb",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css"],
+        "createdAt": "2026-08-23T16:03:54.866Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Buddy Purple, now retired in tactical theme)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#d4af37",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css"],
+        "createdAt": "2026-08-23T16:03:55.025Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Academy Gold, now retired in tactical theme)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#27ae60",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css"],
+        "createdAt": "2026-08-23T16:03:55.197Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Tactical Green, now retired in tactical theme)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0a0a0b",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/pages/PromotionCenterPage.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: command-black foundation (#0A0A0B) for /parent/promotion route, sanctioned by user"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00f5ff",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/pages/PromotionCenterPage.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: tactical-teal accent (#00F5FF) for /parent/promotion route, sanctioned by user"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ff8a00",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: alert-orange accent (#FF8A00) for /parent/promotion route, sanctioned by user"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "JetBrains Mono",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/TacticalPreview.module.css", "src/components/promotionCenter/EliteAcademyCard.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/components/promotionCenter/TerminalReveal.module.css", "src/pages/PromotionCenterPage.module.css"],
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: JetBrains Mono terminal font for /parent/promotion route, sanctioned by user (replaces Roboto Mono per MASTER IMPLEMENTATION DOCUMENT)"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "roboto mono', monospace",
+        "files": ["src/components/promotionCenter/RankStatusHeader.module.css", "src/components/promotionCenter/SkillTreeMap.module.css", "src/components/promotionCenter/TacticalPreview.module.css"],
+        "createdAt": "2026-08-23T16:03:55.476Z",
+        "reason": "user confirmed: Promotion Center sanctioned sub-brand exception (Roboto Mono for numeric stats) — now replaced by JetBrains Mono per tactical theme"
+      },
+      {
+        "rule": "overused-font",
+        "value": "JetBrains Mono",
+        "createdAt": "2026-08-25T01:30:00.000Z",
+        "reason": "Tactical Specialist sub-brand: JetBrains Mono chosen deliberately for terminal/HUD aesthetic on /parent/promotion route, part of sanctioned tactical theme (not AI-slop default)"
+      }
+    ]
+  }
+}
