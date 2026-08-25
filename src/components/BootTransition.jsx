@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './BootTransition.module.css'
 
 /**
@@ -23,12 +23,12 @@ export default function BootTransition({ childName, childAge, onComplete }) {
   const isTactical = childAge >= 9
   useEffect(() => {
     if (!isTactical) {
-      onComplete && onComplete()
+      if (onComplete) onComplete()
       return undefined
     }
     const seen = localStorage.getItem('buddy_boot_seen')
     if (seen) {
-      onComplete && onComplete()
+      if (onComplete) onComplete()
       return undefined
     }
     const t1 = setTimeout(() => setPhase('identity'), 2000)
@@ -36,7 +36,7 @@ export default function BootTransition({ childName, childAge, onComplete }) {
     const t3 = setTimeout(() => {
       localStorage.setItem('buddy_boot_seen', 'true')
       setVisible(false)
-      onComplete && onComplete()
+      if (onComplete) onComplete()
     }, 4500)
     return () => {
       clearTimeout(t1)
