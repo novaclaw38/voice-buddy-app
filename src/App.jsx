@@ -21,6 +21,7 @@ const CookiePolicyPage   = lazy(() => import('./pages/CookiePolicyPage.jsx'))
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
 const AdminUserDetailPage = lazy(() => import('./pages/AdminUserDetailPage.jsx'))
 const StorybookPage = lazy(() => import('./pages/StorybookPage.jsx'))
+const TacticalLandingPage = lazy(() => import('./pages/TacticalLandingPage.jsx'))
 
 // Must match ADMIN_EMAIL in api/_admin.js exactly. This check is UX-only —
 // the API endpoints re-check server-side, which is the real security boundary.
@@ -95,6 +96,7 @@ export default function App() {
               <Route path="/dev-parent" element={<ParentPage session={{ user: { id: 'dev-preview' } }} />} />
               <Route path="/dev-promotion" element={<PromotionCenterPage session={{ access_token: 'dev', user: { id: 'dev-preview' } }} />} />
               <Route path="/dev-lesson" element={<LessonPage session={{ user: { id: 'dev-preview' } }} />} />
+              <Route path="/tactical-landing" element={<TacticalLandingPage />} />
             </>
           )}
 
