@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion, useScroll, useTransform, useSpring } from 'motion/react'
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'motion/react'
 import BuddyOrb from '../components/BuddyOrb.jsx'
 import SkipLink from '../components/SkipLink.jsx'
 import { IconArrowRight, IconCheck } from '../components/icons.jsx'
@@ -79,12 +79,17 @@ export default function TacticalLandingPage() {
   const [showDossier, setShowDossier] = useState(false)
   const [liveCount, setLiveCount] = useState(5287)
   const heroRef = useRef(null)
+  const reduce = useReducedMotion()
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '40%'])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.1])
   const smoothHeroY = useSpring(heroY, { stiffness: 100, damping: 30 })
+
+  // When reduced motion is preferred, skip scroll-driven transforms entirely
+  const heroStyle = reduce ? {} : { y: smoothHeroY, scale: heroScale }
+  const contentStyle = reduce ? {} : { opacity: heroOpacity }
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -101,7 +106,7 @@ export default function TacticalLandingPage() {
         <section ref={heroRef} className={styles.hero}>
           <motion.div
             className={styles.heroBg}
-            style={{ y: smoothHeroY, scale: heroScale }}
+            style={heroStyle}
           >
             {/* CSS grid background pattern — tactical data field */}
             <div className={styles.heroGrid} aria-hidden="true" />
@@ -109,7 +114,7 @@ export default function TacticalLandingPage() {
 
           <motion.div
             className={styles.heroContent}
-            style={{ opacity: heroOpacity }}
+            style={contentStyle}
           >
             <nav className={styles.nav}>
               <div className={styles.logoWrap}>
@@ -170,9 +175,9 @@ export default function TacticalLandingPage() {
             </div>
           </motion.div>
 
-          <motion.div className={styles.heroTicker} style={{ opacity: heroOpacity }}>
+          <motion.div className={styles.heroTicker} style={contentStyle}>
             <div className={styles.tickerItem}><span className={styles.tickerDot} />LIVE_OPS: Commander Leo completed OBSTACLE_RECON_01</div>
-            <div className={styles.tickerCount}>TOTAL MISSIONS: {liveCount.toLocaleString()}</div>
+            <div className={styles.tickerCount}>SAMPLE TOTAL: {liveCount.toLocaleString()}</div>
           </motion.div>
         </section>
 

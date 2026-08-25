@@ -80,7 +80,7 @@
 }
 
 .aarMission {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 700;
   color: var(--tactical-text);
@@ -96,7 +96,7 @@
 
 /* ── Title (not-found state) ── */
 .title {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 1.375rem;
   margin-top: 12px;

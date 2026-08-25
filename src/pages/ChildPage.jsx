@@ -538,7 +538,7 @@ export default function ChildPage({ session }) {
         }
       }, getModeVoice(chat.mode))
     })
-  }, [chat, speech, settings.autoListen, scheduleBubbleClear, cancelBubbleClear, liveKitVoice])
+  }, [chat, speech, settings, scheduleBubbleClear, cancelBubbleClear, liveKitVoice])
 
   // Fires when a listening session ends with nothing usable to act on
   // (silence, timeout, recognition error) — without this, a child who

@@ -57,7 +57,7 @@
   --font-main: var(--font-body);
 
   /* Type scale — this app had ~15 uncoordinated ad-hoc sizes across
-     LandingPage alone before this. Steps chosen to match the sizes
+     the old LandingPage before this. Steps chosen to match the sizes
      already in wide use, not an abstract ratio. */
   --fs-2xs: 0.6875rem;  /* 11px — badges, tags */
   --fs-xs: 0.75rem;     /* 12px — captions, meta */

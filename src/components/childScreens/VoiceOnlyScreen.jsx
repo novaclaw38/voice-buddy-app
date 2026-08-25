@@ -44,6 +44,15 @@ export default function VoiceOnlyScreen({
         {userText ? <p className={styles.voiceUserText}>You: {userText}</p> : null}
 
         <VoiceButton status={uiStatus} onPress={onVoicePress} buddyName={buddyName} />
+        {onExitVoiceOnly && (
+          <button
+            className={styles.exitBtn}
+            onClick={onExitVoiceOnly}
+            aria-label="Exit voice-only mode"
+          >
+            Exit voice
+          </button>
+        )}
       </main>
     </>
   )

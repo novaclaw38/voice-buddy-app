@@ -7,8 +7,8 @@ import { toHaveNoViolations } from 'jest-axe'
 // detector/lint passes can't check.
 expect.extend(toHaveNoViolations)
 
-// LandingPage's RevealSection observes scroll position; jsdom has no
-// IntersectionObserver, so stub it out and never fire the callback.
+// TacticalLandingPage and several components use IntersectionObserver
+// for scroll-reveal and hero animations; jsdom has no implementation,
 class IntersectionObserverStub {
   constructor(callback) { this.callback = callback }
   observe() {}

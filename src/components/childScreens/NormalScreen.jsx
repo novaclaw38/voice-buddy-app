@@ -35,6 +35,9 @@ export default function NormalScreen({
   onVoicePress,
   onShowPicker,
   onShowPin,
+  minutesUsed,
+  dailyLimit,
+  shouldWarn,
 }) {
   const navigate = useNavigate()
   const storyTrapRef = useRef(null)
@@ -66,6 +69,11 @@ export default function NormalScreen({
                 <button className={styles.modeLabel} onClick={onExitMode}>
                   {chatMode} mode ✕
                 </button>
+              )}
+              {dailyLimit > 0 && (
+                <span className={`${styles.screenTimeBadge} ${shouldWarn ? styles.screenTimeWarn : ''}`}>
+                  {minutesUsed}/{dailyLimit} min
+                </span>
               )}
             </div>
             <div className={styles.topBarRight}>
