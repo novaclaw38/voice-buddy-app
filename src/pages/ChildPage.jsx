@@ -174,6 +174,10 @@ export default function ChildPage({ session }) {
   const [minutesUsed, setMinutesUsed] = useState(() => getTodayMinutesUsed(getActiveChildId()))
   const [showWindDown, setShowWindDown] = useState(false)
   const [showFreeLimit, setShowFreeLimit] = useState(false)
+  // Visual flag for the screen-time timer — true when the child is within
+  // the warning window (5 min left) of their daily limit, so the top-bar
+  // indicator can go amber without requiring a separate effect.
+  const shouldWarn = dailyLimit > 0 && minutesUsed >= dailyLimit - 5
   const [bootComplete, setBootComplete] = useState(() => {
     // Skip boot transition if already seen this device or non-tactical age
     return localStorage.getItem('buddy_boot_seen') === 'true' ||
@@ -618,6 +622,11 @@ export default function ChildPage({ session }) {
         onVoicePress={handleVoicePress}
         onCustomize={() => setShowPicker(true)}
         onShowPin={() => setShowPin(true)}
+        onExitVoiceOnly={() => {
+          const next = { ...settings, voiceOnly: false }
+          saveSettings(next)
+          setSettings(next)
+        }}
       />
     )
   } else {
@@ -645,6 +654,9 @@ export default function ChildPage({ session }) {
         onVoicePress={handleVoicePress}
         onShowPicker={() => setShowPicker(true)}
         onShowPin={() => setShowPin(true)}
+        minutesUsed={minutesUsed}
+        dailyLimit={dailyLimit}
+        shouldWarn={shouldWarn}
       />
     )
   }

@@ -117,7 +117,7 @@ export function startAsChild(userId, { onStatusChange, onError } = {}) {
           const offer = await pc.createOffer()
           await pc.setLocalDescription(offer)
           send(channel, { type: MSG.OFFER, sdp: { type: offer.type, sdp: offer.sdp } })
-        } catch (err) {
+        } catch {
           setStatus('error')
           onError?.('camera-start-failed')
         }
@@ -128,7 +128,7 @@ export function startAsChild(userId, { onStatusChange, onError } = {}) {
       }
 
       if (payload.type === MSG.ICE_PARENT && pc) {
-        try { await pc.addIceCandidate(new RTCIceCandidate(payload.candidate)) } catch (_) {}
+        try { await pc.addIceCandidate(new RTCIceCandidate(payload.candidate)) } catch { /* candidate may arrive before remote desc is set — safe to drop */ }
       }
 
       if (payload.type === MSG.STOP) {
@@ -186,7 +186,7 @@ export function startAsParent(userId, { onStatusChange, onRemoteStream, onError 
       }
 
       if (payload.type === MSG.ICE_CHILD) {
-        try { await pc.addIceCandidate(new RTCIceCandidate(payload.candidate)) } catch (_) {}
+        try { await pc.addIceCandidate(new RTCIceCandidate(payload.candidate)) } catch { /* candidate may arrive before remote desc is set — safe to drop */ }
       }
     }).subscribe(() => {
       // Small delay to let the child's subscription settle before it can

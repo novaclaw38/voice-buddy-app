@@ -49,5 +49,5 @@ export function isDailyActivityDismissed() {
 export function dismissDailyActivity() {
   try {
     localStorage.setItem('buddy_activity_' + dateKey(), '1')
-  } catch {}
+  } catch { /* read-only storage — skip persistence */ }
 }

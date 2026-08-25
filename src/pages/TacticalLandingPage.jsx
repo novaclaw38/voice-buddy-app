@@ -249,8 +249,8 @@ export default function TacticalLandingPage() {
                   </span>
                 ))}
                 <span className={styles.tickerItem}>
-                  NEW MISSIONS COMPLETED: {liveCount}
-                  <span className={styles.tickerDot}>⚡</span>
+                  NEW MISSIONS COMPLETED: {liveCount} <span className={styles.tickerDot}>⚡</span>
+                  <span className={styles.illustrativeLabel}>(demo data)</span>
                 </span>
               </div>
             </div>
@@ -300,15 +300,14 @@ export default function TacticalLandingPage() {
                     </div>
                     <p className={styles.missionTagline}>{wing.tagline}</p>
                     <p className={styles.missionDesc}>{wing.description}</p>
-                    <button
+                    <Link
                       className={styles.missionBtn}
-                      onClick={() => {
-                        window.location.href = `/login?plan=pro#${wing.id}`
-                      }}
+                      to={`/login?plan=pro#${wing.id}`}
+                      state={{ mode: 'signup', plan: 'pro' }}
                     >
                       <span className={styles.missionBtnText}>ACCESS BRIEFING</span>
                       <IconArrowRight size={14} />
-                    </button>
+                    </Link>
                   </div>
                 ))}
               </div>

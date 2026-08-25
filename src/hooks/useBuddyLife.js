@@ -60,7 +60,7 @@ export function useBuddyLife({ status, live, getMouthLevel }) {
       gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22)
       osc.connect(gain); gain.connect(ctx.destination)
       osc.start(t); osc.stop(t + 0.24)
-    } catch (_e) { /* silent: poke still wobbles */ }
+    } catch { /* silent: poke still wobbles */ }
   }, [])
 
   const poke = useCallback(() => {

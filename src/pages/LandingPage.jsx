@@ -31,7 +31,7 @@ function CloudField({ scrollRef }) {
     if (!canvas) return undefined
 
     let ctx
-    try { ctx = canvas.getContext('2d') } catch (_e) { ctx = null }
+    try { ctx = canvas.getContext('2d') } catch { ctx = null }
     if (!ctx) return undefined // no 2D canvas support (e.g. jsdom in tests) — static CSS background still shows
 
     const reduced = prefersReducedMotion()
@@ -181,7 +181,7 @@ function BuddyHero() {
       gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.08)
       osc.connect(gain); gain.connect(ctx.destination)
       osc.start(t); osc.stop(t + 0.09)
-    } catch (_e) { /* silent: bubble still reveals visually */ }
+    } catch { /* silent: bubble still reveals visually */ }
   }, [])
 
   // Muted by default — sound only ever starts from this explicit tap, never

@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         agents: [new RoomAgentDispatch({ agentName: 'buddy-voice-agent' })],
       })
       roomExisted = false
-    } catch (_e) {
+    } catch {
       // Ignore already-exists so boot-time collisions are idempotent.
     }
 
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     if (roomExisted) {
       try {
         await roomService.updateRoomMetadata(roomName, metadata)
-      } catch (_e) {
+      } catch {
         // Non-fatal — the agent keeps using whatever it already read.
       }
     }

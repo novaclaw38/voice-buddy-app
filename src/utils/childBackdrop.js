@@ -44,12 +44,12 @@ function pickSessionScene(candidates) {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY)
     if (stored && candidates.includes(stored)) return stored
-  } catch (_) {
+  } catch {
     // sessionStorage unavailable (private mode etc.) — fall through to a
     // fresh pick every mount rather than crashing.
   }
   const id = candidates[Math.floor(Math.random() * candidates.length)]
-  try { sessionStorage.setItem(STORAGE_KEY, id) } catch (_) {}
+  try { sessionStorage.setItem(STORAGE_KEY, id) } catch { /* read-only storage — skip persistence */ }
   return id
 }
 

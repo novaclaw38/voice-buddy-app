@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './TerminalReveal.module.css'
 
 export default function TerminalReveal({ name }) {
   const [visible, setVisible] = useState(false)
+
+  // Trigger the reveal animation on mount — without this, the terminal
+  // stays in its pre-animation state (boot sequence hidden, no typewriter).
+  useEffect(() => {
+    setVisible(true)
+  }, [])
 
   return (
     <div className={`${styles.terminalReveal} ${visible ? styles.visible : ''}`}>

@@ -3,7 +3,7 @@ import { useLiveKitAgent } from '../hooks/useLiveKitAgent.js'
 export function useLiveKitAvatarVoice() {
   const liveKit = useLiveKitAgent()
 
-  const speak = async ({ text, roomName, participantName, childName, buddyName, childAge }) => {
+  const speak = async ({ text: _text, roomName, participantName, childName, buddyName, childAge }) => {
     if (!liveKit.enabled) return { ok: false, skipped: true }
 
     return liveKit.start({ roomName, participantName, childName, buddyName, childAge })

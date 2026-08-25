@@ -21,6 +21,7 @@ export default function VoiceOnlyScreen({
   onVoicePress,
   onCustomize,
   onShowPin,
+  onExitVoiceOnly,
 }) {
   const navigate = useNavigate()
 
@@ -34,6 +35,7 @@ export default function VoiceOnlyScreen({
             onLearn={() => navigate('/courses')}
             onCustomize={onCustomize}
             onSettings={onShowPin}
+            onExit={onExitVoiceOnly}
           />
         </div>
 

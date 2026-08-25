@@ -44,7 +44,7 @@ export function useMouthLevel(audioRef, isSpeaking) {
         ctxRef.current.resume().catch(() => {})
       }
       return ctxRef.current.state === 'running'
-    } catch (_e) {
+    } catch {
       failedRef.current = true
       return false
     }

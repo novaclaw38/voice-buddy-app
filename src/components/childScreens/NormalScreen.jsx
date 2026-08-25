@@ -39,6 +39,9 @@ export default function NormalScreen({
   onVoicePress,
   onShowPicker,
   onShowPin,
+  minutesUsed,
+  dailyLimit,
+  shouldWarn,
 }) {
   const navigate = useNavigate()
   const storyTrapRef = useRef(null)
@@ -101,6 +104,15 @@ export default function NormalScreen({
                 partOfDay={partOfDay}
                 onSpeak={(time) => speech.speak(`It's ${time}!`)}
               />
+              {dailyLimit > 0 && (
+                <span
+                  className={`${styles.timeBadge} ${shouldWarn ? styles.timeBadgeWarn : ''}`}
+                  title={`${minutesUsed} of ${dailyLimit} minutes used today`}
+                  aria-label={`${minutesUsed} of ${dailyLimit} minutes used today`}
+                >
+                  ⏰ {minutesUsed}/{dailyLimit}
+                </span>
+              )}
             </div>
             <div className={styles.topBarRight}>
               {parentMessage && (

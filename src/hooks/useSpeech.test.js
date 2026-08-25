@@ -35,6 +35,7 @@ class FakeUtterance {
     this.onboundary = null
     this.onend = null
     this.onerror = null
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     capturedUtter = this
   }
 }
