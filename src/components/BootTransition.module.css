@@ -1,0 +1,147 @@
+/* ---- BootTransition — "System Reboot" tactical transition ---- */
+/* Plays once per device on first child login: scanline wipe, terminal
+   typing sequence, identity confirmation, then fades to the child UI.
+   Based on Doc 1 "First Command Script" and the Master Blueprint §2. */
+
+@keyframes boot-scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes boot-glitch {
+  0%   { clip: rect(2px, 9999px, 2px, 0);   transform: translate(-2px, -2px); }
+  20%  { clip: rect(8px, 9999px, 6px, 0);   transform: translate(2px, 0); }
+  40%  { clip: rect(4px, 9999px, 2px, 0);   transform: translate(-2px, 2px); }
+  60%  { clip: rect(10px, 9999px, 8px, 0);  transform: translate(2px, 0); }
+  80%  { clip: rect(6px, 9999px, 4px, 0);   transform: translate(-2px, -2px); }
+  100% { clip: rect(0px, 9999px, 9999px, 0); transform: translate(0); }
+}
+
+@keyframes boot-typewriter {
+  0%   { width: 0; opacity: 1; }
+  100% { width: 100%; opacity: 1; }
+}
+
+@keyframes boot-caret-blink {
+  0%, 90%, 100% { border-right-color: transparent; }
+  95%            { border-right-color: currentColor; }
+}
+
+@keyframes boot-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bootOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--command-black, #0A0A0B);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--tactical-teal, #00F5FF);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bootOverlay .bootScanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--command-black, #0A0A0B);
+  animation: boot-scanline 1.5s ease-in-out forwards;
+  z-index: 1;
+}
+
+.bootOverlay .bootContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.bootOverlay .bootStatus {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+}
+
+.bootOverlay .bootTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--tactical-teal, #00F5FF);
+  text-shadow: 0 0 15px rgba(0, 245, 255, 0.6);
+  overflow: hidden;
+  border-right: 2px solid var(--tactical-teal, #00F5FF);
+  white-space: nowrap;
+  width: 0;
+  animation: boot-typewriter 2.5s steps(30) 0.5s forwards,
+             boot-caret-blink 0.8s step-end infinite;
+}
+
+.bootOverlay .bootIdentity {
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  animation: boot-fade-in 0.5s ease forwards 2.8s;
+}
+
+.bootOverlay .bootIdentity .rank {
+  color: var(--pc-purple, #9D50BB);
+}
+
+.bootOverlay .bootIdentity .name {
+  color: var(--alert-orange, #FF8A00);
+  text-shadow: 0 0 10px rgba(255, 138, 0, 0.4);
+}
+
+.bootOverlay .bootReady {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  color: var(--tactical-text-dim, rgba(224, 224, 224, 0.6));
+  opacity: 0;
+  animation: boot-fade-in 0.5s ease forwards 3.2s;
+}
+
+/* Ghost data grid */
+.bootOverlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(0, 245, 255, 0.08) 1px, transparent 1px);
+  background-size: 30px 30px;
+  z-index: 0;
+}
+
+.bootGlitchTitle {
+  color: var(--tactical-teal, #00F5FF);
+  text-shadow: 0 0 15px rgba(0, 245, 255, 0.6);
+  animation: boot-glitch 0.2s infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .bootOverlay .bootScanline,
+  .bootOverlay .bootTitle,
+  .bootOverlay .bootIdentity,
+  .bootOverlay .bootReady {
+    animation: none !important;
+  }
+  .bootOverlay {
+    animation: boot-fade-in 0.01ms !important;
+  }
+}

@@ -7,6 +7,7 @@ import UpgradePrompt from '../components/UpgradePrompt.jsx'
 import NormalScreen from '../components/childScreens/NormalScreen.jsx'
 import VoiceOnlyScreen from '../components/childScreens/VoiceOnlyScreen.jsx'
 import GoalReachedScreen from '../components/childScreens/GoalReachedScreen.jsx'
+import BootTransition from '../components/BootTransition.jsx'
 import { useSpeech } from '../hooks/useSpeech.js'
 import { usePendingAsk } from '../hooks/usePendingAsk.js'
 import { useChat } from '../hooks/useChat.js'
@@ -173,6 +174,11 @@ export default function ChildPage({ session }) {
   const [minutesUsed, setMinutesUsed] = useState(() => getTodayMinutesUsed(getActiveChildId()))
   const [showWindDown, setShowWindDown] = useState(false)
   const [showFreeLimit, setShowFreeLimit] = useState(false)
+  const [bootComplete, setBootComplete] = useState(() => {
+    // Skip boot transition if already seen this device or non-tactical age
+    return localStorage.getItem('buddy_boot_seen') === 'true' ||
+      BAND_BY_AGE(getSettings().childAge) !== 'old'
+  })
   const warnedRef = useRef(false)
 
   useEffect(() => {
@@ -655,7 +661,14 @@ export default function ChildPage({ session }) {
 
   return (
     <>
-      <main id="main">{screen}</main>
+      <BootTransition
+        childName={childName}
+        childAge={settings.childAge}
+        onComplete={() => setBootComplete(true)}
+      />
+      <main id="main" style={{ visibility: bootComplete ? 'visible' : 'hidden' }}>
+        {screen}
+      </main>
 
       <ParentMessageOverlay
         msgPhase={msgOverlayPhase}
