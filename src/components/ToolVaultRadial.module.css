@@ -1,0 +1,163 @@
+/* Tool Vault Radial HUD — fixed bottom-right, circular utility menu */
+.wrap {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.toolDetail {
+  position: absolute;
+  bottom: 5rem;
+  right: 0;
+  width: 280px;
+  background: rgba(10, 10, 11, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid var(--tactical-teal, #00F5FF);
+  padding: 1rem;
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
+  border-radius: 8px;
+  animation: fade-in 0.2s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toolDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--tactical-teal, #00F5FF);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(0, 245, 255, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.closeBtn {
+  color: rgba(224, 224, 224, 0.4);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: white;
+}
+
+.toolName {
+  color: white;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.toolDesc {
+  color: rgba(224, 224, 224, 0.7);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.toolStatus {
+  color: var(--tactical-teal, #00F5FF);
+  background: rgba(0, 245, 255, 0.1);
+  padding: 0.5rem;
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  font-size: 0.5625rem;
+  border-radius: 4px;
+}
+
+.radialContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radialMenu {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.radialBtn {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(10, 10, 11, 0.9);
+  border: 1px solid var(--tactical-teal, #00F5FF);
+  color: var(--tactical-teal, #00F5FF);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.radialBtn:hover {
+  background: var(--tactical-teal, #00F5FF);
+  color: #0A0A0B;
+  transform: scale(1.15);
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+}
+
+.centerBtn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--tactical-teal, #00F5FF);
+  color: #0A0A0B;
+  font-weight: 900;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  border: 2px solid white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+  transition: all 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.centerBtn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(0, 245, 255, 0.6);
+}
+
+.centerBtn:active {
+  transform: scale(0.95);
+}
+
+.centerSub {
+  font-size: 0.5rem;
+  margin-top: 1px;
+}
+
+@media (max-width: 768px) {
+  .wrap {
+    bottom: 1rem;
+    right: 1rem;
+  }
+}

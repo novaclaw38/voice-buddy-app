@@ -1,0 +1,118 @@
+/* Tactical Photo Filter — thermal HUD filter with SVG feColorMatrix */
+.wrap {
+  background: rgba(10, 10, 11, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
+}
+
+.svgFilter {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.header {
+  color: #00F5FF;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+  padding-bottom: 0.25rem;
+}
+
+.preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.previewInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scanlineOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 245, 255, 0.1) 50%, transparent 100%);
+  pointer-events: none;
+  animation: scan-pulse 2s ease-in-out infinite;
+}
+
+@keyframes scan-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+.hudTop {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 0.5rem;
+  color: #00F5FF;
+  text-shadow: 0 0 4px rgba(0, 245, 255, 0.5);
+}
+
+.hudBottom {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 0.5rem;
+  color: #00F5FF;
+  text-shadow: 0 0 4px rgba(0, 245, 255, 0.5);
+}
+
+.placeholder {
+  color: rgba(224, 224, 224, 0.3);
+  font-size: 0.625rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.uploadBtn {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 1px solid #00F5FF;
+  color: #00F5FF;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.uploadBtn:hover {
+  background: #00F5FF;
+  color: #0A0A0B;
+}
+
+.fileInput {
+  display: none;
+}

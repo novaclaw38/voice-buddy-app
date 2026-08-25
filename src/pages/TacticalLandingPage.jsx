@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform, useSpring } from 'motion/react'
 import SkipLink from '../components/SkipLink.jsx'
 import { IconArrowRight, IconCheck } from '../components/icons.jsx'
+import ToolVaultRadial from '../components/ToolVaultRadial.jsx'
+import WhatsAppSimulator from '../components/WhatsAppSimulator.jsx'
+import RankProgressBar from '../components/RankProgressBar.jsx'
+import TacticalPhotoFilter from '../components/TacticalPhotoFilter.jsx'
 import styles from './TacticalLandingPage.module.css'
 
 /**
@@ -12,6 +16,7 @@ import styles from './TacticalLandingPage.module.css'
  * Command Black (#0A0A0B) + Tactical Teal (#00F5FF) + Alert Orange (#FF8A00).
  * Glassmorphism HUD panels, parallax hero, scroll-driven motion.
  * Real FLUX-generated imagery for hero + wing cards.
+ * Interactive: ToolVaultRadial, WhatsAppSimulator, RankProgressBar, TacticalPhotoFilter.
  */
 
 const WINGS = [
@@ -328,6 +333,48 @@ export default function TacticalLandingPage() {
           </motion.div>
         </section>
 
+        {/* ── INTERACTIVE FEATURE DEMOS ── */}
+        <section className={styles.demosSection}>
+          <motion.div
+            className={styles.sectionHeader}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.7 }}
+          >
+            <h2 className={styles.sectionTitle}>TEST FIELD TOOLS</h2>
+            <p className={styles.sectionSub}>Interactive previews of the Buddy Academy capabilities.</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+          >
+            <RankProgressBar />
+          </motion.div>
+
+          <div className={styles.demosGrid}>
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6 }}
+            >
+              <TacticalPhotoFilter />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6 }}
+            >
+              <WhatsAppSimulator />
+            </motion.div>
+          </div>
+        </section>
+
         {/* ── PRICING COMPARISON ── */}
         <section className={styles.pricing}>
           <motion.div
@@ -439,6 +486,9 @@ export default function TacticalLandingPage() {
             </div>
           </div>
         )}
+
+        {/* ── TOOL VAULT RADIAL HUD ── */}
+        <ToolVaultRadial />
       </div>
     </>
   )

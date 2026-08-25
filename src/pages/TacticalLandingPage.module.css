@@ -568,6 +568,20 @@
   box-shadow: var(--glow-teal);
 }
 
+/* ── INTERACTIVE DEMOS ── */
+.demosSection {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+}
+
+.demosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
 /* ── PRICING COMPARISON ── */
 .pricing {
   max-width: 1000px;
