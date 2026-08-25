@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import BuddyOrb from '../components/BuddyOrb.jsx'
 import { RANK_NAMES, RANK_TIERS } from '../components/BuddyOrb.jsx'
+import TacticalOrb from '../components/TacticalOrb/TacticalOrb.jsx'
+import { sounds } from '../components/audio/web-audio-synthesizer.js'
 import styles from './CadetHud.module.css'
 
 const RANK_ORDER = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
@@ -91,6 +93,12 @@ export default function CadetHud() {
 
         {/* Orb as the command core — rank-driven visual modules */}
         <div className={styles.orbPod}>
+          {/* Tactical Orb for comms interaction */}
+          <div className={styles.tacticalOrbWrapper}>
+            <TacticalOrb />
+          </div>
+
+          {/* BuddyOrb 3D visualization */}
           <BuddyOrb
             status={
               cadet.last_mission_status === 'active' ? 'processing' :
@@ -133,6 +141,31 @@ export default function CadetHud() {
           ))}
         </div>
       </div>
+
+      {/* Tactical Academy Navigation */}
+      <nav className={styles.tacticalNav}>
+        <Link 
+          to="/academy/storybooks" 
+          className={styles.navButton}
+          onClick={() => sounds.playRelayClick()}
+        >
+          STORYBOOK ARCHIVE
+        </Link>
+        <Link 
+          to="/academy/promotion-center" 
+          className={styles.navButton}
+          onClick={() => sounds.playPneumaticHiss()}
+        >
+          PROMOTION CENTER
+        </Link>
+        <Link 
+          to="/academy/briefing" 
+          className={styles.navButton}
+          onClick={() => sounds.playCommsStatic?.('start')}
+        >
+          WEEKLY BRIEFING
+        </Link>
+      </nav>
     </div>
   )
 }

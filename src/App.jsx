@@ -19,6 +19,7 @@ const CookiePolicyPage   = lazy(() => import('./pages/CookiePolicyPage.jsx'))
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
 const AdminUserDetailPage = lazy(() => import('./pages/AdminUserDetailPage.jsx'))
 const StorybookPage = lazy(() => import('./pages/StorybookPage.jsx'))
+const TacticalStorybookPage = lazy(() => import('./pages/TacticalStorybookPage.jsx'))
 const TacticalLandingPage = lazy(() => import('./pages/TacticalLandingPage.jsx'))
 const ParentDashboard = lazy(() => import('./pages/ParentDashboard.jsx'))
 const CadetHud = lazy(() => import('./pages/CadetHud.jsx'))
@@ -78,7 +79,7 @@ export default function App() {
           <Route path="/terms" element={<TermsOfServicePage />} />
           <Route path="/refunds" element={<RefundPolicyPage />} />
           <Route path="/cookies" element={<CookiePolicyPage />} />
-          <Route path="/storybook/:token" element={<StorybookPage />} />
+          <Route path="/storybook/:token" element={<TacticalStorybookPage />} />
 
           {/* Authenticated */}
           <Route path="/app"     element={session ? <ChildPage session={session} />  : <Navigate to="/" replace />} />

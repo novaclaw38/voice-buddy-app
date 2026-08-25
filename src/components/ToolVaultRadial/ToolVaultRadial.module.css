@@ -1,0 +1,190 @@
+.fixedContainer {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.modal {
+  position: absolute;
+  bottom: 5rem;
+  right: 0;
+  width: 20rem;
+  background-color: #141416;
+  border: 2px solid #00f5ff;
+  padding: 1rem;
+  box-shadow: 
+    0 0 20px rgba(0, 245, 255, 0.3),
+    inset 0 0 10px rgba(0, 245, 255, 0.1);
+  font-size: 12px;
+  margin-bottom: 1rem;
+  animation: slideIn 0.3s ease forwards;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #00f5ff;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 245, 255, 0.3);
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #ffffff;
+  transform: scale(1.2);
+}
+
+.toolName {
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.toolTagline {
+  color: #ff8a00;
+  font-size: 10px;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toolDesc {
+  color: #d1d5db;
+  font-size: 11px;
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+}
+
+.statusBox {
+  font-size: 9px;
+  color: #00f5ff;
+  background-color: rgba(0, 245, 255, 0.1);
+  padding: 0.5rem;
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.radialWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuRing {
+  position: absolute;
+  width: 16rem;
+  height: 16rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spinIn 0.5s ease;
+}
+
+.radialItem {
+  position: absolute;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: #0a0a0d;
+  border: 1px solid #00f5ff;
+  color: #00f5ff;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+  z-index: 5;
+}
+
+.radialItem:hover {
+  background-color: #00f5ff;
+  color: #0a0a0d;
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.6);
+}
+
+.centralButton {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00f5ff 0%, #00d4e6 100%);
+  color: #0a0a0d;
+  font-weight: 900;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  border: 2px solid #ffffff;
+  box-shadow: 
+    0 0 20px rgba(0, 245, 255, 0.4),
+    0 4px 0 rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.centralButton:hover {
+  box-shadow: 0 0 35px rgba(0, 245, 255, 0.7);
+  transform: scale(1.05);
+}
+
+.centralButton:active {
+  transform: scale(0.95);
+}
+
+.centralButton.open {
+  background: linear-gradient(135deg, #ff8a00 0%, #e07a00 100%);
+  color: #0a0a0d;
+}
+
+.subText {
+  font-size: 8px;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+@keyframes spinIn {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

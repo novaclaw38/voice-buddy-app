@@ -1,0 +1,213 @@
+.card {
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  background-color: #141416;
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  max-width: 28rem;
+  margin: 1rem auto;
+  box-shadow: 
+    0 0 20px rgba(0, 245, 255, 0.1),
+    inset 0 0 15px rgba(0, 245, 255, 0.05);
+}
+
+.hiddenSvg {
+  display: none;
+}
+
+.header {
+  color: #00f5ff;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.viewport {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background-color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.filteredImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: url(#tactical-cyan-filter) contrast(150%) brightness(90%) saturate(1.2);
+}
+
+.scanlineOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 245, 255, 0.1),
+    transparent
+  );
+  pointer-events: none;
+  animation: pulse 2s infinite;
+}
+
+.tagTopLeft {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  font-size: 8px;
+  color: #00f5ff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tagBottomRight {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-size: 8px;
+  color: #00f5ff;
+  text-transform: uppercase;
+}
+
+.overlayGrid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90px, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+.cameraFeed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: url(#tactical-cyan-filter) contrast(150%) brightness(95%) saturate(1.2);
+  transform: scaleX(-1);
+}
+
+.placeholder {
+  color: #6b7280;
+  font-size: 10px;
+  text-align: center;
+  padding: 1rem;
+}
+
+.errorMsg {
+  color: #ff8a00;
+  font-size: 9px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem;
+  background: rgba(255, 138, 0, 0.1);
+  border: 1px solid rgba(255, 138, 0, 0.3);
+}
+
+.buttonRow {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.uploadBtn, .cameraBtn, .clearBtn {
+  flex: 1;
+  text-align: center;
+  background: transparent;
+  border: 1px solid #00f5ff;
+  color: #00f5ff;
+  padding: 0.5rem 0;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadBtn:hover,
+.cameraBtn:hover {
+  background-color: #00f5ff;
+  color: #000000;
+  transform: scale(1.03);
+}
+
+.uploadBtn:focus-within,
+.cameraBtn:focus-within {
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+}
+
+.cameraBtn {
+  background: rgba(255, 138, 0, 0.1);
+  border-color: #ff8a00;
+  color: #ff8a00;
+}
+
+.cameraBtn:hover {
+  background-color: #ff8a00;
+  color: #000000;
+}
+
+.clearBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #9ca3af;
+}
+
+.clearBtn:hover {
+  background-color: rgba(255, 138, 0, 0.2);
+  color: #ff8a00;
+}
+
+.captureBtn {
+  background: rgba(255, 138, 0, 0.2);
+  border: 1px solid #ff8a00;
+  color: #ff8a00;
+  margin-bottom: 0.5rem;
+}
+
+.captureBtn:hover {
+  background-color: #ff8a00;
+  color: #000000;
+  animation: pulse 0.3s ease;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #9ca3af;
+}
+
+.cancelBtn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.fileInput {
+  display: none;
+}
+
+.hiddenCanvas {
+  display: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

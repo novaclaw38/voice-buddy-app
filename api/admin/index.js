@@ -4,6 +4,7 @@ import { requireAdmin, requireCronSecret, computeTier } from '../_admin.js'
 import { COURSES } from '../_courseData.js'
 import { sendWhatsAppTemplateMessage } from '../_whatsapp.js'
 import { generateWeeklyNarrative } from '../_groqNarrative.js'
+import { generateTacticalStorybook } from '../_tacticalStorybook.js'
 
 // Merged with cancel-subscription into one function to stay under Vercel's
 // Hobby-plan 12-Serverless-Function cap — routed by HTTP method instead of path.
@@ -385,6 +386,8 @@ async function handleWeeklyDigest(client) {
         .limit(1)
         .maybeSingle()
       const currentXp = rank?.total_xp || 0
+      // Derive child rank (1-6) from total XP — each rank threshold is 1000 XP
+      const childRank = Math.min(6, Math.max(1, Math.floor(currentXp / 1000) + 1))
       // First-ever recap has no prior snapshot to diff against — report the
       // running total rather than a misleading full-history "delta".
       const xpEarned = lastRecap ? Math.max(0, currentXp - (lastRecap.xp_earned || 0)) : currentXp
@@ -398,6 +401,7 @@ async function handleWeeklyDigest(client) {
       const chatHighlights = (historyRows || []).map((h) => h.user_text).filter(Boolean)
 
       const narrative = await generateWeeklyNarrative(child.name, lessonsSummary, chatHighlights)
+      const storybookContent = await generateTacticalStorybook(child.name, childRank || 1, lessonsSummary, chatHighlights, xpEarned)
 
       const { data: inserted, error: insertErr } = await client
         .from('weekly_recaps')
@@ -408,6 +412,7 @@ async function handleWeeklyDigest(client) {
           narrative,
           lessons_summary: lessonsSummary,
           xp_earned: xpEarned,
+          content_json: storybookContent || {},
         })
         .select('token')
         .single()

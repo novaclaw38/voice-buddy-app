@@ -1,0 +1,188 @@
+.rankCard {
+  background-color: #141416;
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  max-width: 32rem;
+  margin: 1rem auto;
+  box-shadow: 
+    0 0 20px rgba(0, 245, 255, 0.1),
+    inset 0 0 15px rgba(0, 245, 255, 0.05);
+}
+
+.rankHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rankTitle {
+  color: #00f5ff;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rankUpButton {
+  background: transparent;
+  border: 1px solid #00f5ff;
+  color: #00f5ff;
+  padding: 0.25rem 0.75rem;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rankUpButton:hover:not(:disabled) {
+  background-color: #00f5ff;
+  color: #000000;
+  transform: scale(1.03);
+}
+
+.rankUpButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.progressContainer {
+  position: relative;
+  width: 100%;
+  height: 1rem;
+  background-color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  transition: width 0.5s ease;
+  border-radius: 2px;
+}
+
+.tiersGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tier {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 0.25rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  font-size: 9px;
+  position: relative;
+}
+
+.tierActive {
+  transform: scale(1.05);
+}
+
+.tierCurrent {
+  border-width: 2px;
+}
+
+.tierLevel {
+  font-size: 8px;
+  color: #6b7280;
+  margin-bottom: 0.15rem;
+}
+
+.tierName {
+  font-weight: bold;
+  margin-bottom: 0.15rem;
+  color: #d1d5db;
+}
+
+.tierTitle {
+  font-size: 8px;
+  color: #9ca3af;
+  line-height: 1.2;
+}
+
+.currentIndicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 7px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: pulse 2s infinite;
+}
+
+.missionStatus {
+  margin: 1rem 0;
+}
+
+.missionBadge {
+  display: block;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: pulseGlow 2s infinite;
+}
+
+.voiceSection {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.voiceLabel {
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
+  font-size: 10px;
+}
+
+.voiceButton {
+  background: #ff8a00;
+  color: #0a0a0d;
+  padding: 0.4rem 1rem;
+  font-weight: 900;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  box-shadow: 0 0 20px rgba(255, 138, 0, 0.4);
+}
+
+.voiceButton:hover {
+  background: #ff8a00;
+  color: #000000;
+  transform: scale(1.03);
+  box-shadow: 0 0 30px rgba(255, 138, 0, 0.6);
+}
+
+.pointsDisplay {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #6b7280;
+  font-size: 9px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+  50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.8); }
+}

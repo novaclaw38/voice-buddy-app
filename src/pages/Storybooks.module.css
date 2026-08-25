@@ -16,3 +16,8 @@
 
 .cardBody p { font-size: 0.85rem; color: rgba(224, 224, 224, 0.6); line-height: 1.5; }
 .cardFooter { margin-top: 1rem; font-size: 0.75rem; color: rgba(224, 224, 224, 0.4); }
+
+/* WhatsApp Debrief Simulator section */
+.whatsappSection {
+  margin-bottom: 2rem;
+}

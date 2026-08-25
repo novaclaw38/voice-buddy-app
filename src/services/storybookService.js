@@ -9,3 +9,10 @@ export async function fetchRecapByToken(token) {
   if (error) { console.error('Failed to fetch storybook recap:', error.message); return null }
   return data?.[0] || null
 }
+
+// Fetch tactical storybook content_json specifically for the tactical page
+export async function fetchTacticalStorybook(token) {
+  const { data, error } = await supabase.rpc('get_recap_by_token', { p_token: token })
+  if (error) { console.error('Failed to fetch tactical storybook:', error.message); return null }
+  return data?.[0] || null
+}

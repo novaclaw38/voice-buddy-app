@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
+import RankProgressBar from '../components/RankProgressBar/RankProgressBar.jsx'
+import { speechEngine } from '../components/audio/speech-engine.js'
+import { sounds } from '../components/audio/web-audio-synthesizer.js'
 import styles from './PromotionCenter.module.css'
 
 const RANKS = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
@@ -51,7 +54,9 @@ export default function PromotionCenter() {
   const handlePromote = async () => {
     if (!cadet || cadet.current_rank >= 6) return
 
+    sounds.playPneumaticHiss()
     setPromoting(true)
+    const nextRankName = RANKS[cadet.current_rank]
 
     // Update rank
     const { error } = await supabase
@@ -62,6 +67,9 @@ export default function PromotionCenter() {
     if (error) {
       console.error('Failed to promote cadet:', error)
     } else {
+      speechEngine.speak(
+        `Rank ascension verified. Specialist now operating at ${nextRankName} level.`
+      )
       loadCadet()
     }
 
@@ -98,6 +106,18 @@ export default function PromotionCenter() {
             <span className={styles.nextName}>{RANKS[cadet.current_rank]}</span>
           </div>
         )}
+      </div>
+
+      {/* Tactical Rank Progression HUD */}
+      <div className={styles.tacticalRankSection}>
+        <RankProgressBar
+          currentLevel={cadet.current_rank}
+          totalPoints={cadet.total_points}
+          showVoiceSample={true}
+          onRankUp={(_newLevel) => {
+            sounds.playPneumaticHiss()
+          }}
+        />
       </div>
 
       <div className={styles.progressSection}>

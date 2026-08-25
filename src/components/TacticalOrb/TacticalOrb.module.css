@@ -1,0 +1,185 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.orbWrapper {
+  position: relative;
+  width: 7rem;
+  height: 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ringOuter1 {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 245, 255, 0.4);
+  animation: spin 10s linear infinite;
+}
+
+.ringOuter2 {
+  position: absolute;
+  inset: 0.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 245, 255, 0.2);
+  border-top-color: #00f5ff;
+  animation: spinReverse 6s linear infinite;
+}
+
+.ringAlert {
+  border-color: #ff8a00;
+  animation: spin 2s linear infinite;
+}
+
+.ringAlertReverse {
+  border-top-color: #ff8a00;
+  animation: spinReverse 2s linear infinite;
+}
+
+.core {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+}
+
+.idle {
+  background: rgba(0, 245, 255, 0.2);
+  box-shadow: 
+    0 0 20px rgba(0, 245, 255, 0.4),
+    inset 0 0 15px rgba(0, 245, 255, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.listening {
+  background: rgba(0, 245, 255, 0.4);
+  box-shadow: 
+    0 0 35px rgba(0, 245, 255, 0.8),
+    inset 0 0 20px rgba(0, 245, 255, 0.4);
+  transform: scale(1.1);
+}
+
+.processing {
+  background: rgba(255, 138, 0, 0.4);
+  box-shadow: 
+    0 0 30px rgba(255, 138, 0, 0.8),
+    inset 0 0 15px rgba(255, 138, 0, 0.4);
+  animation: bounce 0.5s infinite alternate;
+}
+
+.speaking {
+  background: rgba(0, 245, 255, 0.6);
+  box-shadow: 
+    0 0 40px rgba(0, 245, 255, 1),
+    inset 0 0 25px rgba(0, 245, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: #00f5ff;
+  transition: all 0.3s ease;
+}
+
+.dotAlert {
+  background-color: #ff8a00;
+  animation: ping 1s infinite;
+}
+
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+  height: 1.5rem;
+}
+
+.equalizer span {
+  width: 0.25rem;
+  background-color: #ffffff;
+  border-radius: 2px;
+}
+
+.bar1 { 
+  height: 100%; 
+  animation: pulse 0.6s infinite;
+}
+
+.bar2 { 
+  height: 66%; 
+  animation: pulse 0.8s infinite 0.2s; 
+}
+
+.bar3 { 
+  height: 80%; 
+  animation: pulse 0.5s infinite 0.4s; 
+}
+
+.telemetryTag {
+  position: absolute;
+  bottom: -0.75rem;
+  font-size: 8px;
+  color: #00f5ff;
+  background-color: #000000;
+  padding: 0 0.5rem;
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  z-index: 5;
+}
+
+.hintText {
+  font-size: 10px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.glowPulse {
+  position: absolute;
+  inset: -0.25rem;
+  border-radius: 50%;
+  animation: pulseGlow 3s infinite;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinReverse {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
+
+@keyframes bounce {
+  from { transform: scale(1); }
+  to { transform: scale(1.1) translate(-4px, -4px); }
+}
+
+@keyframes ping {
+  75%, 100% { transform: scale(1.5); opacity: 0; }
+}

@@ -52,3 +52,49 @@
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
+
+/* Tactical orb wrapper next to the BuddyOrb */
+.tacticalOrbWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Tactical Academy Navigation */
+.tacticalNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(20, 20, 22, 0.6);
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  border-radius: 8px;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid #00F5FF;
+  color: #00F5FF;
+  padding: 0.6rem 1rem;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+  text-decoration: none;
+}
+
+.navButton:hover {
+  background: #00F5FF;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+}
