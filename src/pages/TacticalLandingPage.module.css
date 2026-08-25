@@ -5,7 +5,7 @@
   min-height: 100dvh;
   background: var(--command-black);
   color: var(--tactical-text);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'JetBrains Mono', system-ui, sans-serif;
   overflow-x: hidden;
   position: relative;
 }
@@ -46,19 +46,17 @@
   z-index: 0;
 }
 
-.heroBg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-.heroOverlay {
+/* Tactical data-field grid background replacing the static hero image */
+.heroGrid {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(10, 10, 11, 0.7) 0%, rgba(10, 10, 11, 0.4) 40%, rgba(10, 10, 11, 0.9) 100%),
-    radial-gradient(ellipse at 50% 0%, rgba(0, 245, 255, 0.08) 0%, transparent 60%);
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(0, 245, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(255, 138, 0, 0.02) 0%, transparent 50%),
+    linear-gradient(rgba(0, 245, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 255, 0.01) 1px, transparent 1px);
+  background-size: 40px 40px, 60px 60px, 40px 40px, 40px 40px;
+  opacity: 0.6;
 }
 
 .heroContent {
@@ -122,9 +120,25 @@
   box-shadow: var(--glow-teal);
 }
 
+/* Hero split: Orb on left, commander hook on right — no center bias */
+.heroSplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 4rem;
+}
+
+.heroOrb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+}
+
 .heroText {
-  text-align: center;
-  padding-top: 6rem;
+  text-align: left;
+  padding-top: 0;
 }
 
 .heroBadge {
@@ -145,9 +159,10 @@
 }
 
 .heroTitle {
+  font-family: 'JetBrains Mono', monospace;
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--tactical-text);
   margin-bottom: 1.5rem;
   line-height: 1.1;
@@ -159,6 +174,7 @@
 }
 
 .heroSub {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 1.05rem;
   max-width: 45rem;
   margin: 0 auto 2.5rem;
@@ -979,6 +995,20 @@
 
   .wingsGrid {
     grid-template-columns: 1fr;
+  }
+
+  .heroSplit {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .heroOrb {
+    order: -1;
+  }
+
+  .heroText {
+    text-align: center;
   }
 
   .pricingFeatures {

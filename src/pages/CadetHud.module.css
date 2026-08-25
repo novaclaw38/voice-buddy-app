@@ -1,0 +1,54 @@
+.loading { display: flex; align-items: center; justify-content: center; min-height: 100dvh; font-family: 'JetBrains Mono', monospace; color: #00F5FF; }
+.error { display: flex; align-items: center; justify-content: center; min-height: 100dvh; font-family: 'JetBrains Mono', monospace; color: #ef4444; }
+
+.hud { min-height: 100dvh; background: #0A0A0B; padding: 2rem; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.header h1 { font-size: 1.5rem; color: #E0E0E0; }
+
+.rankBadge { background: rgba(0, 245, 255, 0.1); border: 1px solid #00F5FF; padding: 0.5rem 1rem; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
+.rankNumber { font-size: 1.5rem; font-weight: 700; color: #00F5FF; }
+.rankName { font-size: 0.7rem; color: rgba(224, 224, 224, 0.6); font-family: 'JetBrains Mono', monospace; }
+
+/* Header layout: name + rank modules on left, Orb pod on right */
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.headerLeft { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.rankModules { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.moduleBadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 245, 255, 0.2);
+  color: rgba(224, 224, 224, 0.5);
+  background: rgba(0, 245, 255, 0.05);
+}
+.moduleBadge:first-child { color: #00F5FF; border-color: rgba(0, 245, 255, 0.4); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.statCard { background: rgba(20, 20, 22, 0.8); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: 8px; padding: 1.5rem; text-align: center; }
+.statValue { font-size: 2rem; font-weight: 700; color: #00F5FF; }
+.statLabel { font-size: 0.7rem; color: rgba(224, 224, 224, 0.5); text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+
+.objectives { background: rgba(20, 20, 22, 0.8); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: 8px; padding: 1.5rem; }
+.objectives h2 { font-size: 1rem; color: #E0E0E0; margin-bottom: 1rem; }
+.objectiveList { display: flex; flex-direction: column; gap: 0.75rem; }
+.objective { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(0, 245, 255, 0.05); border: 1px solid rgba(0, 245, 255, 0.1); border-radius: 4px; }
+.objectiveIcon { font-size: 1.25rem; }
+.objectiveText { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #E0E0E0; }
+
+/* Orb pod — the CadetHud command core */
+.orbPod {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rankLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #00F5FF;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}

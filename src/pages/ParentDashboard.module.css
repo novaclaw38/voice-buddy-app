@@ -1,0 +1,44 @@
+.loading { display: flex; align-items: center; justify-content: center; min-height: 100dvh; font-family: 'JetBrains Mono', monospace; color: #00F5FF; }
+.error { display: flex; align-items: center; justify-content: center; min-height: 100dvh; font-family: 'JetBrains Mono', monospace; color: #ef4444; }
+
+.dashboard { min-height: 100dvh; background: #0A0A0B; padding: 2rem; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.header h1 { font-size: 1.5rem; color: #E0E0E0; font-family: 'Inter', sans-serif; }
+
+.addBtn { background: #00F5FF; color: #0A0A0B; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; font-family: 'JetBrains Mono', monospace; }
+.addBtn:hover { box-shadow: 0 0 20px rgba(0, 245, 255, 0.5); }
+
+.cadetGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.cadetCard { background: rgba(20, 20, 22, 0.8); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: 8px; padding: 1.5rem; }
+.cadetCard:hover { border-color: #00F5FF; box-shadow: 0 0 20px rgba(0, 245, 255, 0.1); }
+
+.cadetHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.cadetName { font-size: 1.25rem; font-weight: 700; color: #E0E0E0; }
+.cadetRank { font-size: 0.75rem; color: #00F5FF; font-family: 'JetBrains Mono', monospace; }
+
+.cadetStats { display: flex; gap: 2rem; margin-bottom: 1rem; }
+.stat { display: flex; flex-direction: column; }
+.statLabel { font-size: 0.7rem; color: rgba(224, 224, 224, 0.5); text-transform: uppercase; }
+.statValue { font-size: 1.1rem; font-weight: 700; color: #E0E0E0; }
+
+.cadetActions { display: flex; gap: 0.75rem; }
+.actionBtn { flex: 1; background: transparent; border: 1px solid #00F5FF; color: #00F5FF; padding: 0.5rem; border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+.actionBtn:hover { background: #00F5FF; color: #0A0A0B; }
+.deleteBtn { background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+.deleteBtn:hover { background: #ef4444; color: white; }
+
+/* Mission Status Orb — ParentDashboard */
+.missionOrb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.orbStatusLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--tactical-text-dim, rgba(224, 224, 224, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
