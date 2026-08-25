@@ -1,36 +1,119 @@
-.page {
+/* ---- Sunday Storybook / AAR page (Tactical Academy theme) ---- */
+/* Dark theme with Tactical Teal / Academy Gold accents. */
+
+:root {
   --sb-gold: #D4AF37;
-  min-height: 100vh;
+  --tactical-teal: #00F5FF;
+  --alert-orange: #FF8A00;
+  --command-black: #0A0A0B;
+  --command-black-2: #141416;
+  --tactical-text: #E0E0E0;
+  --tactical-text-dim: rgba(224, 224, 224, 0.6);
+  --tactical-border: rgba(0, 245, 255, 0.2);
+  --tactical-ghost: rgba(0, 245, 255, 0.08);
+}
+
+.page {
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   padding: 40px 24px;
   text-align: center;
-  background: linear-gradient(165deg, #1a1430 0%, #302352 55%, #4a3670 100%);
-  color: #fff;
+  background: var(--command-black);
+  color: var(--tactical-text);
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Ghost data grid background */
+.page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 1px 1px, var(--tactical-ghost) 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: 0.2;
+  z-index: 0;
+}
+
+/* Content above grid */
+.page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── States ── */
 .loading,
 .body {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--tactical-text-dim);
   font-size: 0.875rem;
 }
 
+.loading {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.1em;
+}
+
+/* ── AAR Header ── */
+.aarHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--tactical-border);
+}
+
+.aarRank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--tactical-teal);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+}
+
+.aarMission {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--tactical-text);
+  letter-spacing: 0.05em;
+}
+
+.aarDate {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--tactical-text-dim);
+  letter-spacing: 0.1em;
+}
+
+/* ── Title (not-found state) ── */
 .title {
-  font-family: var(--font-head, sans-serif);
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 700;
   font-size: 1.375rem;
   margin-top: 12px;
+  color: var(--tactical-text);
 }
 
+/* ── Narrative ── */
 .narrative {
   max-width: 480px;
   font-size: 0.875rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--tactical-text);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: pre-line;
 }
 
+/* ── Lessons section ── */
 .section {
   width: 100%;
   max-width: 480px;
@@ -38,11 +121,13 @@
 }
 
 .sectionTitle {
-  font-family: var(--font-head, sans-serif);
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--sb-gold);
+  color: var(--tactical-teal);
   margin-bottom: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .lessonList {
@@ -54,32 +139,86 @@
 }
 
 .lessonItem {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--r-md, 12px);
+  background: var(--command-black-2);
+  border: 1px solid var(--tactical-border);
+  border-radius: 8px;
   padding: 10px 14px;
   text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--tactical-text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.mastery {
-  color: rgba(255, 255, 255, 0.6);
+.lessonItem .mastery {
+  color: var(--tactical-text-dim);
   font-size: 0.75rem;
 }
 
+/* ── XP ── */
 .xp {
   margin-top: 8px;
-  font-family: var(--font-head, sans-serif);
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   color: var(--sb-gold);
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
 }
 
+/* ── Parent Prompt ── */
+.promptBox {
+  margin-top: 16px;
+  padding: 12px 20px;
+  background: rgba(0, 245, 255, 0.05);
+  border: 1px solid var(--tactical-border);
+  border-radius: 8px;
+  max-width: 480px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.825rem;
+  text-align: left;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.promptLabel {
+  color: var(--alert-orange);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+
+.promptText {
+  color: var(--tactical-text-dim);
+}
+
+/* ── Home link (not-found state) ── */
 .homeLink {
   margin-top: 12px;
   padding: 12px 22px;
   min-height: 44px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: var(--r-pill, 999px);
-  color: #fff;
+  background: rgba(0, 245, 255, 0.1);
+  border: 1px solid var(--tactical-border);
+  border-radius: 999px;
+  color: var(--tactical-text);
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.homeLink:hover {
+  background: rgba(0, 245, 255, 0.2);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .page::before {
+    display: none;
+  }
 }
