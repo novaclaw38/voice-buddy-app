@@ -10,7 +10,6 @@ const ParentPage  = lazy(() => import('./pages/ParentPage.jsx'))
 const PromotionCenterPage = lazy(() => import('./pages/PromotionCenterPage.jsx'))
 const AuthPage    = lazy(() => import('./pages/AuthPage.jsx'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage.jsx'))
-const LandingPage = lazy(() => import('./pages/LandingPage.jsx'))
 const CoursesPage = lazy(() => import('./pages/CoursesPage.jsx'))
 const LessonPage  = lazy(() => import('./pages/LessonPage.jsx'))
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage.jsx'))
@@ -67,7 +66,7 @@ export default function App() {
         <Suspense fallback={<Loader />}>
         <Routes>
           {/* Public */}
-          <Route path="/"      element={session ? <Navigate to="/app" replace /> : <LandingPage />} />
+          <Route path="/"      element={session ? <Navigate to="/app" replace /> : <TacticalLandingPage />} />
           <Route path="/login" element={session ? <Navigate to="/app" replace /> : <AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
@@ -96,8 +95,7 @@ export default function App() {
               <Route path="/dev-parent" element={<ParentPage session={{ user: { id: 'dev-preview' } }} />} />
               <Route path="/dev-promotion" element={<PromotionCenterPage session={{ access_token: 'dev', user: { id: 'dev-preview' } }} />} />
               <Route path="/dev-lesson" element={<LessonPage session={{ user: { id: 'dev-preview' } }} />} />
-              <Route path="/tactical-landing" element={<TacticalLandingPage />} />
-            </>
+              </>
           )}
 
           {/* Catch-all */}
