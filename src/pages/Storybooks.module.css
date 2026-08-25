@@ -1,0 +1,18 @@
+.loading { display: flex; align-items: center; justify-content: center; min-height: 100dvh; font-family: 'JetBrains Mono', monospace; color: #00F5FF; }
+.error { display: flex; align-items: center; justify-content: center; min-height: 100dvh; font-family: 'JetBrains Mono', monospace; color: #ef4444; }
+
+.page { min-height: 100dvh; background: #0A0A0B; padding: 2rem; }
+.header { margin-bottom: 2rem; }
+.header h1 { font-size: 1.5rem; color: #E0E0E0; }
+.header p { font-size: 0.85rem; color: rgba(224, 224, 224, 0.5); margin-top: 0.5rem; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.card { background: rgba(20, 20, 22, 0.8); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: 8px; padding: 1.5rem; }
+.card:hover { border-color: #00F5FF; box-shadow: 0 0 20px rgba(0, 245, 255, 0.1); }
+
+.cardHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.cardHeader h3 { font-size: 1rem; color: #E0E0E0; }
+.rankBadge { font-size: 0.7rem; color: #00F5FF; font-family: 'JetBrains Mono', monospace; background: rgba(0, 245, 255, 0.1); padding: 0.25rem 0.5rem; border-radius: 4px; }
+
+.cardBody p { font-size: 0.85rem; color: rgba(224, 224, 224, 0.6); line-height: 1.5; }
+.cardFooter { margin-top: 1rem; font-size: 0.75rem; color: rgba(224, 224, 224, 0.4); }

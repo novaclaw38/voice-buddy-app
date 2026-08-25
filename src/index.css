@@ -79,6 +79,27 @@
   --parent-rose-text: #be185d;
   --parent-green-text: #15803d;
 
+  /* ---- Buddy Tactical Academy core palette ----
+     Command Black, Tactical Teal, Alert Orange — the three anchor
+     colors of the tactical persona. Declared once at :root so the
+     shader orb, boot sequence, HUD rings, and parent dashboard status
+     indicator all reference a single source. The legacy candy palette
+     above is retained for the gentle under-9 boot path and for any
+     un-migrated candy-surface rules. */
+  --command-black: #0a0a0d;
+  --command-black-soft: #16171e;
+  --tactical-teal: #00f5ff;
+  --tactical-teal-dim: rgba(0, 245, 255, 0.35);
+  --alert-orange: #ff8a00;
+  --alert-orange-dim: rgba(255, 138, 0, 0.45);
+  --academy-gold: #d4af37;
+  --academy-green: #27ae60;
+  --tactical-text-dim: rgba(224, 224, 224, 0.6);
+  /* Rank-tier glows — map 1:1 to deriveRank() thresholds */
+  --rank-recruit-glow: rgba(0, 245, 255, 0.4);
+  --rank-specialist-glow: rgba(255, 138, 0, 0.5);
+  --rank-commander-glow: rgba(212, 175, 55, 0.6);
+
   /* Light-purple surface tints, previously duplicated as 6+ near-identical
      one-off hex values across CoursesPage and lesson step cards. */
   --surface-tint: #f4f0fc;

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styles from './RankProgressBar.module.css'
+import { speechEngine } from '../components/speech-engine.js'
 
 const RANKS = ['RECRUIT', 'BIO-ANALYST', 'SENIOR SCOUT', 'SPECIALIST']
 
@@ -32,6 +33,16 @@ export default function RankProgressBar() {
             <div className={styles.rankName}>{rank}</div>
           </div>
         ))}
+      </div>
+      {/* Voice Comms Audio Sampler */}
+      <div className={styles.voiceSection}>
+        <div className={styles.voiceLabel}>COMMAND VOICE FILTER SAMPLE:</div>
+        <button
+          onClick={() => speechEngine.speak('Attention Specialist. Rank ascension sequence verified.', () => {})}
+          className={styles.voiceBtn}
+        >
+          ▶ PLAY COMMS AUDIO
+        </button>
       </div>
     </div>
   )

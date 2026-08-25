@@ -7,7 +7,6 @@ import { authHeaders } from './services/chatService.js'
 
 const ChildPage   = lazy(() => import('./pages/ChildPage.jsx'))
 const ParentPage  = lazy(() => import('./pages/ParentPage.jsx'))
-const PromotionCenterPage = lazy(() => import('./pages/PromotionCenterPage.jsx'))
 const AuthPage    = lazy(() => import('./pages/AuthPage.jsx'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage.jsx'))
 const CoursesPage = lazy(() => import('./pages/CoursesPage.jsx'))
@@ -21,6 +20,11 @@ const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
 const AdminUserDetailPage = lazy(() => import('./pages/AdminUserDetailPage.jsx'))
 const StorybookPage = lazy(() => import('./pages/StorybookPage.jsx'))
 const TacticalLandingPage = lazy(() => import('./pages/TacticalLandingPage.jsx'))
+const ParentDashboard = lazy(() => import('./pages/ParentDashboard.jsx'))
+const CadetHud = lazy(() => import('./pages/CadetHud.jsx'))
+const StorybooksPage = lazy(() => import('./pages/Storybooks.jsx'))
+const PromotionCenterPage = lazy(() => import('./pages/PromotionCenterPage.jsx'))
+const BriefingPage = lazy(() => import('./pages/Briefing.jsx'))
 
 // Must match ADMIN_EMAIL in api/_admin.js exactly. This check is UX-only —
 // the API endpoints re-check server-side, which is the real security boundary.
@@ -80,6 +84,11 @@ export default function App() {
           <Route path="/app"     element={session ? <ChildPage session={session} />  : <Navigate to="/" replace />} />
           <Route path="/parent"  element={session ? <ParentPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/parent/promotion" element={session ? <PromotionCenterPage session={session} /> : <Navigate to="/" replace />} />
+          <Route path="/parent/command" element={session ? <ParentDashboard session={session} /> : <Navigate to="/" replace />} />
+          <Route path="/academy/hud" element={session ? <CadetHud /> : <Navigate to="/" replace />} />
+          <Route path="/academy/storybooks" element={session ? <StorybooksPage /> : <Navigate to="/" replace />} />
+          <Route path="/academy/promotion-center" element={session ? <PromotionCenterPage /> : <Navigate to="/" replace />} />
+          <Route path="/academy/briefing" element={session ? <BriefingPage /> : <Navigate to="/" replace />} />
           <Route path="/courses" element={session ? <CoursesPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/lesson"  element={session ? <LessonPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/admin" element={session?.user?.email === ADMIN_EMAIL ? <AdminPage /> : <Navigate to={session ? '/app' : '/'} replace />} />

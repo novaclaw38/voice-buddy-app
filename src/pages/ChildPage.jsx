@@ -179,9 +179,11 @@ export default function ChildPage({ session }) {
   // indicator can go amber without requiring a separate effect.
   const shouldWarn = dailyLimit > 0 && minutesUsed >= dailyLimit - 5
   const [bootComplete, setBootComplete] = useState(() => {
-    // Skip boot transition if already seen this device or non-tactical age
+    // Skip boot/enlistment if already seen on this device. Checks both keys
+    // — 'buddy_boot_seen' (legacy reboot transition) and 'buddy_enlistment_seen'
+    // (the enlistment sequence) — so a device that saw either skips on return.
     return localStorage.getItem('buddy_boot_seen') === 'true' ||
-      BAND_BY_AGE(getSettings().childAge) !== 'old'
+      localStorage.getItem('buddy_enlistment_seen') === 'true'
   })
   const warnedRef = useRef(false)
 
