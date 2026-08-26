@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useFocusTrap from '../../hooks/useFocusTrap.js'
-import BuddyAvatar from '../BuddyAvatar.jsx'
 import SpeechBubble from '../SpeechBubble.jsx'
 import VoiceButton from '../VoiceButton.jsx'
 import SkipLink from '../SkipLink.jsx'
@@ -45,7 +44,6 @@ export default function NormalScreen({
   useFocusTrap(storyTrapRef, storyPhase === 'ask', onDeclineStory)
 
   const wordIndex = speech.wordIndex
-  const avatarType = settings.avatarType || 'bear'
 
   // Play sound FX on voice status changes
   useEffect(() => {
@@ -90,13 +88,14 @@ export default function NormalScreen({
             </div>
           </div>
 
-          {/* Central Avatar + Orb */}
+          {/* Central Tactical Orb */}
           <div className={styles.avatarArea}>
             <p className={styles.buddyNameTag}>{buddyName}</p>
-            <BuddyAvatar status={uiStatus} avatarColor={settings.avatarColor} type={avatarType} costume={settings.costume} size={180} audioRef={speech.audioRef} partOfDay="day" />
-            <div className={styles.orbOverlay}>
-              <TacticalOrb status={uiStatus} />
-            </div>
+            <TacticalOrb
+              status={uiStatus}
+              rank={settings.rank}
+              totalXp={settings.totalXp}
+            />
           </div>
 
           {/* Speech bubble */}

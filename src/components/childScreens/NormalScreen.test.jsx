@@ -38,7 +38,7 @@ const baseSpeech = {
 }
 
 const baseProps = {
-  settings: { avatarColor: '#7c3aed', costume: null },
+  settings: { rank: 1, totalXp: 0 },
   buddyName: 'Buddy',
   chatMode: 'chat',
   partOfDay: 'afternoon',
