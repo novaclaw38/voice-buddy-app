@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'motion/react'
-import BuddyOrb from '../components/BuddyOrb.jsx'
+import TacticalOrb from '../components/TacticalOrb.jsx'
 import SkipLink from '../components/SkipLink.jsx'
 import { IconArrowRight, IconCheck } from '../components/icons.jsx'
 import styles from './TacticalLandingPage.module.css'
@@ -133,7 +133,7 @@ export default function TacticalLandingPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
               >
-                <BuddyOrb status="idle" rank={1} size={240} interactive={true} />
+                <TacticalOrb status="idle" totalXp={0} interactive={true} style={{ width: 240, height: 240 }} />
               </motion.div>
 
               {/* Commander hook — right side */}
