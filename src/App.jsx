@@ -18,7 +18,6 @@ const RefundPolicyPage   = lazy(() => import('./pages/RefundPolicyPage.jsx'))
 const CookiePolicyPage   = lazy(() => import('./pages/CookiePolicyPage.jsx'))
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
 const AdminUserDetailPage = lazy(() => import('./pages/AdminUserDetailPage.jsx'))
-const StorybookPage = lazy(() => import('./pages/StorybookPage.jsx'))
 const TacticalStorybookPage = lazy(() => import('./pages/TacticalStorybookPage.jsx'))
 const TacticalLandingPage = lazy(() => import('./pages/TacticalLandingPage.jsx'))
 const ParentDashboard = lazy(() => import('./pages/ParentDashboard.jsx'))
@@ -86,27 +85,16 @@ export default function App() {
           <Route path="/parent"  element={session ? <ParentPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/parent/promotion" element={session ? <PromotionCenterPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/parent/command" element={session ? <ParentDashboard session={session} /> : <Navigate to="/" replace />} />
-          <Route path="/academy/hud" element={session ? <CadetHud /> : <Navigate to="/" replace />} />
-          <Route path="/academy/storybooks" element={session ? <StorybooksPage /> : <Navigate to="/" replace />} />
-          <Route path="/academy/promotion-center" element={session ? <PromotionCenterPage /> : <Navigate to="/" replace />} />
+          <Route path="/academy/hud" element={session ? <CadetHud session={session} /> : <Navigate to="/" replace />} />
+          <Route path="/academy/storybooks" element={session ? <StorybooksPage session={session} /> : <Navigate to="/" replace />} />
+          <Route path="/academy/promotion" element={session ? <PromotionCenterPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/academy/briefing" element={session ? <BriefingPage /> : <Navigate to="/" replace />} />
           <Route path="/courses" element={session ? <CoursesPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/lesson"  element={session ? <LessonPage session={session} /> : <Navigate to="/" replace />} />
           <Route path="/admin" element={session?.user?.email === ADMIN_EMAIL ? <AdminPage /> : <Navigate to={session ? '/app' : '/'} replace />} />
           <Route path="/admin/users/:id" element={session?.user?.email === ADMIN_EMAIL ? <AdminUserDetailPage /> : <Navigate to={session ? '/app' : '/'} replace />} />
 
-          {/* Dev-only preview routes. Wrapped in import.meta.env.DEV so Vite
-              statically eliminates them from production builds — they mint a
-              fake session and would otherwise bypass auth and the paywall. */}
-          {import.meta.env.DEV && (
-            <>
-              <Route path="/dev-child" element={<ChildPage session={{ user: { id: 'dev-preview' } }} />} />
-              <Route path="/dev-courses" element={<CoursesPage session={{ user: { id: 'dev-preview' } }} />} />
-              <Route path="/dev-parent" element={<ParentPage session={{ user: { id: 'dev-preview' } }} />} />
-              <Route path="/dev-promotion" element={<PromotionCenterPage session={{ access_token: 'dev', user: { id: 'dev-preview' } }} />} />
-              <Route path="/dev-lesson" element={<LessonPage session={{ user: { id: 'dev-preview' } }} />} />
-              </>
-          )}
+          {/* All routes are auth-guarded. No dev-only preview routes. */}
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to={session ? '/app' : '/'} replace />} />

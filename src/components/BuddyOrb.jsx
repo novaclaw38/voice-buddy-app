@@ -109,7 +109,7 @@ export default function BuddyOrb({
 /**
  * The 3D orb scene: core sphere, energy ring, rank-gated modules.
  */
-function OrbScene({ statusColor, rankTier, status, interactive }) {
+function OrbScene({ statusColor, rankTier, status, interactive: _interactive }) {
   const coreRef = useRef()
   const ringRef = useRef()
   const scanRingRef = useRef()

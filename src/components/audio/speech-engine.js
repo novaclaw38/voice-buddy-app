@@ -10,7 +10,7 @@ class TacticalSpeechEngine {
       try {
         this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       } catch (e) {
-        console.warn('Audio context not available');
+        console.warn('Audio context not available:', e)
       }
     }
   }

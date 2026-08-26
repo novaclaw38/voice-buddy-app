@@ -1,90 +1,90 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
+import { fetchChildRank } from '../services/rankService.js'
+import { deriveRank } from '../utils/rank.js'
+import { useProgress } from '../hooks/useProgress.js'
 import BuddyOrb from '../components/BuddyOrb.jsx'
-import { RANK_NAMES, RANK_TIERS } from '../components/BuddyOrb.jsx'
-import TacticalOrb from '../components/TacticalOrb/TacticalOrb.jsx'
-import { sounds } from '../components/audio/web-audio-synthesizer.js'
+import { RANK_TIERS } from '../components/BuddyOrb.jsx'
+import TacticalOrb from '../components/TacticalOrb.jsx'
 import styles from './CadetHud.module.css'
 
 const RANK_ORDER = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
 
-export default function CadetHud() {
+export default function CadetHud({ session: _session }) {
   const [searchParams] = useSearchParams()
-  const cadetId = searchParams.get('cadet')
-  const [cadet, setCadet] = useState(null)
-  const [progress, setProgress] = useState([])
+  const childId = searchParams.get('child') || searchParams.get('cadet')
+  const [child, setChild] = useState(null)
+  const [rankData, setRankData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { completions, records } = useProgress()
 
   useEffect(() => {
-    if (cadetId) {
-      loadCadet()
-      loadProgress()
+    if (childId) {
+      loadChild()
     }
-  }, [cadetId])
+  }, [childId])
 
-  const loadCadet = async () => {
+  const loadChild = async () => {
     const { data, error } = await supabase
-      .from('cadets')
+      .from('children')
       .select('*')
-      .eq('id', cadetId)
+      .eq('id', childId)
       .single()
 
     if (error) {
-      console.error('Failed to load cadet:', error)
+      console.error('Failed to load child:', error)
     } else {
-      setCadet(data)
+      setChild(data)
+      // Load rank data from child_ranks table (queries children.id)
+      const rankRow = await fetchChildRank(childId)
+      const derived = deriveRank(rankRow?.totalXp || 0)
+      setRankData(derived)
     }
     setLoading(false)
   }
 
-  const loadProgress = async () => {
-    const { data, error } = await supabase
-      .from('curriculum_progress')
-      .select('*')
-      .eq('cadet_id', cadetId)
-      .order('created_at', { ascending: true })
-
-    if (error) {
-      console.error('Failed to load progress:', error)
-    } else {
-      setProgress(data || [])
-    }
-  }
-
   if (loading) {
-    return <div className={styles.loading}>Loading...</div>
+    return <div className={styles.loading}>Loading…</div>
   }
 
-  if (!cadet) {
+  if (!child) {
     return <div className={styles.error}>Cadet not found</div>
   }
+
+  const level = rankData?.level || 1
+  const rankName = RANK_ORDER[Math.min(level, RANK_ORDER.length - 1)] || 'Recruit'
+  const rankTierInfo = RANK_TIERS[rankName] || RANK_TIERS.Recruit
+
+  // Count completed lessons from useProgress (lesson_completions table)
+  const completedLessons = completions.size
+  const totalLessons = records.size
 
   return (
     <div className={styles.hud}>
       <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1>Cadet {cadet.name}</h1>
+          <h1>Cadet {child.name}</h1>
 
           {/* Visual modules unlocked per rank tier */}
           <div className={styles.rankModules}>
             <span className={styles.moduleBadge}>
-              {RANK_TIERS[RANK_ORDER[cadet.current_rank - 1]]?.tier >= 2
+              {rankTierInfo.tier >= 2
                 ? '◆ HALO RING UNLOCKED'
                 : 'HALO RING LOCKED'}
             </span>
             <span className={styles.moduleBadge}>
-              {RANK_TIERS[RANK_ORDER[cadet.current_rank - 1]]?.tier >= 3
+              {rankTierInfo.tier >= 3
                 ? '◆ HUD RINGS UNLOCKED'
                 : 'HUD RINGS LOCKED'}
             </span>
             <span className={styles.moduleBadge}>
-              {RANK_TIERS[RANK_ORDER[cadet.current_rank - 1]]?.tier >= 4
+              {rankTierInfo.tier >= 4
                 ? '◆ SCAN RING UNLOCKED'
                 : 'SCAN RING LOCKED'}
             </span>
             <span className={styles.moduleBadge}>
-              {RANK_TIERS[RANK_ORDER[cadet.current_rank - 1]]?.tier >= 5
+              {rankTierInfo.tier >= 5
                 ? '◆ CORE PULSE UNLOCKED'
                 : 'CORE PULSE LOCKED'}
             </span>
@@ -95,37 +95,34 @@ export default function CadetHud() {
         <div className={styles.orbPod}>
           {/* Tactical Orb for comms interaction */}
           <div className={styles.tacticalOrbWrapper}>
-            <TacticalOrb />
+            <TacticalOrb rank={level} />
           </div>
 
           {/* BuddyOrb 3D visualization */}
           <BuddyOrb
-            status={
-              cadet.last_mission_status === 'active' ? 'processing' :
-              cadet.last_mission_status === 'completed' ? 'completed' :
-              'idle'
-            }
-            rank={cadet.current_rank}
+            status="idle"
+            rank={level}
             size={120}
             interactive={false}
+            onBootComplete={undefined}
           />
           <span className={styles.rankLabel}>
-            {RANK_ORDER[cadet.current_rank - 1]}
+            {rankName}
           </span>
         </div>
       </header>
 
       <div className={styles.stats}>
         <div className={styles.statCard}>
-          <span className={styles.statValue}>{cadet.total_points}</span>
-          <span className={styles.statLabel}>Total Points</span>
+          <span className={styles.statValue}>{rankData?.totalXp || 0}</span>
+          <span className={styles.statLabel}>Total XP</span>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statValue}>{progress.filter(p => p.completed).length}</span>
+          <span className={styles.statValue}>{completedLessons}</span>
           <span className={styles.statLabel}>Missions Completed</span>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statValue}>{progress.length}</span>
+          <span className={styles.statValue}>{totalLessons}</span>
           <span className={styles.statLabel}>Total Missions</span>
         </div>
       </div>
@@ -133,10 +130,10 @@ export default function CadetHud() {
       <div className={styles.objectives}>
         <h2>Current Objectives</h2>
         <div className={styles.objectiveList}>
-          {progress.filter(p => !p.completed).slice(0, 3).map((p) => (
-            <div key={p.id} className={styles.objective}>
+          {Array.from(records.entries()).filter(([_, r]) => !r.completed).slice(0, 3).map(([key]) => (
+            <div key={key} className={styles.objective}>
               <span className={styles.objectiveIcon}>🎯</span>
-              <span className={styles.objectiveText}>{p.module_id}</span>
+              <span className={styles.objectiveText}>{key.replace(':', ' / ')}</span>
             </div>
           ))}
         </div>
@@ -144,27 +141,9 @@ export default function CadetHud() {
 
       {/* Tactical Academy Navigation */}
       <nav className={styles.tacticalNav}>
-        <Link 
-          to="/academy/storybooks" 
-          className={styles.navButton}
-          onClick={() => sounds.playRelayClick()}
-        >
-          STORYBOOK ARCHIVE
-        </Link>
-        <Link 
-          to="/academy/promotion-center" 
-          className={styles.navButton}
-          onClick={() => sounds.playPneumaticHiss()}
-        >
-          PROMOTION CENTER
-        </Link>
-        <Link 
-          to="/academy/briefing" 
-          className={styles.navButton}
-          onClick={() => sounds.playCommsStatic?.('start')}
-        >
-          WEEKLY BRIEFING
-        </Link>
+        <Link to="/academy/storybooks" className={styles.navButton}>STORYBOOK ARCHIVE</Link>
+        <Link to="/academy/promotion" className={styles.navButton}>PROMOTION CENTER</Link>
+        <Link to="/academy/briefing" className={styles.navButton}>WEEKLY BRIEFING</Link>
       </nav>
     </div>
   )

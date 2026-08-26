@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
+import { fetchChildRank } from '../services/rankService.js'
+import { deriveRank } from '../utils/rank.js'
 import styles from './Briefing.module.css'
 
 const RANKS = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
@@ -32,7 +34,7 @@ const BRIEFINGS = {
     { title: 'Long-term Planning', content: 'Setting and achieving long-term goals.' },
   ],
   6: [
-    { title: 'Commander\'s Oath', content: 'The final commitment to leadership.' },
+    { title: "Commander's Oath", content: 'The final commitment to leadership.' },
     { title: 'Graduation Protocol', content: 'Preparing for your final mission.' },
     { title: 'Legacy & Mentorship', content: 'Guiding the next generation.' },
   ],
@@ -40,46 +42,53 @@ const BRIEFINGS = {
 
 export default function Briefing() {
   const [searchParams] = useSearchParams()
-  const cadetId = searchParams.get('cadet')
-  const [cadet, setCadet] = useState(null)
+  const childId = searchParams.get('child') || searchParams.get('cadet')
+  const [child, setChild] = useState(null)
+  const [rankData, setRankData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (cadetId) {
-      loadCadet()
+    if (childId) {
+      loadChild()
     }
-  }, [cadetId])
+  }, [childId])
 
-  const loadCadet = async () => {
+  const loadChild = async () => {
     const { data, error } = await supabase
-      .from('cadets')
+      .from('children')
       .select('*')
-      .eq('id', cadetId)
+      .eq('id', childId)
       .single()
 
     if (error) {
-      console.error('Failed to load cadet:', error)
+      console.error('Failed to load child:', error)
     } else {
-      setCadet(data)
+      setChild(data)
+      // Load rank data from child_ranks table
+      const rankRow = await fetchChildRank(childId)
+      const derived = deriveRank(rankRow?.totalXp || 0)
+      setRankData(derived)
     }
     setLoading(false)
   }
 
   if (loading) {
-    return <div className={styles.loading}>Loading...</div>
+    return <div className={styles.loading}>Loading…</div>
   }
 
-  if (!cadet) {
+  if (!child) {
     return <div className={styles.error}>Cadet not found</div>
   }
 
-  const briefings = BRIEFINGS[cadet.current_rank] || BRIEFINGS[1]
+  const level = rankData?.level || 1
+  const rankIndex = Math.min(level, RANKS.length - 1)
+  const briefings = BRIEFINGS[rankIndex + 1] || BRIEFINGS[1]
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <h1>Weekly Briefing</h1>
-        <p>Rank {cadet.current_rank}: {RANKS[cadet.current_rank - 1]} — Tactical Lessons</p>
+        <p>Level {level}: {RANKS[rankIndex]} — Tactical Lessons</p>
       </header>
 
       <div className={styles.briefingList}>

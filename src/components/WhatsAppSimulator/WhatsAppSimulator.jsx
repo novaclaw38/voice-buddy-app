@@ -15,9 +15,6 @@ export const WhatsAppSimulator = ({ cadetName = 'Leo', onDebriefSent }) => {
     if (!normalized.startsWith('1') && normalized.length === 10) {
       // Likely South African without country code
       normalized = '27' + normalized.substring(1);
-    } else if (normalized.length === 11 && normalized.startsWith('27')) {
-      // Already has country code but might have leading 0 duplicate
-      normalized = normalized;
     } else if (normalized.length > 13) {
       normalized = normalized.slice(0, 15);
     }
