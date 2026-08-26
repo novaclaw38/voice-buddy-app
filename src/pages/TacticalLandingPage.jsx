@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'motion/react'
 import TacticalOrb from '../components/TacticalOrb.jsx'
@@ -77,7 +77,6 @@ NEXT BRIEFING: Sunday 6:00 PM
 
 export default function TacticalLandingPage() {
   const [showDossier, setShowDossier] = useState(false)
-  const [liveCount, setLiveCount] = useState(5287)
   const heroRef = useRef(null)
   const reduce = useReducedMotion()
 
@@ -90,13 +89,6 @@ export default function TacticalLandingPage() {
   // When reduced motion is preferred, skip scroll-driven transforms entirely
   const heroStyle = reduce ? {} : { y: smoothHeroY, scale: heroScale }
   const contentStyle = reduce ? {} : { opacity: heroOpacity }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveCount((prev) => prev + Math.floor(Math.random() * 10))
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
 
   return (
     <>
@@ -177,7 +169,7 @@ export default function TacticalLandingPage() {
 
           <motion.div className={styles.heroTicker} style={contentStyle}>
             <div className={styles.tickerItem}><span className={styles.tickerDot} />LIVE_OPS: Commander Leo completed OBSTACLE_RECON_01</div>
-            <div className={styles.tickerCount}>SAMPLE TOTAL: {liveCount.toLocaleString()}</div>
+            <div className={styles.tickerCount}>SAMPLE TOTAL: {(5287).toLocaleString()}</div>
           </motion.div>
         </section>
 
