@@ -98,10 +98,10 @@ export default function BuddyOrb({
             interactive={interactive}
           />
         </Suspense>
-
-        {/* Scanline overlay (CSS, not 3D) for the HUD aesthetic */}
-        <ScanlineOverlay />
       </Canvas>
+
+      {/* Scanline overlay (CSS, not 3D) for the HUD aesthetic */}
+      <ScanlineOverlay />
     </div>
   )
 }
