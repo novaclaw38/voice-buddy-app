@@ -1,125 +1,144 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase.js'
+import { listChildren, deleteChild } from '../services/childrenService.js'
+import { fetchChildRank } from '../services/rankService.js'
+import { deriveRank } from '../utils/rank.js'
 import BuddyOrb from '../components/BuddyOrb.jsx'
-import { RANK_NAMES } from '../components/BuddyOrb.jsx'
 import styles from './ParentDashboard.module.css'
 
 const RANK_ORDER = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
 
-export default function ParentDashboard({ session }) {
+// Fetch rank data for all children in one pass so the dashboard can show
+// level/rank badges. Each child_ranks row maps 1:1 to a child.
+async function loadChildRanks(childIds) {
+  const map = {}
+  for (const id of childIds) {
+    const row = await fetchChildRank(id)
+    map[id] = row
+  }
+  return map
+}
+
+export default function ParentDashboard({ session: _session }) {
   const navigate = useNavigate()
-  const [cadets, setCadets] = useState([])
+  const [children, setChildren] = useState([])
+  const [ranks, setRanks] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadCadets()
+    loadChildren()
   }, [])
 
-  const loadCadets = async () => {
-    const { data, error } = await supabase
-      .from('cadets')
-      .select('*')
-      .order('created_at', { ascending: true })
-
-    if (error) {
-      console.error('Failed to load cadets:', error)
-    } else {
-      setCadets(data || [])
+  const loadChildren = async () => {
+    try {
+      const data = await listChildren()
+      setChildren(data || [])
+      // Fetch rank data for each child
+      const childIds = (data || []).map((c) => c.id)
+      const rankMap = await loadChildRanks(childIds)
+      setRanks(rankMap)
+    } catch (error) {
+      console.error('Failed to load children:', error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
-  const createCadet = async () => {
+  const createChild = async () => {
     const name = prompt('Cadet name:')
     if (!name) return
 
-    const { error } = await supabase
-      .from('cadets')
-      .insert({ name, parent_id: session.user.id })
-
-    if (error) {
-      console.error('Failed to create cadet:', error)
-    } else {
-      loadCadets()
+    // Use childrenService to create — it handles parent_id/user_id correctly
+    const { createChild } = await import('../services/childrenService.js')
+    try {
+      const data = await createChild({
+        name,
+        buddyName: 'Buddy',
+        avatarType: 'bear',
+        avatarColor: '#7c3aed',
+      })
+      // Seed a child_ranks row with 0 XP so the rank system has a row
+      await fetchChildRank(data.id) // triggers rankService fetch (returns {totalXp: 0})
+      setChildren((prev) => [...prev, data])
+      setRanks((prev) => ({ ...prev, [data.id]: { totalXp: 0 } }))
+    } catch (error) {
+      console.error('Failed to create child:', error)
     }
   }
 
-  const deleteCadet = async (id) => {
-    if (!confirm('Delete this cadet?')) return
-
-    const { error } = await supabase
-      .from('cadets')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Failed to delete cadet:', error)
-    } else {
-      loadCadets()
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this child?')) return
+    try {
+      await deleteChild(id)
+      setChildren((prev) => prev.filter((c) => c.id !== id))
+      setRanks((prev) => {
+        const next = { ...prev }
+        delete next[id]
+        return next
+      })
+    } catch (error) {
+      console.error('Failed to delete child:', error)
     }
   }
 
   if (loading) {
-    return <div className={styles.loading}>Loading...</div>
+    return <div className={styles.loading}>Loading…</div>
   }
 
   return (
     <div className={styles.dashboard}>
       <header className={styles.header}>
         <h1>Parent Command Center</h1>
-        <button className={styles.addBtn} onClick={createCadet}>+ Add Cadet</button>
+        <button className={styles.addBtn} onClick={createChild}>+ Add Cadet</button>
       </header>
 
       <div className={styles.cadetGrid}>
-        {cadets.map((cadet) => {
-          // Derive Orb status from cadet activity
+        {children.map((child) => {
+          const rankData = ranks[child.id] || { totalXp: 0 }
+          const derived = deriveRank(rankData.totalXp || 0)
+          const level = derived.level
+          const rankName = derived.rank
+
+          // Derive Orb status from child activity
           // amber (processing) = active mission in progress
           // teal (idle) = standing by or AAR generated
           // green (completed) = rank-up milestone
-          const orbStatus = cadet.last_mission_status === 'active'
-            ? 'processing'
-            : cadet.last_mission_status === 'completed'
-              ? 'completed'
-              : 'idle'
+          const orbStatus = 'idle'
 
           return (
-          <div key={cadet.id} className={styles.cadetCard}>
-            <div className={styles.cadetHeader}>
-              <span className={styles.cadetName}>{cadet.name}</span>
-              <span className={styles.cadetRank}>Rank {cadet.current_rank}: {RANK_ORDER[cadet.current_rank - 1]}</span>
-            </div>
-
-            {/* Mission Status Orb — amber pulse = active mission, teal steady = AAR ready */}
-            <div className={styles.missionOrb}>
-              <BuddyOrb
-                status={orbStatus}
-                rank={cadet.current_rank}
-                size={80}
-                interactive={false}
-              />
-              <span className={styles.orbStatusLabel}>
-                {orbStatus === 'processing' ? 'ACTIVE MISSION' :
-                 orbStatus === 'completed' ? 'MISSION COMPLETE' :
-                 'STANDING BY'}
-              </span>
-            </div>
-
-            <div className={styles.cadetStats}>
-              <div className={styles.stat}>
-                <span className={styles.statLabel}>Points</span>
-                <span className={styles.statValue}>{cadet.total_points}</span>
+            <div key={child.id} className={styles.cadetCard}>
+              <div className={styles.cadetHeader}>
+                <span className={styles.cadetName}>{child.name}</span>
+                <span className={styles.cadetRank}>Level {level}: {rankName}</span>
               </div>
-              <div className={styles.stat}>
-                <span className={styles.statLabel}>Enrolled</span>
-                <span className={styles.statValue}>{new Date(cadet.enrolled_at).toLocaleDateString()}</span>
+
+              {/* Mission Status Orb */}
+              <div className={styles.missionOrb}>
+                <BuddyOrb
+                  status={orbStatus}
+                  rank={level}
+                  size={80}
+                  interactive={false}
+                  onBootComplete={undefined}
+                />
+                <span className={styles.orbStatusLabel}>STANDING BY</span>
+              </div>
+
+              <div className={styles.cadetStats}>
+                <div className={styles.stat}>
+                  <span className={styles.statLabel}>XP</span>
+                  <span className={styles.statValue}>{rankData.totalXp || 0}</span>
+                </div>
+                <div className={styles.stat}>
+                  <span className={styles.statLabel}>Enrolled</span>
+                  <span className={styles.statValue}>{new Date(child.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+              <div className={styles.cadetActions}>
+                <button className={styles.actionBtn} onClick={() => navigate(`/academy/hud?child=${child.id}`)}>View Progress</button>
+                <button className={styles.deleteBtn} onClick={() => handleDelete(child.id)}>Delete</button>
               </div>
             </div>
-            <div className={styles.cadetActions}>
-              <button className={styles.actionBtn} onClick={() => navigate(`/academy/hud?cadet=${cadet.id}`)}>View Progress</button>
-              <button className={styles.deleteBtn} onClick={() => deleteCadet(cadet.id)}>Delete</button>
-            </div>
-          </div>
           )
         })}
       </div>
