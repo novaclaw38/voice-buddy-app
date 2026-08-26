@@ -66,7 +66,11 @@ export default function NormalScreen({
           <div className={styles.topBar}>
             <div className={styles.topBarLeft}>
               {chatMode !== 'chat' && (
-                <button className={styles.modeLabel} onClick={onExitMode}>
+                <button
+                  className={styles.modeLabel}
+                  onClick={onExitMode}
+                  aria-label={`Leave ${chatMode} mode`}
+                >
                   {chatMode} mode ✕
                 </button>
               )}
@@ -82,7 +86,7 @@ export default function NormalScreen({
                   <IconMail size={20} />
                 </button>
               )}
-              {cameraOn && <span className={styles.cameraIndicator}><IconCamera size={18} /></span>}
+              {cameraOn && <span className={styles.cameraIndicator} aria-label="Camera on"><IconCamera size={18} /></span>}
             </div>
           </div>
 

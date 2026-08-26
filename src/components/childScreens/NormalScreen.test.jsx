@@ -1,6 +1,32 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+
+// NormalScreen imports TacticalOrb, which uses @react-three/fiber (Canvas/useFrame)
+// and @react-three/drei (OrbitControls). In jsdom there is no WebGL context, so
+// R3F's createReconciler crashes on import. The tests only assert on the 2D DOM
+// output (speech bubble, dock buttons, camera indicator, story overlay) — the 3D
+// orb itself is not part of these test cases, so mock it as an inert placeholder.
+vi.mock('@react-three/fiber', () => ({
+  Canvas: ({ children }) => <div data-testid="r3f-canvas">{children}</div>,
+  useFrame: () => {},
+}))
+vi.mock('@react-three/drei', () => ({
+  OrbitControls: () => null,
+  Sphere: () => null,
+  Torus: () => null,
+}))
+// TacticalOrb's useEffect calls canvas.getContext('webgl2'), which jsdom
+// doesn't implement. Stub TacticalOrb to a data-attribute placeholder.
+vi.mock('../TacticalOrb.jsx', () => ({
+  default: () => <div data-testid="tactical-orb" />,
+}))
+// NormalScreen calls sfx.click() / sfx.nav() on button presses; the SoundFX
+// class uses the Web Audio API (AudioContext), which jsdom doesn't implement.
+vi.mock('../sound-fx.js', () => ({
+  sfx: { click: vi.fn(), nav: vi.fn(), alert: vi.fn(), hiss: vi.fn(), success: vi.fn() },
+}))
+
 import NormalScreen from './NormalScreen.jsx'
 
 const baseSpeech = {

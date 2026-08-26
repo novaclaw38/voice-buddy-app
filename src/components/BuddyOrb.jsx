@@ -80,7 +80,6 @@ export default function BuddyOrb({
         gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
         onPointerMissed={() => {}}
       >
-        <color attach="background" args={['transparent']} />
         <ambientLight intensity={0.4} />
         <pointLight intensity={1.5} position={[0, 0, 5]} color={statusColor} />
 
