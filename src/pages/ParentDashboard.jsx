@@ -6,8 +6,6 @@ import { deriveRank } from '../utils/rank.js'
 import BuddyOrb from '../components/BuddyOrb.jsx'
 import styles from './ParentDashboard.module.css'
 
-const RANK_ORDER = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
-
 // Fetch rank data for all children in one pass so the dashboard can show
 // level/rank badges. Each child_ranks row maps 1:1 to a child.
 async function loadChildRanks(childIds) {
