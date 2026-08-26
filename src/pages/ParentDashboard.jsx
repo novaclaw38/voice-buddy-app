@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { listChildren, deleteChild } from '../services/childrenService.js'
 import { fetchChildRank } from '../services/rankService.js'
 import { deriveRank } from '../utils/rank.js'
-import BuddyOrb from '../components/BuddyOrb.jsx'
+import TacticalOrb from '../components/TacticalOrb.jsx'
 import styles from './ParentDashboard.module.css'
 
 // Fetch rank data for all children in one pass so the dashboard can show
@@ -112,12 +112,11 @@ export default function ParentDashboard({ session: _session }) {
 
               {/* Mission Status Orb */}
               <div className={styles.missionOrb}>
-                <BuddyOrb
+                <TacticalOrb
                   status={orbStatus}
-                  rank={level}
-                  size={80}
+                  totalXp={rankData.totalXp || 0}
                   interactive={false}
-                  onBootComplete={undefined}
+                  style={{ width: 80, height: 80 }}
                 />
                 <span className={styles.orbStatusLabel}>STANDING BY</span>
               </div>

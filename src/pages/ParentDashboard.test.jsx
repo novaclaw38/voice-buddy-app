@@ -26,11 +26,10 @@ vi.mock('../utils/rank.js', () => ({
     return { level, rank: level <= 5 ? 'Recruit' : level <= 12 ? 'Specialist' : 'Commander', xpIntoLevel: (xp || 0) % 100, xpToNextLevel: 100 - ((xp || 0) % 100) }
   },
 }))
-vi.mock('../components/BuddyOrb.jsx', () => ({
-  default: ({ status, rank, size }) => (
-    <div data-testid="buddy-orb" data-status={status} data-rank={rank} data-size={size}>orb</div>
+vi.mock('../components/TacticalOrb.jsx', () => ({
+  default: ({ status, totalXp, style }) => (
+    <div data-testid="tactical-orb" data-status={status} data-total-xp={totalXp} style={style}>orb</div>
   ),
-  RANK_TIERS: { Recruit: { tier: 1 }, Specialist: { tier: 2 } },
 }))
 
 import ParentDashboard from './ParentDashboard.jsx'
@@ -65,17 +64,17 @@ describe('ParentDashboard', () => {
     expect(await screen.findAllByText('Level 3: Recruit')).toHaveLength(2)
   })
 
-  it('renders BuddyOrb with the correct rank and size', async () => {
+  it('renders TacticalOrb with the correct totalXp and size', async () => {
     render(
       <MemoryRouter>
         <ParentDashboard session={{ access_token: 't', user: { id: 'u1' } }} />
       </MemoryRouter>
     )
     await screen.findByText('Ada')
-    const orbs = screen.getAllByTestId('buddy-orb')
+    const orbs = screen.getAllByTestId('tactical-orb')
     expect(orbs.length).toBeGreaterThanOrEqual(1)
-    expect(orbs[0]).toHaveAttribute('data-rank', '3')
-    expect(orbs[0]).toHaveAttribute('data-size', '80')
+    expect(orbs[0]).toHaveAttribute('data-total-xp', '250')
+    expect(orbs[0]).toHaveStyle({ width: '80px', height: '80px' })
   })
 
   it('renders a Delete button for each child', async () => {
