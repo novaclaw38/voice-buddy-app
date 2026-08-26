@@ -1,15 +1,14 @@
 /**
  * Academy Rank Progression Model
  *
- * Maps a cadet's total XP → rank tier + the set of "Visual Modules" the
- * Tactical Orb should display. Each module unlocks progressively as the
- * cadet climbs from Recruit to Grand Master Specialist.
- *
- * The tier boundaries mirror deriveRank() in rank.js (level = floor(xp/100)+1;
- * Recruit 1–5, Specialist 6–12, Commander 13+), but this module adds the
+ * Maps a cadet's total XP to a rank tier + the set of "Visual Modules" the
+ * Tactical Orb should display. Level/tier come from deriveRank() in rank.js
+ * (the single source of truth for rank boundaries); this module adds the
  * 6-month Wing lattice and the Orb-specific visual unlocks that deriveRank()
  * deliberately keeps free of presentation concerns.
  */
+
+import { deriveRank } from './rank.js'
 
 // ── The 5 Academy Wings ──────────────────────────────────────────────────
 export const ACADEMY_WINGS = [
@@ -129,14 +128,8 @@ export const ORB_MODULES = {
  * @param {string|null} currentWing — optional active wing id to colorize the orb
  */
 export function getAcademyRank(totalXp, currentWing = null) {
-  const xp = Number(totalXp) || 0
-  const level = Math.floor(xp / 100) + 1
-
-  let tier
-  if (level <= 5) tier = RANK_TIERS.Recruit
-  else if (level <= 12) tier = RANK_TIERS.Specialist
-  else tier = RANK_TIERS.Commander
-
+  const { level, rank: tierLabel } = deriveRank(totalXp)
+  const tier = RANK_TIERS[tierLabel]
   const modules = tier.modules.map((m) => ORB_MODULES[m])
 
   // If a wing is active, override the core color to that wing's color
