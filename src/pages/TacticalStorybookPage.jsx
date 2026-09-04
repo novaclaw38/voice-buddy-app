@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { fetchTacticalStorybook } from '../services/storybookService.js'
 import SkipLink from '../components/SkipLink.jsx'
-import TacticalOrb from '../components/TacticalOrb/TacticalOrb.jsx'
+import TacticalOrb from '../components/TacticalOrb.jsx'
 import styles from './TacticalStorybookPage.module.css'
 
 // Tactical AAR headers per wing (Doc 3 + Master Blueprint §C)
@@ -30,10 +30,6 @@ function inferWing(lessons) {
     return 'botany-ops'
   return 'general'
 }
-
-// Rank progression mapping (used for display in tactical context)
-const RANK_ORDER = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
-void RANK_ORDER // Available for rank display extensions
 
 // Public page (no auth guard) — a parent opens this straight from the
 // WhatsApp weekly-digest link, often signed out on a different device.

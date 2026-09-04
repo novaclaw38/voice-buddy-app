@@ -206,15 +206,6 @@ export const TOOL_VAULT = {
   },
 }
 
-// ── Ceremony of Ascension (Doc 3 §3) ──────────────────────────────────────
-// Fires when all 4 Month 1 missions are completed
-export const ASCENSION_SEQUENCE = {
-  1: 'MISSION SUCCESS',
-  2: 'AUTHORIZATION_LEVEL_INCREASED',
-  3: 'A 3D "Metal Case" drops onto the screen, opens with a hydraulic hiss, and the new Tool floats out.',
-  4: 'UTILITY_BELT_UPDATED. WELL DONE, COMMANDER.',
-}
-
 /**
  * Get tactical wing metadata for a course ID.
  * Falls back to a general training wing if no match.
