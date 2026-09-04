@@ -80,7 +80,7 @@ export default function CadetHud({ session: _session }) {
         {/* Orb as the command core — rank-driven visual modules */}
         <div className={styles.orbPod}>
           <div className={styles.tacticalOrbWrapper}>
-            <TacticalOrb status="idle" totalXp={rankInfo.totalXp} style={{ width: 120, height: 120 }} />
+            <TacticalOrb status="idle" totalXp={rankInfo.totalXp} rank={rankInfo.level} style={{ width: 120, height: 120 }} />
           </div>
           <span className={styles.rankLabel}>
             {rankInfo.rank}

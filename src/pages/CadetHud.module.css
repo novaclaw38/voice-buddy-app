@@ -53,7 +53,7 @@
   letter-spacing: 0.15em;
 }
 
-/* Tactical orb wrapper next to the BuddyOrb */
+/* Tactical orb wrapper */
 .tacticalOrbWrapper {
   display: flex;
   flex-direction: column;

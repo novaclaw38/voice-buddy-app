@@ -5,8 +5,6 @@ import { fetchChildRank } from '../services/rankService.js'
 import { deriveRank } from '../utils/rank.js'
 import styles from './Briefing.module.css'
 
-const RANKS = ['Recruit', 'Specialist', 'Corporal', 'Sergeant', 'Lieutenant', 'Commander']
-
 const BRIEFINGS = {
   1: [
     { title: 'Mission Safety Protocols', content: 'Learn the basics of staying safe during missions.' },
@@ -81,14 +79,14 @@ export default function Briefing() {
   }
 
   const level = rankData?.level || 1
-  const rankIndex = Math.min(level, RANKS.length - 1)
-  const briefings = BRIEFINGS[rankIndex + 1] || BRIEFINGS[1]
+  const briefingTier = Math.min(level, 6)
+  const briefings = BRIEFINGS[briefingTier] || BRIEFINGS[1]
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <h1>Weekly Briefing</h1>
-        <p>Level {level}: {RANKS[rankIndex]} — Tactical Lessons</p>
+        <p>Level {level}: {rankData?.rank || 'Recruit'} — Tactical Lessons</p>
       </header>
 
       <div className={styles.briefingList}>
