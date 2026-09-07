@@ -173,6 +173,24 @@ The Promotion Center (`/parent/promotion`) is a deliberate visual sub-brand, not
 
 These custom properties are declared locally on `PromotionCenterPage.module.css`'s `.page` class (`--pc-purple`, `--pc-gold`, `--pc-green`) — not added to `:root` in `src/index.css` — so they cascade to child components within this page's DOM subtree without becoming globally available tokens.
 
+## Tactical Landing Page (sanctioned exception)
+
+The marketing landing page (`/`, `TacticalLandingPage.jsx`) is a second deliberate sub-brand, extended 2026-09-04 alongside the Promotion Center exception above — it is the top-of-funnel counterpart to the same Tactical Specialist persona: a "Command Black + Tactical Teal" HUD aesthetic aimed at a parent evaluating the product before ever meeting Buddy or the child-facing app.
+
+**Scope:** `src/pages/TacticalLandingPage.jsx` and `TacticalLandingPage.module.css` only. Nothing outside this route uses these tokens.
+
+**Palette:**
+- Command Black `#0A0A0B` / `#141416` — page background and section fills
+- Tactical Teal `#00F5FF` — primary accent (CTAs, links, active/highlighted states, glow)
+- Alert Orange `#FF8A00` — "the old way" contrast accents only; not used for CTAs
+- Tactical text `#E0E0E0` on dark, with a dimmed variant at `rgba(224,224,224,0.6)`
+
+**Typography:** **JetBrains Mono** throughout — nav, hero, body copy, and section headers — as the page's one consistent voice; not paired with Fredoka/Nunito. Loaded via the same Google Fonts mechanism as the Promotion Center's Roboto Mono.
+
+**Shape:** Sharp, technical radii (4–12px) are intentional here, not drift — a deliberate departure from the base system's fat radii to read as a command terminal rather than a toy. Do not "fix" these back to the base radius scale.
+
+These custom properties are declared locally on `TacticalLandingPage.module.css`'s `.page` class — not added to `:root` — so they stay scoped to this route only.
+
 ## Shapes
 
 Radii are fat and consistent: 16px (small elements — pills' inner controls, tags), 24px (default cards, inputs, buttons), 34px (large modals/panels), and 999px (true pills — avatars, badges, toggle tracks). Nothing in the system uses a sharp corner (0–8px) except where a circle (50%) is the correct shape (avatars, icon buttons). Borders are rare and, when present, a faint tinted violet (`rgba(124, 58, 237, 0.12)`) rather than a solid neutral gray line.

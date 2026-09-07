@@ -254,6 +254,276 @@
         "value": "#4a3670",
         "createdAt": "2026-08-23T19:41:22.656Z",
         "reason": "reused verbatim from the existing GoalReachedScreen.module.css dark celebratory gradient, not new drift"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "jetbrains mono",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:02.741Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.7rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:02.832Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.8rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:02.917Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.024Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.05rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.118Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.125rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.210Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.1rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.308Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.25rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.397Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.2rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.489Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.5rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.578Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.670Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "2.5rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.763Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "2rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.870Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "3rem",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:03.962Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "12px",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.068Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "32px",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.154Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.252Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "6px",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.338Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "8px",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.426Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#141416",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.518Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 0, 0, 0.85)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.606Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.1)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.690Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.15)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.781Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.2)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.884Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.3)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:04.990Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.4)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:05.100Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(10, 10, 11, 0.9)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:05.187Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 138, 0, 0.3)",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-04T18:43:05.278Z",
+        "reason": "sanctioned Tactical Landing Page exception, DESIGN.md 2026-09-04"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "2px",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-07T07:22:08.499Z",
+        "reason": "focus-ring outline radius on the sanctioned Tactical Landing Page exception (DESIGN.md: 4-12px sharp radii intentional here); not a card/button shape, just outline corner softening"
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "src/pages/TacticalLandingPage.module.css"
+        ],
+        "createdAt": "2026-09-07T07:27:33.847Z",
+        "reason": "pre-existing hero grid on the sanctioned Command Black + Tactical Teal HUD/command-terminal route (DESIGN.md); the grid is the intentional 'tactical data field' blueprint texture the aesthetic calls for, not a generic dashboard background — was already noted in the 2026-09-04 critique's deterministic scan without being raised as an issue to fix"
       }
     ]
   }
