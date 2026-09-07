@@ -25,7 +25,7 @@ const PRICING_COMPARISON = [
   { label: 'YOUTUBE / GAMES', price: 'R0 / R150+', desc: 'Mindless loops. Passive learning. Zero reporting.', dim: true },
 ]
 
-const STORYBOOK_PREVIEW = `SUBJECT: Bio-Analyst [Name] // Intelligence Report #1
+const STORYBOOK_PREVIEW = `SUBJECT: Bio-Analyst Mia R. // Intelligence Report #1
 
 The Narrative: "This week, the Analyst
 successfully decrypted nature's "Ghost Protocol."
@@ -172,7 +172,10 @@ export default function TacticalLandingPage() {
           </motion.div>
 
           <motion.div className={styles.heroTicker} style={contentStyle}>
-            <div className={styles.tickerItem}><span className={styles.tickerDot} />SAMPLE MISSION LOG (illustrative): "Specialist Mia R." completed OBSTACLE_RECON_01</div>
+            <div className={styles.tickerItem}>
+              <span className={styles.tickerDot} />
+              <span className={styles.tickerText}>SAMPLE MISSION LOG (illustrative): "Specialist Mia R." completed OBSTACLE_RECON_01</span>
+            </div>
             <div className={styles.tickerCount}>5 WINGS · 6-MONTH ACADEMY PATH</div>
           </motion.div>
         </section>

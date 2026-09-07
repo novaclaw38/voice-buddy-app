@@ -275,8 +275,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  white-space: nowrap;
+  min-width: 0;
   overflow: hidden;
+}
+
+.tickerText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 

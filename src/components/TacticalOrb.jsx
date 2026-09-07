@@ -35,7 +35,7 @@ function ScanlineRing({ radius = 1, color = [0, 245, 255], active = 1, speed = 1
   useFrame(({ clock }) => {
     if (ref.current) {
       ref.current.rotation.x = Math.PI / 2
-      ref.current.material.uniforms.uTime.value = clock.elapsedTime * speed
+      ref.current.rotation.z = clock.elapsedTime * speed
     }
   })
 

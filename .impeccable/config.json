@@ -524,6 +524,15 @@
         ],
         "createdAt": "2026-09-07T07:27:33.847Z",
         "reason": "pre-existing hero grid on the sanctioned Command Black + Tactical Teal HUD/command-terminal route (DESIGN.md); the grid is the intentional 'tactical data field' blueprint texture the aesthetic calls for, not a generic dashboard background — was already noted in the 2026-09-04 critique's deterministic scan without being raised as an issue to fix"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "bounce",
+        "files": [
+          "src/components/TacticalOrb.module.css"
+        ],
+        "createdAt": "2026-09-07T09:57:58.344Z",
+        "reason": "processing-state bounce on the orb (live via styles[status], not dead code) matches DESIGN.md's documented companion-character animation language (bounce-in/jelly keyframes are sanctioned expressive states for this mascot-like component, not a UI-transition easing choice); pre-existing, not touched this session"
       }
     ]
   }
