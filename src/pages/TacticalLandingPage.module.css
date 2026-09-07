@@ -453,23 +453,23 @@
 
 .missionTitle {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--tactical-text);
+  color: var(--tactical-teal);
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.2);
   margin-bottom: 0.25rem;
 }
 
 .missionTagline {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--tactical-teal);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--tactical-text-dim);
   margin-bottom: 0.5rem;
-  text-shadow: 0 0 8px rgba(0, 245, 255, 0.2);
 }
 
 .missionDesc {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--tactical-text-dim);
   line-height: 1.5;
   margin-bottom: 1rem;
@@ -484,7 +484,7 @@
   font-weight: 600;
   color: var(--tactical-teal);
   border: 1px solid var(--tactical-border);
-  padding: 0.6rem 1.25rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 4px;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -520,10 +520,11 @@
 }
 
 .intelBody {
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--tactical-text-dim);
   line-height: 1.7;
-  margin-bottom: 2rem;
+  max-width: 60ch;
+  margin: 0 auto 2rem;
 }
 
 .intelTagline {
@@ -544,7 +545,7 @@
   background: #141416;
   border: 1px solid var(--tactical-border);
   border-radius: 32px;
-  padding: 12px;
+  padding: 0.75rem;
   box-shadow: 0 0 40px rgba(0, 245, 255, 0.15);
   position: relative;
   overflow: hidden;
@@ -562,7 +563,7 @@
 }
 
 .phoneText {
-  padding: 16px;
+  padding: 1rem;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
   color: var(--tactical-text-dim);
@@ -704,7 +705,7 @@
 
 .comparisonCta {
   display: inline-block;
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   background: var(--tactical-teal);
   color: var(--command-black);
   font-weight: 700;
@@ -839,7 +840,7 @@
   font-size: 1.25rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  padding: 1.25rem 3rem;
+  padding: 1.5rem 3rem;
   border-radius: 6px;
   text-decoration: none;
   box-shadow: var(--glow-orange);
@@ -897,7 +898,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem 1.25rem;
+  gap: 0.5rem 1.5rem;
 }
 
 .footerLink {
@@ -978,7 +979,7 @@
   font-weight: 700;
   color: var(--command-black);
   background: var(--tactical-teal);
-  padding: 0.8rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 4px;
   text-decoration: none;
   box-shadow: var(--glow-teal);
