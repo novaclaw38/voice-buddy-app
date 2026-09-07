@@ -24,6 +24,7 @@ import { fetchLatestUndelivered, markStoryDelivered } from '../services/storyReq
 import { startAsChild } from '../services/cameraSignal.js'
 import { getDailyActivity, isDailyActivityDismissed, dismissDailyActivity } from '../utils/dailyActivities.js'
 import { getModeVoice } from '../utils/modeVoice.js'
+import { isValidVoiceKey, DEFAULT_VOICE } from '../utils/voiceOptions.js'
 import { pickRandomDistinct } from '../utils/prompts.js'
 import { BAND_BY_AGE } from '../utils/subjects.js'
 import styles from './ChildPage.module.css'
@@ -501,7 +502,15 @@ export default function ChildPage({ session }) {
     if (liveKitVoice.enabled) {
       const roomName = `buddy-voice-${encodeURIComponent(settings.childId || 'child')}`
       liveKitVoice
-        .speak({ text: transcript, roomName, participantName: settings.buddyName, childName, buddyName, childAge: settings.childAge })
+        .speak({
+          text: transcript,
+          roomName,
+          participantName: settings.buddyName,
+          childName,
+          buddyName,
+          childAge: settings.childAge,
+          voice: isValidVoiceKey(settings.voiceName) ? settings.voiceName : DEFAULT_VOICE,
+        })
         .then((result) => {
           if (!result?.ok) return
           setBuddyText(result?.text || '')

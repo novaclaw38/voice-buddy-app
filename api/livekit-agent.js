@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Sign in to use LiveKit avatar voice.' })
   }
 
-  const { roomName, participantName, childName, buddyName, childAge } = req.body || {}
+  const { roomName, participantName, childName, buddyName, childAge, voice } = req.body || {}
 
   if (!roomName || typeof roomName !== 'string') {
     return res.status(400).json({ error: 'roomName is required' })
@@ -28,6 +28,7 @@ export default async function handler(req, res) {
       childName: typeof childName === 'string' ? childName.slice(0, 100) : undefined,
       buddyName: typeof buddyName === 'string' ? buddyName.slice(0, 100) : undefined,
       childAge: typeof childAge === 'number' ? childAge : undefined,
+      voice: typeof voice === 'string' ? voice.slice(0, 50) : undefined,
     })
 
     let roomExisted = true

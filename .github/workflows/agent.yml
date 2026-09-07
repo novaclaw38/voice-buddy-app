@@ -1,0 +1,96 @@
+name: Agent
+
+# Moved from agent/.github/workflows/ — GitHub Actions only reads workflow
+# files from .github/workflows/ at the repo root, so the workflows that used
+# to live under agent/ never actually ran. Path-filtered so unrelated root
+# changes don't trigger it.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'agent/**'
+      - 'src/utils/prompts.js'
+      - 'src/utils/ageBand.js'
+      - 'src/utils/voiceOptions.js'
+      - 'scripts/sync-agent-persona.mjs'
+      - '.github/workflows/agent.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'agent/**'
+      - 'src/utils/prompts.js'
+      - 'src/utils/ageBand.js'
+      - 'src/utils/voiceOptions.js'
+      - 'scripts/sync-agent-persona.mjs'
+      - '.github/workflows/agent.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Catches exactly the drift that let agent.ts's persona and googleTts.ts's
+  # voice map go stale before scripts/sync-agent-persona.mjs existed: if the
+  # committed agent/src/generated/ files don't match what the source
+  # produces right now, someone edited the source and forgot to re-sync.
+  sync-check:
+    name: Persona/voice sync is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/sync-agent-persona.mjs
+      - run: git diff --exit-code agent/src/generated
+        # If this fails: run `npm run sync:agent-persona` locally and commit
+        # the result.
+
+  test:
+    name: Test (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent
+
+    strategy:
+      matrix:
+        node-version: [24]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: pnpm install
+      - run: pnpm run test
+        env:
+          LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+          LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+          LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+
+  format:
+    name: Formatting & Linting
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: pnpm install
+      - run: pnpm run typecheck
+      - run: pnpm run lint
+      # format:check is omitted — agent/package.json's script depends on
+      # `prettier`, which isn't listed as a dependency (only the sort-imports
+      # plugin is), so it fails today regardless of this change. Pre-existing,
+      # not introduced by the persona/voice sync work.

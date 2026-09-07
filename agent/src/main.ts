@@ -18,6 +18,7 @@ function parseChildInfo(metadata: string | undefined): ChildInfo {
       childName: typeof parsed.childName === 'string' ? parsed.childName : undefined,
       buddyName: typeof parsed.buddyName === 'string' ? parsed.buddyName : undefined,
       childAge: typeof parsed.childAge === 'number' ? parsed.childAge : undefined,
+      voice: typeof parsed.voice === 'string' ? parsed.voice : undefined,
     };
   } catch {
     return {};
@@ -48,8 +49,10 @@ export default defineAgent({
       stt: new GoogleSTT(),
 
       // Voice: Google Cloud Text-to-Speech, same named voices as the main
-      // app's api/tts.js so Buddy sounds the same everywhere.
-      tts: new GoogleTTS({ voice: 'sunny' }),
+      // app's api/tts.js so Buddy sounds the same everywhere. Uses the
+      // parent's actual Settings choice (room metadata's `voice`, set by
+      // api/livekit-agent.js) instead of always defaulting to 'sunny'.
+      tts: new GoogleTTS({ voice: childInfo.voice ?? 'sunny' }),
 
       turnHandling: {
         turnDetection: new inference.TurnDetector(),

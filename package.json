@@ -12,7 +12,8 @@
     "lint": "eslint src/ api/ --ext .js,.jsx",
     "type-check": "tsc --noEmit",
     "scan:a11y": "pa11y-ci -c .pa11yci.json",
-    "icons": "node scripts/generate-icons.mjs"
+    "icons": "node scripts/generate-icons.mjs",
+    "sync:agent-persona": "node scripts/sync-agent-persona.mjs"
   },
   "dependencies": {
     "@react-three/drei": "9.122.0",

@@ -1,5 +1,7 @@
 // Groups COURSES into subject sections for CoursesPage. See
 // docs/superpowers/specs/2026-07-30-learn-section-redesign-design.md §5.
+import { BAND_BY_AGE } from './ageBand.js'
+
 export const SUBJECTS = [
   { id: 'literacy', title: 'Literacy', emoji: '📖' },
   { id: 'numeracy', title: 'Numeracy', emoji: '🔢' },
@@ -10,8 +12,6 @@ export const SUBJECTS = [
   { id: 'life-skills', title: 'Life Skills', emoji: '🍳' },
   { id: 'community', title: 'Community Helpers', emoji: '🤝' },
 ]
-
-const BAND_BY_AGE = (age) => (age <= 5 ? 'young' : age <= 8 ? 'middle' : 'old')
 
 // Literacy, numeracy and feelings are the explicitly age-banded subjects, so
 // they lead. This ordering is deliberately age-independent — bands live on

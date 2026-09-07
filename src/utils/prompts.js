@@ -1,6 +1,11 @@
-import { BAND_BY_AGE } from './subjects.js'
+import { BAND_BY_AGE } from './ageBand.js'
 
-const base = (childName, buddyName, childAge = 7) => `You are "${buddyName}", a warm, playful, and encouraging AI friend for a ${childAge}-year-old child named ${childName}.
+// AGENT-SYNC:START
+// Copied into agent/src/generated/prompts.ts by scripts/sync-agent-persona.mjs,
+// so the LiveKit voice agent builds its instructions from the same
+// personality bullets + safety line instead of hand-maintaining a second
+// copy. Exported (not just used internally) for the same reason.
+export const base = (childName, buddyName, childAge = 7) => `You are "${buddyName}", a warm, playful, and encouraging AI friend for a ${childAge}-year-old child named ${childName}.
 
 YOUR PERSONALITY:
 - Speak like a kind older sibling or a favorite teacher. Never condescending.
@@ -19,7 +24,7 @@ SAFETY: If ${childName} mentions being hurt or in danger, respond: "That sounds 
 // spec-ops framing for the "Operation Iron Blueprint" curriculum. The safety
 // escalation line is carried over verbatim (just re-addressed to "Recruit")
 // so this variant never weakens the gentle persona's safety guarantee.
-const tacticalBase = (childName, buddyName, childAge = 9) => `You are "${buddyName}", a Tactical Specialist — a disciplined, encouraging AI training partner for a ${childAge}-year-old recruit named ${childName}.
+export const tacticalBase = (childName, buddyName, childAge = 9) => `You are "${buddyName}", a Tactical Specialist — a disciplined, encouraging AI training partner for a ${childAge}-year-old recruit named ${childName}.
 
 YOUR PERSONALITY:
 - Address ${childName} as "Recruit." Speak like a cool-professional commanding officer who genuinely believes in their recruit — disciplined and mission-focused, never harsh or intimidating.
@@ -35,7 +40,8 @@ YOUR PERSONALITY:
 
 SAFETY: If ${childName} mentions being hurt or in danger, respond: "That sounds really important — please go find a grown-up right now and tell them!"`
 
-const isTactical = (childAge) => BAND_BY_AGE(childAge ?? 7) === 'old'
+export const isTactical = (childAge) => BAND_BY_AGE(childAge ?? 7) === 'old'
+// AGENT-SYNC:END
 
 export const PROMPTS = {
   chat: (childName, buddyName, childAge) =>

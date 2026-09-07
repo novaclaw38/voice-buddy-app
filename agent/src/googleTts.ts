@@ -1,18 +1,11 @@
 import { AudioByteStream, shortuuid, tts } from '@livekit/agents';
 import type { APIConnectOptions } from '@livekit/agents';
+import { VOICES as GENERATED_VOICES } from './generated/voiceOptions.ts';
 
-// Mirrors the voice map in the main app's api/tts.js so parents pick from the
-// same named voices whether Buddy talks in-browser or over LiveKit.
-export const VOICES = {
-  sunny: 'en-US-Neural2-F',
-  giggles: 'en-US-Neural2-C',
-  lullaby: 'en-US-Neural2-G',
-  sparkle: 'en-US-Neural2-H',
-  buddy: 'en-US-Neural2-A',
-  captain: 'en-US-Neural2-I',
-  zippy: 'en-US-Neural2-J',
-  robo: 'en-US-Neural2-D',
-} as const;
+// Generated from src/utils/voiceOptions.js (see scripts/sync-agent-persona.mjs)
+// so parents pick from the same named voices whether Buddy talks in-browser
+// or over LiveKit.
+export const VOICES = GENERATED_VOICES;
 
 const SYNTHESIZE_URL = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 const SAMPLE_RATE = 24000;
