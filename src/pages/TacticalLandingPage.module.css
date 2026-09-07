@@ -342,11 +342,13 @@
   text-wrap: pretty;
 }
 
-/* ── WALKTHROUGH STEPS (01/02) ── */
+/* ── WALKTHROUGH STEPS (01/02) ──
+   Two light beats in a row: tighter than the section baseline so they read
+   as a quick matched pair, not two full-weight chapters. */
 .stepSection {
   max-width: 900px;
   margin: 0 auto;
-  padding: 5rem 2rem;
+  padding: 4rem 2rem;
 }
 
 .previewTag {
@@ -440,11 +442,13 @@
   text-wrap: pretty;
 }
 
-/* ── 5 WINGS SECTION ── */
+/* ── 5 WINGS SECTION ──
+   The content-heaviest step (five image cards) earns the most generous
+   padding on the page — the middle chapter, not another equal beat. */
 .wingsSection {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 5rem 2rem;
+  padding: 6rem 2rem;
 }
 
 .wingsGrid {
@@ -672,11 +676,13 @@
   margin-top: 2rem;
 }
 
-/* ── PRICING BOX (STEP 05) ── */
+/* ── PRICING BOX (STEP 05) ──
+   The destination step: a generous arrival above, a tighter run into the
+   footer below — the footer supplies its own closing space. */
 .pricingBoxSection {
   max-width: 900px;
   margin: 0 auto;
-  padding: 5rem 2rem;
+  padding: 6rem 2rem 4rem;
 }
 
 .pricingBox {
