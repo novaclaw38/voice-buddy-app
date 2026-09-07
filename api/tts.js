@@ -13,18 +13,28 @@ export const VOICES = {
   robo:    'en-US-Neural2-D', // deep/robot male
 }
 
-// Groq's new Orpheus TTS only has 3 confirmed voice names publicly
-// documented (troy, hannah, austin) — not enough to cover all 8 personas
-// above, so only these three get a Groq voice. Every other persona (and
-// these three on Groq failure) falls through to Google TTS below, which
-// still has a voice for all 8. Groq has no pitch parameter — voiceOpts'
+// Groq's Orpheus TTS ships 6 English voices (3 female, 3 male) — one short
+// of our 8 personas, so two pairs double up on the same underlying voice.
+// The pairing is a first pass by described character, not by ear (nobody's
+// listened to samples yet) — trivial to reshuffle once someone has.
+// Falls through to Google TTS on any failure, which still has a distinct
+// voice for all 8. Groq also has no pitch parameter — voiceOpts'
 // pitchOffset only applies on the Google path.
 export const GROQ_VOICES = {
-  sunny:   'hannah',
-  buddy:   'troy',
-  captain: 'austin',
+  sunny:   'hannah',  // warm female (default)
+  giggles: 'autumn',  // cheerful female
+  lullaby: 'diana',   // gentle female
+  sparkle: 'autumn',  // bright female — shares with giggles
+  buddy:   'troy',    // calm male
+  captain: 'austin',  // adventurous male
+  zippy:   'daniel',  // energetic male
+  robo:    'troy',    // deep/robot male — shares with buddy
 }
 const GROQ_TTS_MODEL = 'canopylabs/orpheus-v1-english'
+// Orpheus caps input at 200 characters — most conversational replies run
+// longer, so text over that limit skips Groq entirely rather than paying
+// for a network round trip that's guaranteed to fail.
+const GROQ_MAX_CHARS = 200
 
 import { getUser, allowRequest, isEntitled } from './_auth.js'
 
@@ -34,14 +44,15 @@ const RATE_LIMIT_PER_MIN = 30
 const FREE_LIMIT_PER_DAY = 60
 const PRO_LIMIT_PER_DAY  = 1000
 
-// Returns raw MP3 bytes, or null if Groq isn't usable for this request
-// (no key configured, or no Groq voice for the requested persona) — the
-// caller falls through to Google in either case. Throws only on an actual
-// Groq API failure, so the caller can log it before falling back.
+// Returns raw MP3 bytes, or null if Groq isn't usable for this request (no
+// key configured, no Groq voice for the requested persona, or text over
+// Orpheus's 200-character cap) — the caller falls through to Google in
+// every case. Throws only on an actual Groq API failure, so the caller can
+// log it before falling back.
 async function speakWithGroq(text, rate, voice) {
   const key = process.env.GROQ_API_KEY
   const groqVoice = GROQ_VOICES[voice]
-  if (!key || !groqVoice) return null
+  if (!key || !groqVoice || text.length > GROQ_MAX_CHARS) return null
 
   const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
     method: 'POST',

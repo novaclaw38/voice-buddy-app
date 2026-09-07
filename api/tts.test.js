@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
 }))
 vi.mock('./_auth.js', () => mocks)
 
-import handler from './tts.js'
+import handler, { VOICES, GROQ_VOICES } from './tts.js'
 
 function mockRes() {
   const res = { statusCode: 0, body: null, headers: {} }
@@ -96,13 +96,13 @@ describe('api/tts Groq primary, Google fallback', () => {
     expect(res.body.toString()).toBe('google-audio')
   })
 
-  it('skips Groq entirely for a persona with no Groq voice', async () => {
+  it('skips Groq entirely for an unmapped voice key', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ audioContent: Buffer.from('google-audio').toString('base64') }),
     })
     const res = mockRes()
-    await handler({ ...req, body: { text: 'hello', voice: 'zippy' } }, res)
+    await handler({ ...req, body: { text: 'hello', voice: 'not-a-real-persona' } }, res)
 
     expect(res.statusCode).toBe(200)
     expect(global.fetch).toHaveBeenCalledTimes(1)
@@ -110,5 +110,34 @@ describe('api/tts Groq primary, Google fallback', () => {
       expect.stringContaining('texttospeech.googleapis.com'),
       expect.any(Object)
     )
+  })
+
+  it('skips Groq for text over its 200-character cap', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ audioContent: Buffer.from('google-audio').toString('base64') }),
+    })
+    const res = mockRes()
+    const longText = 'a'.repeat(201)
+    await handler({ ...req, body: { text: longText, voice: 'sunny' } }, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('texttospeech.googleapis.com'),
+      expect.any(Object)
+    )
+  })
+
+  it('every persona has a mapped Groq or Google voice', () => {
+    for (const persona of Object.keys(VOICES)) {
+      expect(VOICES[persona]).toBeTruthy()
+      // Not every persona needs a Groq voice, but every one that has one
+      // must point at a real, docs-confirmed Orpheus voice name.
+      const groqVoice = GROQ_VOICES[persona]
+      if (groqVoice) {
+        expect(['autumn', 'diana', 'hannah', 'austin', 'daniel', 'troy']).toContain(groqVoice)
+      }
+    }
   })
 })
