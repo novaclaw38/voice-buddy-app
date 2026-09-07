@@ -342,83 +342,102 @@
   text-wrap: pretty;
 }
 
-/* ── CONTRAST SECTION ── */
-.contrastSection {
-  max-width: 1000px;
+/* ── WALKTHROUGH STEPS (01/02) ── */
+.stepSection {
+  max-width: 900px;
   margin: 0 auto;
   padding: 5rem 2rem;
 }
 
-.contrastGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+.previewTag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--alert-orange);
+  border: 1px solid rgba(255, 138, 0, 0.3);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
 }
 
-.contrastCard {
+.stepCard {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 2rem;
-  transition-property: transform, border-color, box-shadow;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-out;
 }
 
-.contrastCard:hover {
-  transform: translateY(-4px);
+.stepCardMono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--tactical-text-dim);
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
 
-.contrastCard.old {
-  border-color: rgba(255, 138, 0, 0.3);
-}
-
-.contrastCard.old:hover {
-  box-shadow: var(--glow-orange);
-}
-
-.contrastCard.new {
-  border-color: var(--tactical-border);
-}
-
-.contrastCard.new:hover {
-  box-shadow: var(--glow-teal);
-}
-
-.contrastCardHeader {
+.quizPrompt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--tactical-text);
+  line-height: 1.6;
+  white-space: pre-wrap;
   margin-bottom: 1.5rem;
 }
 
-.contrastTitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.old .contrastTitle { color: var(--alert-orange); }
-.new .contrastTitle { color: var(--tactical-teal); }
-
-.contrastList {
-  list-style: none;
-  padding: 0;
+.quizOptions {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.contrastList li {
-  font-size: 0.95rem;
+.quizOption {
+  flex: 1 1 200px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tactical-text);
+  background: transparent;
+  border: 1px solid var(--tactical-border);
+  border-radius: 4px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition-property: transform, border-color, background-color, color;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
+}
+
+.quizOption:hover {
+  border-color: var(--tactical-teal);
+  background: rgba(0, 245, 255, 0.08);
+}
+
+.quizOption:active {
+  transform: scale(0.97);
+}
+
+.quizCorrect {
+  border-color: var(--tactical-teal);
+  background: rgba(0, 245, 255, 0.15);
+  color: var(--tactical-teal);
+}
+
+.quizWrong {
+  border-color: var(--alert-orange);
+  background: rgba(255, 138, 0, 0.15);
+  color: var(--alert-orange);
+}
+
+.quizFeedback {
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
   color: var(--tactical-text-dim);
-  line-height: 1.5;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px dashed var(--tactical-border);
-}
-
-.contrastList li:last-child {
-  border-bottom: none;
+  border-top: 1px dashed var(--tactical-border);
+  padding-top: 1.25rem;
+  text-wrap: pretty;
 }
 
 /* ── 5 WINGS SECTION ── */
@@ -653,132 +672,11 @@
   margin-top: 2rem;
 }
 
-/* ── PRICING COMPARISON ── */
-.pricing {
-  max-width: 1000px;
+/* ── PRICING BOX (STEP 05) ── */
+.pricingBoxSection {
+  max-width: 900px;
   margin: 0 auto;
   padding: 5rem 2rem;
-}
-
-.comparisonWrap {
-  text-align: center;
-}
-
-.comparisonTitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--tactical-text);
-  margin-bottom: 1rem;
-  text-wrap: balance;
-}
-
-.comparisonSub {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1rem;
-  color: var(--tactical-text-dim);
-  margin-bottom: 3rem;
-}
-
-.comparisonGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-}
-
-.comparisonCard {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  transition-property: transform, border-color, box-shadow;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-out;
-}
-
-.comparisonCard:hover {
-  transform: translateY(-4px);
-}
-
-.comparisonCard.dim {
-  opacity: 0.4;
-}
-
-.comparisonCard.highlighted {
-  border-color: var(--tactical-teal);
-  box-shadow: var(--glow-teal);
-}
-
-.comparisonCard h3 {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  color: var(--tactical-text-dim);
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-}
-
-.comparisonCard.highlighted h3 {
-  color: var(--tactical-teal);
-}
-
-.comparisonCard .price {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.comparisonCard.dim .price {
-  color: var(--tactical-text-dim);
-}
-
-.comparisonCard.highlighted .price {
-  color: var(--tactical-teal);
-  text-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
-}
-
-.comparisonCard p {
-  color: var(--tactical-text-dim);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.comparisonCta {
-  display: inline-block;
-  margin-top: 1.5rem;
-  background: var(--tactical-teal);
-  color: var(--command-black);
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  text-decoration: none;
-  box-shadow: var(--glow-teal);
-  transition-property: transform, background-color, border-color, box-shadow;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-out;
-}
-
-.comparisonCta:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px var(--tactical-teal);
-}
-
-.comparisonCta:active {
-  transform: scale(0.95);
-}
-
-/* ── PRICING BOX ── */
-.pricingBoxSection {
-  padding: 0 2rem 5rem;
 }
 
 .pricingBox {
@@ -792,17 +690,6 @@
   padding: 3rem;
   text-align: center;
   box-shadow: 0 0 40px rgba(0, 245, 255, 0.15);
-}
-
-.pricingTitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--tactical-text);
-  margin-bottom: 1rem;
-  text-wrap: balance;
 }
 
 .pricingInline {
@@ -866,57 +753,6 @@
 }
 
 .ctaEnlist:active {
-  transform: scale(0.95);
-}
-
-/* ── RANK UP CTA ── */
-.rankUp {
-  text-align: center;
-  padding: 5rem 2rem;
-  background: linear-gradient(135deg, var(--command-black-2) 0%, var(--command-black) 100%);
-  border-top: 1px solid var(--tactical-border);
-  border-bottom: 1px solid var(--tactical-border);
-}
-
-.rankUpTitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 700;
-  color: var(--tactical-text);
-  margin-bottom: 1rem;
-  text-wrap: balance;
-}
-
-.rankUpSub {
-  font-size: 1.1rem;
-  color: var(--tactical-teal);
-  margin-bottom: 2rem;
-}
-
-.ctaAuthorize {
-  display: inline-block;
-  background: var(--alert-orange);
-  color: var(--command-black);
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  padding: 1.5rem 3rem;
-  border-radius: 6px;
-  text-decoration: none;
-  box-shadow: var(--glow-orange);
-  transition-property: transform, background-color, border-color, box-shadow;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-out;
-  border: 2px solid var(--alert-orange);
-}
-
-.ctaAuthorize:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 40px var(--alert-orange);
-}
-
-.ctaAuthorize:active {
   transform: scale(0.95);
 }
 

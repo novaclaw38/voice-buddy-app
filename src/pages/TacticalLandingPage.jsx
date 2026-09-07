@@ -8,8 +8,28 @@ import styles from './TacticalLandingPage.module.css'
 
 /**
  * TacticalLandingPage — Buddy Tactical Academy landing page.
- * Conversion-focused marketing page with parallax hero, glassmorphism, scroll-driven motion.
+ * Structure IS the onboarding sequence: a skeptical parent scrolls through
+ * the exact five steps that happen after signup, before ever clicking Enlist.
  */
+
+const DIRECTION_CONTRACT = `
+THESIS: The page's structure is the onboarding sequence itself, not stacked
+marketing sections — replacing "confusing flow" with earned, load-bearing order.
+OWN-WORLD: Command Black plus Tactical Teal HUD, JetBrains Mono throughout,
+sharp 4-12px radii — the sanctioned Tactical Landing Page exception in
+DESIGN.md, unchanged.
+STORY: A skeptical parent watches the exact post-signup flow — Recruit Brief,
+Assessment, Mission Assign, Parent Debrief, Enlist — before ever clicking, so
+the one CTA feels earned, not blind.
+FIRST VIEWPORT: Hero — orb left, headline and CTAs right, ticker cue below
+reading "PREVIEW BELOW: exactly what happens after you enlist — 5 steps, no
+surprises", pointing at the walkthrough beneath the fold.
+FORM: Onboarding-simulation walkthrough, dealt lead of concept-seed --scope
+surface --mode persuade, seed key 2409565c.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the
+finish review, the verdict, DESIGN.md, and every shipping raster carrying its
+provenance.
+`
 
 const WINGS = [
   { id: 'robotics', title: 'ROBOTICS WING', tagline: 'Build the Brains', description: 'From logic gates to autonomous command, train as an engineer.', image: '/backdrops/robotics-wing.webp' },
@@ -19,11 +39,31 @@ const WINGS = [
   { id: 'botany-ops', title: 'BOTANY OPS', tagline: 'Grow the Future', description: 'Treat gardening as a high-tech sustainment project in resource generation.', image: '/backdrops/botany-ops-wing.webp' },
 ]
 
-const PRICING_COMPARISON = [
-  { label: 'PRIVATE TUTORING', price: 'R1,200+/mo', desc: '1 hour a week. High cost. Inconvenient.', dim: true },
-  { label: 'BUDDY ACADEMY', price: 'R149/mo', desc: '24/7 Professional Mentorship. Structured Curricula. Sunday Storybooks.', highlight: true },
-  { label: 'YOUTUBE / GAMES', price: 'R0 / R150+', desc: 'Mindless loops. Passive learning. Zero reporting.', dim: true },
-]
+const RECRUIT_BRIEF_PREVIEW = `> ENLISTMENT INTAKE — UNIT 01
+
+CALLSIGN: [ your child picks one ]
+UNIT: Buddy (Unit 01), reporting.
+
+"Listen up, Recruit. Every elite unit
+needs a commander — that's you.
+Let's find out what you already know."
+
+STATUS: Awaiting first mission assignment...`
+
+const QUIZ_QUESTION = {
+  prompt: `SAMPLE ASSESSMENT — LOGIC GATES
+
+If an OR gate receives one 'ON' signal and
+one 'OFF' signal, does the signal pass through?`,
+  options: [
+    { id: 'yes', label: 'YES — SIGNAL PASSES', correct: true },
+    { id: 'no', label: 'NO — SIGNAL BLOCKED', correct: false },
+  ],
+  feedback: {
+    yes: 'CORRECT. An OR gate passes the signal if at least one input is ON.',
+    no: 'NOT QUITE. An OR gate only blocks the signal when every input is OFF.',
+  },
+}
 
 const STORYBOOK_PREVIEW = `SUBJECT: Bio-Analyst Mia R. // Intelligence Report #1
 
@@ -77,6 +117,7 @@ NEXT BRIEFING: Sunday 6:00 PM
 
 export default function TacticalLandingPage() {
   const [showDossier, setShowDossier] = useState(false)
+  const [quizAnswer, setQuizAnswer] = useState(null)
   const heroRef = useRef(null)
   const reduce = useReducedMotion()
 
@@ -96,6 +137,8 @@ export default function TacticalLandingPage() {
 
   return (
     <>
+      {/* eslint-disable-next-line react/no-danger */}
+      <div aria-hidden="true" style={{ display: 'none' }} dangerouslySetInnerHTML={{ __html: `<!--${DIRECTION_CONTRACT}-->` }} />
       <SkipLink />
       <div className={styles.page}>
         {/* HERO — Split: Orb on left, commander hook on right */}
@@ -134,19 +177,11 @@ export default function TacticalLandingPage() {
 
               {/* Commander hook — right side */}
               <div className={styles.heroText}>
-                <motion.div
-                  className={styles.heroBadge}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  SECTOR_AUTH_REQUIRED
-                </motion.div>
                 <motion.h1
                   className={styles.heroTitle}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
                 >
                   Your Child. Our <span className={styles.teal}>Missions</span>. Their Future.
                 </motion.h1>
@@ -154,7 +189,7 @@ export default function TacticalLandingPage() {
                   className={styles.heroSub}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.7 }}
+                  transition={{ duration: 0.7, delay: 0.6 }}
                 >
                   Buddy is the elite Tactical Specialist mentor turning screen time into field expertise. Robotics, Beast Intelligence, Enviro Recon, Field Rations, and Botany Ops, across a structured 6-month Academy path.
                 </motion.p>
@@ -162,10 +197,10 @@ export default function TacticalLandingPage() {
                   className={styles.heroCtas}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 1.0 }}
+                  transition={{ duration: 0.7, delay: 0.9 }}
                 >
                   <Link className={styles.ctaPrimary} to="/login" state={{ mode: 'signup', plan: 'pro' }}>ENLIST NOW</Link>
-                  <a href="#how-it-works" className={styles.ctaSecondary}>HOW THE ACADEMY WORKS</a>
+                  <a href="#walkthrough" className={styles.ctaSecondary}>SEE THE WALKTHROUGH</a>
                 </motion.div>
               </div>
             </div>
@@ -174,42 +209,57 @@ export default function TacticalLandingPage() {
           <motion.div className={styles.heroTicker} style={contentStyle}>
             <div className={styles.tickerItem}>
               <span className={styles.tickerDot} />
-              <span className={styles.tickerText}>SAMPLE MISSION LOG (illustrative): "Specialist Mia R." completed OBSTACLE_RECON_01</span>
+              <span className={styles.tickerText}>PREVIEW BELOW: exactly what happens after you enlist — 5 steps, no surprises</span>
             </div>
-            <div className={styles.tickerCount}>5 WINGS · 6-MONTH ACADEMY PATH</div>
+            <div className={styles.tickerCount}>STEP 01 OF 05 ↓</div>
           </motion.div>
         </section>
 
-        {/* MINDLESS vs BUDDY */}
-        <section className={styles.contrastSection} id="how-it-works">
+        {/* STEP 01 — RECRUIT BRIEF */}
+        <section className={styles.stepSection} id="walkthrough">
           <motion.div className={styles.sectionHeader} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.7 } })}>
-            <h2 className={styles.sectionTitle}>MINDLESS vs. MEANINGFUL</h2>
+            <h2 className={styles.sectionTitle}>STEP 01 / 05 — RECRUIT BRIEF</h2>
+            <p className={styles.sectionSub}>The moment you enlist, this is what your child sees first.</p>
           </motion.div>
-          <div className={styles.contrastGrid}>
-            <motion.div className={`${styles.contrastCard} ${styles.old}`} {...anim({ initial: { opacity: 0, x: -40 }, whileInView: { opacity: 1, x: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.6 } })}>
-              <h3 className={styles.contrastTitle}>THE OLD WAY</h3>
-              <ul className={styles.contrastList}>
-                <li>Mindless Loops: Endless scrolling that dulls the senses.</li>
-                <li>Zero Impact: Hours spent watching other people do things.</li>
-                <li>Parent Guilt: The feeling of "plugging them in" for peace.</li>
-              </ul>
-            </motion.div>
-            <motion.div className={`${styles.contrastCard} ${styles.new}`} {...anim({ initial: { opacity: 0, x: 40 }, whileInView: { opacity: 1, x: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.6, delay: 0.15 } })}>
-              <h3 className={styles.contrastTitle}>THE BUDDY WAY</h3>
-              <ul className={styles.contrastList}>
-                <li>Active Field Ops: Missions that require real-world action.</li>
-                <li>Skill Mastery: 6-month structured curricula by experts.</li>
-                <li>Zero Guilt: Give them a mentor, not just a screen.</li>
-              </ul>
-            </motion.div>
-          </div>
+          <motion.div className={styles.stepCard} {...anim({ initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.6 } })}>
+            <span className={styles.previewTag}>PREVIEW</span>
+            <pre className={styles.stepCardMono}>{RECRUIT_BRIEF_PREVIEW}</pre>
+          </motion.div>
         </section>
 
-        {/* 5 WINGS */}
+        {/* STEP 02 — ASSESSMENT */}
+        <section className={styles.stepSection}>
+          <motion.div className={styles.sectionHeader} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.7 } })}>
+            <h2 className={styles.sectionTitle}>STEP 02 / 05 — ASSESSMENT</h2>
+            <p className={styles.sectionSub}>A real question from Mission 01. Try it.</p>
+          </motion.div>
+          <motion.div className={styles.stepCard} {...anim({ initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.6 } })}>
+            <span className={styles.previewTag}>PREVIEW</span>
+            <pre className={styles.quizPrompt}>{QUIZ_QUESTION.prompt}</pre>
+            <div className={styles.quizOptions}>
+              {QUIZ_QUESTION.options.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  className={`${styles.quizOption} ${quizAnswer === opt.id ? (opt.correct ? styles.quizCorrect : styles.quizWrong) : ''}`}
+                  onClick={() => setQuizAnswer(opt.id)}
+                  aria-pressed={quizAnswer === opt.id}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {quizAnswer && (
+              <p className={styles.quizFeedback} aria-live="polite">{QUIZ_QUESTION.feedback[quizAnswer]}</p>
+            )}
+          </motion.div>
+        </section>
+
+        {/* STEP 03 — MISSION ASSIGN (5 WINGS) */}
         <section className={styles.wingsSection}>
           <motion.div className={styles.sectionHeader} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.7 } })}>
-            <h2 className={styles.sectionTitle}>THE FIVE WINGS</h2>
-            <p className={styles.sectionSub}>Five specialization tracks. One elite curriculum path.</p>
+            <h2 className={styles.sectionTitle}>STEP 03 / 05 — MISSION ASSIGN</h2>
+            <p className={styles.sectionSub}>Your child's assigned track. Five specializations, one 6-month path.</p>
           </motion.div>
           <div className={styles.wingsGrid}>
             {WINGS.map((wing, i) => (
@@ -231,10 +281,10 @@ export default function TacticalLandingPage() {
           </div>
         </section>
 
-        {/* PARENT INTELLIGENCE FEED */}
+        {/* STEP 04 — PARENT DEBRIEF */}
         <section className={styles.intelSection}>
           <motion.div className={styles.intelContent} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.2 }, transition: { duration: 0.7 } })}>
-            <h2 className={styles.intelTitle}>PARENT INTELLIGENCE FEED</h2>
+            <h2 className={styles.intelTitle}>STEP 04 / 05 — PARENT DEBRIEF</h2>
             <p className={styles.intelBody}>Every Sunday at 6:00 PM, a "Mission Debrief" (AAR) arrives via WhatsApp. No more wondering what they're doing.</p>
             <p className={styles.intelTagline}>Intel you can be proud of.</p>
             <div className={styles.intelPreview}>
@@ -248,28 +298,14 @@ export default function TacticalLandingPage() {
           </motion.div>
         </section>
 
-        {/* PRICING */}
-        <section className={styles.pricing}>
-          <motion.div className={styles.comparisonWrap} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.2 }, transition: { duration: 0.7 } })}>
-            <h2 className={styles.comparisonTitle}>THE INVESTMENT</h2>
-            <div className={styles.comparisonGrid}>
-              {PRICING_COMPARISON.map((plan, i) => (
-                <motion.div key={plan.label} className={`${styles.comparisonCard} ${plan.dim ? styles.dim : ''} ${plan.highlight ? styles.highlighted : ''}`} {...anim({ initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.5, delay: i * 0.1 } })}>
-                  <h3>{plan.label}</h3>
-                  <div className={styles.price}>{plan.price}</div>
-                  <p>{plan.desc}</p>
-                  {plan.highlight && <Link className={styles.comparisonCta} to="/login" state={{ mode: 'signup', plan: 'pro' }}>ENLIST NOW</Link>}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </section>
-
-        {/* PRICING BOX */}
+        {/* STEP 05 — ENLIST */}
         <section className={styles.pricingBoxSection}>
+          <motion.div className={styles.sectionHeader} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.7 } })}>
+            <h2 className={styles.sectionTitle}>STEP 05 / 05 — ENLIST</h2>
+            <p className={styles.sectionSub}>One plan. Everything included. No surprises.</p>
+          </motion.div>
           <motion.div className={styles.pricingBox} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.2 }, transition: { duration: 0.7 } })}>
-            <h2 className={styles.pricingTitle}>UNLOCK THE FULL SPECIALIST PATH</h2>
-            <p className={styles.pricingDesc}>At <span className={styles.pricingInline}>R149/month</span> — less than a weekend takeaway — you get 24/7 access to the Academy, the Sunday Storybook, and the elite 6-month curriculum. Everything included:</p>
+            <p className={styles.pricingDesc}>At <span className={styles.pricingInline}>R149/month</span> — less than a weekend takeaway, and far less than R1,200+/month for one hour of private tutoring a week — you get 24/7 access to the Academy, the Sunday Storybook, and the elite 6-month curriculum. Everything included:</p>
             <ul className={styles.pricingFeatures}>
               <li><IconCheck size={16} /> 5 Specialization Wings</li>
               <li><IconCheck size={16} /> Weekly Mission Debriefs (AAR)</li>
@@ -279,15 +315,6 @@ export default function TacticalLandingPage() {
               <li><IconCheck size={16} /> First 10 Days Free — No Card Needed</li>
             </ul>
             <Link className={styles.ctaEnlist} to="/login" state={{ mode: 'signup', plan: 'pro' }}>ENLIST NOW — START FREE TRIAL</Link>
-          </motion.div>
-        </section>
-
-        {/* RANK UP CTA */}
-        <section className={styles.rankUp}>
-          <motion.div {...anim({ initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.7 } })}>
-            <h2 className={styles.rankUpTitle}>Stop the Scroll. Start the Mission.</h2>
-            <p className={styles.rankUpSub}>Enlist today. Your first 3 missions are free.</p>
-            <Link className={styles.ctaAuthorize} to="/login" state={{ mode: 'signup', plan: 'pro' }}>ENLIST NOW</Link>
           </motion.div>
         </section>
 

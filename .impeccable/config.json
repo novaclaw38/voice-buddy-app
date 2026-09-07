@@ -539,6 +539,18 @@
         "value": "20px",
         "createdAt": "2026-09-07T10:30:52.799Z",
         "reason": "phoneMockup device-bezel is a pre-existing skeuomorphic exception to the tactical 4-12px scale (32px outer, unflagged, unchanged); 20px is the concentric-radius-corrected inner screen radius (32px outer - 12px padding), not a new shape category"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.08)",
+        "createdAt": "2026-09-07T10:54:41.136Z",
+        "reason": "alpha variant of sanctioned Tactical Teal #00F5FF, quiz-option hover state, matches existing 0.1/0.15 alpha steps used elsewhere on this route"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 138, 0, 0.15)",
+        "createdAt": "2026-09-07T10:54:41.225Z",
+        "reason": "alpha variant of sanctioned Alert Orange #FF8A00, quiz-option wrong-answer state, matches existing 0.1/0.3 alpha steps used elsewhere on this route"
       }
     ]
   }
