@@ -533,6 +533,12 @@
         ],
         "createdAt": "2026-09-07T09:57:58.344Z",
         "reason": "processing-state bounce on the orb (live via styles[status], not dead code) matches DESIGN.md's documented companion-character animation language (bounce-in/jelly keyframes are sanctioned expressive states for this mascot-like component, not a UI-transition easing choice); pre-existing, not touched this session"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "20px",
+        "createdAt": "2026-09-07T10:30:52.799Z",
+        "reason": "phoneMockup device-bezel is a pre-existing skeuomorphic exception to the tactical 4-12px scale (32px outer, unflagged, unchanged); 20px is the concentric-radius-corrected inner screen radius (32px outer - 12px padding), not a new shape category"
       }
     ]
   }

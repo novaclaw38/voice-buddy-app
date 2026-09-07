@@ -170,3 +170,17 @@
   to { transform: translateY(-4px); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .ringOuter1,
+  .ringOuter2,
+  .ringAlert,
+  .ringAlertReverse,
+  .idle,
+  .processing,
+  .bar1,
+  .bar2,
+  .bar3 {
+    animation: none !important;
+  }
+}
+
