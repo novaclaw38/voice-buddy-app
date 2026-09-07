@@ -159,23 +159,6 @@
   padding-top: 0;
 }
 
-.heroBadge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  color: var(--tactical-teal);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  margin-bottom: 2rem;
-  text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--tactical-border);
-  border-radius: 4px;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-}
-
 .heroTitle {
   font-family: 'JetBrains Mono', monospace;
   font-size: clamp(2rem, 5vw, 4.5rem);
@@ -495,7 +478,7 @@
 .missionCardOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 11, 0.9) 100%);
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--command-black) 90%, transparent) 100%);
 }
 
 .missionCardContent {
@@ -602,7 +585,7 @@
   display: inline-block;
   width: 280px;
   min-height: 340px;
-  background: #141416;
+  background: var(--command-black-2);
   border: 1px solid var(--tactical-border);
   border-radius: 32px;
   padding: 0.75rem;
@@ -660,20 +643,6 @@
 
 .sampleBtn:active {
   transform: scale(0.97);
-}
-
-/* ── INTERACTIVE DEMOS ── */
-.demosSection {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 5rem 2rem;
-}
-
-.demosGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
 }
 
 /* ── PRICING BOX (STEP 05) ──
@@ -811,6 +780,8 @@
 }
 
 .footerLink {
+  display: inline-block;
+  padding: 0.5rem 0;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
   color: var(--tactical-text-dim);
@@ -855,8 +826,8 @@
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: flex;
   align-items: center;
   justify-content: center;

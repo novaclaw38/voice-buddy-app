@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'motion/react'
 import TacticalOrb from '../components/TacticalOrb.jsx'
@@ -119,7 +119,19 @@ export default function TacticalLandingPage() {
   const [showDossier, setShowDossier] = useState(false)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const heroRef = useRef(null)
+  const dossierCloseRef = useRef(null)
   const reduce = useReducedMotion()
+
+  // Modal focus management: move focus in on open, restore on close, dismiss on Escape.
+  useEffect(() => {
+    if (!showDossier) return
+    dossierCloseRef.current?.focus()
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setShowDossier(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [showDossier])
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '40%'])
@@ -140,7 +152,7 @@ export default function TacticalLandingPage() {
       {/* eslint-disable-next-line react/no-danger */}
       <div aria-hidden="true" style={{ display: 'none' }} dangerouslySetInnerHTML={{ __html: `<!--${DIRECTION_CONTRACT}-->` }} />
       <SkipLink />
-      <div className={styles.page}>
+      <main className={styles.page} id="main">
         {/* HERO — Split: Orb on left, commander hook on right */}
         <section ref={heroRef} className={styles.hero}>
           <motion.div
@@ -168,36 +180,28 @@ export default function TacticalLandingPage() {
               {/* Orb — the living command core */}
               <motion.div
                 className={styles.heroOrb}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
+                {...anim({ initial: { opacity: 0, scale: 0.8 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 1, delay: 0.5, ease: 'easeOut' } })}
               >
-                <TacticalOrb status="idle" totalXp={0} interactive={true} style={{ width: 240, height: 240 }} />
+                <TacticalOrb status="idle" totalXp={0} interactive={false} style={{ width: 240, height: 240 }} />
               </motion.div>
 
               {/* Commander hook — right side */}
               <div className={styles.heroText}>
                 <motion.h1
                   className={styles.heroTitle}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
+                  {...anim({ initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, delay: 0.3 } })}
                 >
                   Your Child. Our <span className={styles.teal}>Missions</span>. Their Future.
                 </motion.h1>
                 <motion.p
                   className={styles.heroSub}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.6 }}
+                  {...anim({ initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay: 0.6 } })}
                 >
                   Buddy is the elite Tactical Specialist mentor turning screen time into field expertise. Robotics, Beast Intelligence, Enviro Recon, Field Rations, and Botany Ops, across a structured 6-month Academy path.
                 </motion.p>
                 <motion.div
                   className={styles.heroCtas}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.9 }}
+                  {...anim({ initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay: 0.9 } })}
                 >
                   <Link className={styles.ctaPrimary} to="/login" state={{ mode: 'signup', plan: 'pro' }}>ENLIST NOW</Link>
                   <a href="#walkthrough" className={styles.ctaSecondary}>SEE THE WALKTHROUGH</a>
@@ -265,7 +269,7 @@ export default function TacticalLandingPage() {
             {WINGS.map((wing, i) => (
               <motion.div key={wing.id} className={styles.missionCard} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.2 }, transition: { duration: 0.6, delay: i * 0.1 } })}>
                 <div className={styles.missionCardImage}>
-                  <img src={wing.image} alt="" aria-hidden="true" />
+                  <img src={wing.image} alt="" aria-hidden="true" loading="lazy" />
                   <div className={styles.missionCardOverlay} />
                 </div>
                 <div className={styles.missionCardContent}>
@@ -341,14 +345,14 @@ export default function TacticalLandingPage() {
         {showDossier && (
           <div className={styles.dossierOverlay} role="dialog" aria-modal="true" aria-label="Sample Mission Debrief">
             <div className={styles.dossierCard}>
-              <button className={styles.dossierClose} onClick={() => setShowDossier(false)} aria-label="Close sample report">×</button>
+              <button ref={dossierCloseRef} className={styles.dossierClose} onClick={() => setShowDossier(false)} aria-label="Close sample report">×</button>
               <h3 className={styles.dossierTitle}>AFTER-ACTION REPORT (AAR) — SAMPLE</h3>
               <pre className={styles.dossierContent}>{DOSSIER_CONTENT}</pre>
               <Link className={styles.dossierCta} to="/login" state={{ mode: 'signup', plan: 'pro' }} onClick={() => setShowDossier(false)}>VIEW FULL COMMANDER LOG IN DASHBOARD</Link>
             </div>
           </div>
         )}
-      </div>
+      </main>
     </>
   )
 }
