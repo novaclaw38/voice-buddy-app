@@ -13,6 +13,19 @@ export const VOICES = {
   robo:    'en-US-Neural2-D', // deep/robot male
 }
 
+// Groq's new Orpheus TTS only has 3 confirmed voice names publicly
+// documented (troy, hannah, austin) — not enough to cover all 8 personas
+// above, so only these three get a Groq voice. Every other persona (and
+// these three on Groq failure) falls through to Google TTS below, which
+// still has a voice for all 8. Groq has no pitch parameter — voiceOpts'
+// pitchOffset only applies on the Google path.
+export const GROQ_VOICES = {
+  sunny:   'hannah',
+  buddy:   'troy',
+  captain: 'austin',
+}
+const GROQ_TTS_MODEL = 'canopylabs/orpheus-v1-english'
+
 import { getUser, allowRequest, isEntitled } from './_auth.js'
 
 const RATE_LIMIT_PER_MIN = 30
@@ -21,28 +34,41 @@ const RATE_LIMIT_PER_MIN = 30
 const FREE_LIMIT_PER_DAY = 60
 const PRO_LIMIT_PER_DAY  = 1000
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+// Returns raw MP3 bytes, or null if Groq isn't usable for this request
+// (no key configured, or no Groq voice for the requested persona) — the
+// caller falls through to Google in either case. Throws only on an actual
+// Groq API failure, so the caller can log it before falling back.
+async function speakWithGroq(text, rate, voice) {
+  const key = process.env.GROQ_API_KEY
+  const groqVoice = GROQ_VOICES[voice]
+  if (!key || !groqVoice) return null
 
-  // Require a signed-in user — this endpoint spends paid Google TTS credits.
-  const user = await getUser(req)
-  if (!user) return res.status(401).json({ error: 'Sign in to use Buddy.' })
+  const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_TTS_MODEL,
+      input: text,
+      voice: groqVoice,
+      response_format: 'mp3',
+      speed: Math.max(0.5, Math.min(5, rate)),
+    }),
+  })
 
-  // Cost guard: cap how fast and how much any one account can spend, with a
-  // much tighter daily ceiling for accounts that aren't paying.
-  const entitled = await isEntitled(user.id)
-  const dailyLimit = entitled ? PRO_LIMIT_PER_DAY : FREE_LIMIT_PER_DAY
-  if (!(await allowRequest(user.id, 'tts-1m', RATE_LIMIT_PER_MIN, 60)) ||
-      !(await allowRequest(user.id, 'tts-1d', dailyLimit, 86400))) {
-    return res.status(429).json({ error: 'Too many requests — take a short break.' })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(`groq_tts_error (${response.status}): ${err.error?.message || JSON.stringify(err)}`)
   }
 
-  const key = process.env.GOOGLE_TTS_KEY
-  if (!key) return res.status(503).json({ error: 'GOOGLE_TTS_KEY not configured' })
+  return Buffer.from(await response.arrayBuffer())
+}
 
-  const { text, rate = 0.9, pitch = 0, voice = 'sunny' } = req.body
-  if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text is required' })
-  if (text.length > 2000) return res.status(400).json({ error: 'text is too long' })
+async function speakWithGoogle(text, rate, pitch, voice) {
+  const key = process.env.GOOGLE_TTS_KEY
+  if (!key) throw new Error('GOOGLE_TTS_KEY not configured')
 
   const response = await fetch(
     `https://texttospeech.googleapis.com/v1/text:synthesize?key=${key}`,
@@ -67,14 +93,53 @@ export default async function handler(req, res) {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
-    console.error('Google TTS error:', response.status, err.error?.message || JSON.stringify(err))
-    return res.status(response.status).json({ error: err.error?.message || 'Google TTS error' })
+    throw new Error(err.error?.message || 'Google TTS error')
   }
 
-  // Google returns base64; send raw MP3 bytes so the client skips the ~33%
-  // base64 transfer overhead and plays via an object URL.
+  // Google returns base64; the caller sends raw bytes so the client skips
+  // the ~33% base64 transfer overhead and plays via an object URL.
   const { audioContent } = await response.json()
-  const audio = Buffer.from(audioContent, 'base64')
+  return Buffer.from(audioContent, 'base64')
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
+  // Require a signed-in user — this endpoint spends paid TTS credits.
+  const user = await getUser(req)
+  if (!user) return res.status(401).json({ error: 'Sign in to use Buddy.' })
+
+  // Cost guard: cap how fast and how much any one account can spend, with a
+  // much tighter daily ceiling for accounts that aren't paying.
+  const entitled = await isEntitled(user.id)
+  const dailyLimit = entitled ? PRO_LIMIT_PER_DAY : FREE_LIMIT_PER_DAY
+  if (!(await allowRequest(user.id, 'tts-1m', RATE_LIMIT_PER_MIN, 60)) ||
+      !(await allowRequest(user.id, 'tts-1d', dailyLimit, 86400))) {
+    return res.status(429).json({ error: 'Too many requests — take a short break.' })
+  }
+
+  const { text, rate = 0.9, pitch = 0, voice = 'sunny' } = req.body
+  if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text is required' })
+  if (text.length > 2000) return res.status(400).json({ error: 'text is too long' })
+
+  // Groq first for the 3 personas it has a real voice for; Google covers
+  // every persona, so it's both the fallback and the only path for the rest.
+  let audio
+  try {
+    audio = await speakWithGroq(text, rate, voice)
+  } catch (err) {
+    console.warn('Groq TTS failed, falling back to Google:', err.message)
+  }
+
+  if (!audio) {
+    try {
+      audio = await speakWithGoogle(text, rate, pitch, voice)
+    } catch (err) {
+      console.error('Google TTS error:', err.message)
+      return res.status(503).json({ error: err.message })
+    }
+  }
+
   res.setHeader('Content-Type', 'audio/mpeg')
   res.setHeader('Cache-Control', 'no-store')
   res.status(200).send(audio)
