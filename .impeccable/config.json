@@ -551,6 +551,84 @@
         "value": "rgba(255, 138, 0, 0.15)",
         "createdAt": "2026-09-07T10:54:41.225Z",
         "reason": "alpha variant of sanctioned Alert Orange #FF8A00, quiz-option wrong-answer state, matches existing 0.1/0.3 alpha steps used elsewhere on this route"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "jetbrains mono",
+        "createdAt": "2026-09-07T13:39:51.788Z",
+        "reason": "DESIGN.md's Tactical Landing Page + Auth exception now scopes AuthPage.module.css alongside TacticalLandingPage.module.css; same font already sanctioned there"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "2px",
+        "createdAt": "2026-09-07T13:39:51.909Z",
+        "reason": "focus-visible outline-radius, matches TacticalLandingPage.module.css's identical focus-visible rule"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "createdAt": "2026-09-07T13:39:51.998Z",
+        "reason": "Tactical world's sanctioned sharp-radius scale (4-12px), documented in DESIGN.md, reused verbatim from TacticalLandingPage.module.css"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "8px",
+        "createdAt": "2026-09-07T13:39:52.100Z",
+        "reason": "Tactical world's sanctioned sharp-radius scale (4-12px), matches TacticalLandingPage.module.css's .stepCard/.missionCard radius"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.8rem",
+        "createdAt": "2026-09-07T13:39:52.193Z",
+        "reason": "Tactical world's mono type scale, matches sizes already used on TacticalLandingPage.module.css"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "2rem",
+        "createdAt": "2026-09-07T13:39:52.281Z",
+        "reason": "Tactical world's display size, within TacticalLandingPage.module.css's own heroTitle clamp(2rem,...) range"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.95rem",
+        "createdAt": "2026-09-07T13:39:52.370Z",
+        "reason": "Tactical world's mono type scale, matches TacticalLandingPage.module.css's heroSub size"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.7rem",
+        "createdAt": "2026-09-07T13:39:52.485Z",
+        "reason": "Tactical world's mono type scale, matches TacticalLandingPage.module.css's tickerText/previewTag size"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.1)",
+        "createdAt": "2026-09-07T13:39:52.635Z",
+        "reason": "sanctioned Tactical Teal alpha variant, identical value already used/ignored on TacticalLandingPage.module.css hover states"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 245, 255, 0.12)",
+        "createdAt": "2026-09-07T13:39:52.751Z",
+        "reason": "sanctioned Tactical Teal alpha variant (input focus ring), same hue/family as TacticalLandingPage.module.css's teal glows"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(224, 224, 224, 0.35)",
+        "createdAt": "2026-09-07T13:39:52.869Z",
+        "reason": "dimmed placeholder text, alpha variant of the already-sanctioned --tactical-text (#E0E0E0)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 138, 0, 0.1)",
+        "createdAt": "2026-09-07T13:39:52.963Z",
+        "reason": "sanctioned Alert Orange alpha variant (error message bg), same hue already used on TacticalLandingPage.module.css"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 138, 0, 0.3)",
+        "createdAt": "2026-09-07T13:39:53.064Z",
+        "reason": "sanctioned Alert Orange alpha variant (error message border), matches TacticalLandingPage.module.css's previewTag border"
       }
     ]
   }

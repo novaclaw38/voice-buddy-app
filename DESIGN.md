@@ -173,23 +173,25 @@ The Promotion Center (`/parent/promotion`) is a deliberate visual sub-brand, not
 
 These custom properties are declared locally on `PromotionCenterPage.module.css`'s `.page` class (`--pc-purple`, `--pc-gold`, `--pc-green`) — not added to `:root` in `src/index.css` — so they cascade to child components within this page's DOM subtree without becoming globally available tokens.
 
-## Tactical Landing Page (sanctioned exception)
+## Tactical Landing Page + Auth (sanctioned exception)
 
-The marketing landing page (`/`, `TacticalLandingPage.jsx`) is a second deliberate sub-brand, extended 2026-09-04 alongside the Promotion Center exception above — it is the top-of-funnel counterpart to the same Tactical Specialist persona: a "Command Black + Tactical Teal" HUD aesthetic aimed at a parent evaluating the product before ever meeting Buddy or the child-facing app.
+The marketing funnel (`/` → `/login`, `TacticalLandingPage.jsx` + `AuthPage.jsx`) is a second deliberate sub-brand, extended 2026-09-04 alongside the Promotion Center exception above — it is the top-of-funnel counterpart to the same Tactical Specialist persona: a "Command Black + Tactical Teal" HUD aesthetic aimed at a parent evaluating the product before ever meeting Buddy or the child-facing app. `AuthPage.jsx` joined the exception on 2026-09-07 — it is `/login`'s only entry point (every CTA on the landing page routes there, and nothing else in the app links to it), so a visitor never leaves the Tactical world between deciding to enlist and finishing signup.
 
-**Scope:** `src/pages/TacticalLandingPage.jsx` and `TacticalLandingPage.module.css` only. Nothing outside this route uses these tokens.
+**Scope:** `src/pages/TacticalLandingPage.jsx`, `TacticalLandingPage.module.css`, `src/pages/AuthPage.jsx`, and `AuthPage.module.css` only. Nothing outside these two routes uses these tokens.
 
 **Palette:**
 - Command Black `#0A0A0B` / `#141416` — page background and section fills
 - Tactical Teal `#00F5FF` — primary accent (CTAs, links, active/highlighted states, glow)
-- Alert Orange `#FF8A00` — "the old way" contrast accents only; not used for CTAs
+- Alert Orange `#FF8A00` — "the old way" contrast accents on the landing page; on Auth, doubles as the error-message color (no separate error token was worth adding for one use)
 - Tactical text `#E0E0E0` on dark, with a dimmed variant at `rgba(224,224,224,0.6)`
 
-**Typography:** **JetBrains Mono** throughout — nav, hero, body copy, and section headers — as the page's one consistent voice; not paired with Fredoka/Nunito. Loaded via the same Google Fonts mechanism as the Promotion Center's Roboto Mono.
+**Typography:** **JetBrains Mono** throughout — nav, hero, body copy, section headers, and now the auth form's labels/inputs/buttons — as the funnel's one consistent voice; not paired with Fredoka/Nunito. Loaded via the same Google Fonts mechanism as the Promotion Center's Roboto Mono.
 
 **Shape:** Sharp, technical radii (4–12px) are intentional here, not drift — a deliberate departure from the base system's fat radii to read as a command terminal rather than a toy. Do not "fix" these back to the base radius scale.
 
-These custom properties are declared locally on `TacticalLandingPage.module.css`'s `.page` class — not added to `:root` — so they stay scoped to this route only.
+**Auth's mascot:** `AuthPage.jsx` swaps the base app's purple bear-avatar mascot for `TacticalOrb` (the same component the landing hero and Parent Dashboard already use) — not a new mascot, a reuse of the one already-shared Tactical-persona avatar, appropriate since this route never shows the bear anywhere in its own funnel. The orb's `status` prop carries forward the bear's old "reacts to your password" beat: `listening` while the password field is focused and hidden, `idle` otherwise.
+
+These custom properties are declared locally on each file's own `.page` class — not added to `:root` — so they stay scoped to these two routes only.
 
 ## Shapes
 
