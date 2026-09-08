@@ -226,6 +226,10 @@ export default function TacticalLandingPage() {
             <p className={styles.sectionSub}>The moment you enlist, this is what your child sees first.</p>
           </motion.div>
           <motion.div className={styles.stepCard} {...anim({ initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.6 } })}>
+            <div className={styles.stepCardImage}>
+              <img src="/backdrops/recruit-scan.webp" alt="" aria-hidden="true" loading="lazy" />
+              <div className={styles.stepCardImageOverlay} />
+            </div>
             <span className={styles.previewTag}>PREVIEW</span>
             <pre className={styles.stepCardMono}>{RECRUIT_BRIEF_PREVIEW}</pre>
           </motion.div>
@@ -287,6 +291,10 @@ export default function TacticalLandingPage() {
 
         {/* STEP 04 — PARENT DEBRIEF */}
         <section className={styles.intelSection}>
+          <div className={styles.intelBg} aria-hidden="true">
+            <img src="/backdrops/debrief-tablet.webp" alt="" loading="lazy" />
+            <div className={styles.intelBgOverlay} />
+          </div>
           <motion.div className={styles.intelContent} {...anim({ initial: { opacity: 0, y: 40 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.2 }, transition: { duration: 0.7 } })}>
             <h2 className={styles.intelTitle}>STEP 04 / 05 — PARENT DEBRIEF</h2>
             <p className={styles.intelBody}>Every Sunday at 6:00 PM, a "Mission Debrief" (AAR) arrives via WhatsApp. No more wondering what they're doing.</p>

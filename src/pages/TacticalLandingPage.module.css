@@ -354,6 +354,28 @@
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 2rem;
+  overflow: hidden;
+}
+
+/* Banner image bled to the card edges — same grammar as .missionCardImage
+   in STEP 03, so the walkthrough reads as one consistent visual language. */
+.stepCardImage {
+  position: relative;
+  height: 200px;
+  margin: -2rem -2rem 1.5rem;
+  overflow: hidden;
+}
+
+.stepCardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stepCardImageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--command-black) 85%, transparent) 100%);
 }
 
 .stepCardMono {
@@ -538,13 +560,51 @@
 
 /* ── INTEL SECTION ── */
 .intelSection {
+  position: relative;
   background: var(--command-black-2);
   padding: 5rem 2rem;
   border-top: 1px solid var(--tactical-border);
   border-bottom: 1px solid var(--tactical-border);
+  overflow: hidden;
+}
+
+/* The one authored focal moment on this step: a slow, continuous drift on
+   the debrief photo behind the text — evidence, not decoration, of the
+   report a parent actually receives. Frozen under reduced motion. */
+.intelBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.intelBg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+  animation: intelDrift 18s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intelBg img {
+    animation: none;
+  }
+}
+
+@keyframes intelDrift {
+  from { transform: scale(1) translate(0, 0); }
+  to { transform: scale(1.08) translate(-1%, -1%); }
+}
+
+.intelBgOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--command-black-2) 0%, color-mix(in srgb, var(--command-black-2) 55%, transparent) 45%, var(--command-black-2) 100%);
 }
 
 .intelContent {
+  position: relative;
+  z-index: 1;
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
